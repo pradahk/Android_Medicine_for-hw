@@ -37,14 +37,12 @@ public class SignupActivity extends AppCompatActivity {
     private EditText editTextEmail;
     private EditText editTextPassword;
 
-    //
+    // 작성한 이름 값과 전화번호 값을 저장할 객체 생성
     private EditText editTextName;
     private EditText editTextPhone;
 
     private String email = "";
     private String password = "";
-
-    //
     private String name = "";
     private String phone = "";
 

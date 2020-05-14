@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth;
 
-    // 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
+    // 작성한 이메일 값과 비밀번호 값과 이름 값을 저장할 객체 생성
     private EditText editTextEmail;
     private EditText editTextPassword;
     private EditText editTextName;
@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
-
 
     // 이메일 로그인
     public void signIn(View view) {
