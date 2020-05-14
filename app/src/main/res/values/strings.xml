@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">FirebaseEmail</string>
+    <string name="title">약 쏙</string>
+
+    <string name="email">이메일</string>
+    <string name="password">비밀번호</string>
+    <string name="findpw">비밀번호 찾기</string>
+
+    <string name="success_login">로그인 성공</string>
+    <string name="failed_login">로그인 실패</string>
+
+    <string name="usercheck">아직 계정이 없으신가요?</string>
+    <string name="makeuser">계정 만들기</string>
+    <string name="writeemail">이메일을 입력하세요</string>
+    <string name="sendemail">이메일 발송</string>
+    <string name="emailsending">이메일을 발송하였습니다.</string>
+    <string name="emailfail">이메일 발송에 실패하였습니다.</string>
+
+    <string name="success_signup">회원가입 성공</string>
+    <string name="failed_signup">회원가입 실패</string>
+
+    <string name="signin">로그인</string>
+    <string name="signup">회원가입</string>
+
+
+
+</resources>
