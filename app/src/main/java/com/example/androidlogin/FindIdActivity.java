@@ -36,7 +36,7 @@ public class FindIdActivity extends AppCompatActivity {
 
     // 회원의 이메일을 보여줄 textview 객체 생성
     private TextView textshowid;
-    private  TextView textshowtext;
+    private TextView textshowtext;
 
     // 로그인 화면으로 돌아가기 위한 버튼 객체 생성
     private Button btngotologin;
@@ -103,11 +103,16 @@ public class FindIdActivity extends AppCompatActivity {
                                     textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
                                     textshowid.setText(document.getData().get("email").toString());
                                     btngotologin.setVisibility(View.VISIBLE);
+
                                 }
                                 else{
                                     textshowtext.setText("일치하는 회원정보가 없습니다.");
                                 }
+
+
+
                             }
+
 
                         }
 

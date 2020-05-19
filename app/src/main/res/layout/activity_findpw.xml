@@ -6,7 +6,6 @@
     android:background="@drawable/main_header_selector"
     tools:context=".FindpwActivity">
 
-
     <EditText
         android:id="@+id/write_email"
         android:layout_width="match_parent"

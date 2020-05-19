@@ -15,6 +15,14 @@
         android:inputType="textEmailAddress"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp" />
+    <Button
+        android:id="@+id/check_email"
+        android:onClick="checkEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="360dp"
+        android:layout_alignBottom="@+id/write_email"
+        android:text="인증" />
 
     <EditText
         android:id="@+id/write_name"
@@ -137,4 +145,6 @@
         android:text="@string/signup"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
+
+
 </RelativeLayout>
