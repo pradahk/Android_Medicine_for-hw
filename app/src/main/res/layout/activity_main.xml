@@ -78,40 +78,21 @@
             android:textColor="#FFFFFF" />
     </LinearLayout>
 
-
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_findpw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="400dp"
-            android:layout_weight="1"
-            android:background="#00FFFFFF"
-            android:text="비밀번호 찾기"
-            android:layout_centerHorizontal="true"/>
+            android:orientation="vertical">
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="430dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="30dp"
-            android:text="@string/usercheck" />
-
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="430dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="30dp"
+                android:text="@string/usercheck" />
         <Button
             android:id="@+id/btn_signUp"
             android:layout_width="match_parent"
@@ -124,6 +105,55 @@
             android:textColor="#2A49F3"
             android:textColorHint="#5A7CAA"
             android:layout_centerHorizontal="true"/>
+
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_findid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="400dp"
+            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:background="#00FFFFFF"
+            android:text="이메일 찾기"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/btn_findpw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="400dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:background="#00FFFFFF"
+            android:text="비밀번호 재설정"
+            android:layout_centerHorizontal="true"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="485dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:padding="30dp"
+        android:text="────── 다른 방법으로 로그인 ──────"
+        android:layout_centerHorizontal="true" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/signInButton"
+        android:layout_width="200dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="550dp"
+        android:layout_centerHorizontal="true">
+    </com.google.android.gms.common.SignInButton>
 
 </RelativeLayout>

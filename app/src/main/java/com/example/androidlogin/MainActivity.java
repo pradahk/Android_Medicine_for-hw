@@ -1,7 +1,10 @@
 package com.example.androidlogin;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.auth.User;
 
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
     private String password = "";
     private String name = "";
 
+    // 구글 로그인 객체 생성
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
+    private SignInButton signInButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +82,14 @@ public class MainActivity extends AppCompatActivity {
 
         // 회원가입 버튼 객체 생성
         Button signup_btn = findViewById(R.id.btn_signUp);
-        // 비밀번호 찾기 버튼 객체 생성
+        // 비밀번호 재설정 버튼 객체 생성
         Button findpw_btn = findViewById(R.id.btn_findpw);
+        // 이메일 찾기 버튼 객체 생성
+        Button findid_btn = findViewById(R.id.btn_findid);
+
+        // 구글 로그인 버튼 객체 생성
+        signInButton = findViewById(R.id.signInButton);
+
 
         // 회원가입 버튼 onclicklistener 생성
         signup_btn.setOnClickListener(new View.OnClickListener(){
@@ -84,16 +101,83 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 비밀번호 찾기 버튼 onclicklistener 생성
+        // 비밀번호 재설정 버튼 onclicklistener 생성
         findpw_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 비밀번호 찾기 버튼을 누르면 비밀번호 찾기 레이아웃으로 이동
+                // 비밀번호 재설정 버튼을 누르면 비밀번호 찾기 레이아웃으로 이동
                 Intent intent = new Intent(getApplicationContext(),FindpwActivity.class);
                 startActivity(intent);
             }
         });
 
+        // 이메일 찾기 버튼 onclicklistener 생성
+        findid_btn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                // 이메일 찾기 버튼을 누르면 이메일 찾기 레이아웃으로 이동
+                 Intent intent = new Intent(getApplicationContext(), FindIdActivity.class);
+                 startActivity(intent);
+        }
+        });
+
+        // 구글 로그인
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // 구글 로그인 버튼  onClicklistener 생성
+        signInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                // 클릭시 구글 로그인 메서드 실행
+                signIn();
+            }
+        });
+
+    }
+
+    // 구글 로그인 메서드
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                assert account != null;
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+            }
+        }
+    }
+
+    // 파이어베이스와 구글 로그인 연결
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                        } else {
+                            // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
+                            Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     // 이메일 로그인
@@ -150,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 
 
