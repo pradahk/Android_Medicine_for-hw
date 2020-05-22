@@ -27,6 +27,10 @@
             android:name=".FindIdActivity"
             android:label="FindIdActivity" >
         </activity>
+        <activity
+            android:name=".MenuActivity"
+            android:label="MenuActivity" >
+        </activity>
 
     </application>
 
