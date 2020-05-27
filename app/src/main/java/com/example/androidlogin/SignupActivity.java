@@ -1,15 +1,13 @@
 package com.example.androidlogin;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,7 +28,7 @@ import java.util.regex.Pattern;
 
 import static com.example.androidlogin.FirebaseID.user;
 
-public class SignupActivity extends AppCompatActivity{
+public class SignupActivity extends AppCompatActivity {
 
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
@@ -59,7 +57,7 @@ public class SignupActivity extends AppCompatActivity{
     private String name = "";
     private String phone = "";
 
-    Button authBtn;
+    private AuthemailDialog authemailDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +75,19 @@ public class SignupActivity extends AppCompatActivity{
         // id가 write_phone인 editText에 대한 메서드 저장
         editTextPhone = findViewById(R.id.write_phone);
 
+        // 파라미터에 리스너 등록
+        authemailDialog = new AuthemailDialog(this, positiveListener);
 
     }
+
+    // 이메일 인증 다이얼로그에 확인버튼 클릭시
+    private View.OnClickListener positiveListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            authemailDialog.dismiss();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        }
+    };
 
     // onClick signup
     public void singUp(View view) {
@@ -88,6 +97,7 @@ public class SignupActivity extends AppCompatActivity{
         passwordCheck = editTextPasswordCheck.getText().toString();
         name = editTextName.getText().toString();
         phone = editTextPhone.getText().toString();
+
 
         // 유효성 검사 후 회원가입 실행
         if(isValidEmail() && isValidPasswd() && isValidPasswdcheck() && isValidName() && isValidPhone()) {
@@ -109,7 +119,7 @@ public class SignupActivity extends AppCompatActivity{
                                                         // 회원가입에 성공하면 "회원가입 성공" 토스트를 보여줌
                                                         Toast.makeText(SignupActivity.this, R.string.success_signup, Toast.LENGTH_SHORT).show();
                                                         sendEmailVerification();
-
+                                                        authemailDialog.show();
 
                                                     }
                                                 })
@@ -129,10 +139,6 @@ public class SignupActivity extends AppCompatActivity{
         }
     }
 
-    public void emailAuth(View view){
-        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(intent);
-    }
 
     // 이메일 인증 메서드
     public void sendEmailVerification(){
@@ -150,8 +156,6 @@ public class SignupActivity extends AppCompatActivity{
                     }
                 });
     }
-
-
 
     // 이메일 유효성 검사
     private boolean isValidEmail() {
