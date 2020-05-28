@@ -57,6 +57,7 @@ public class SignupActivity extends AppCompatActivity {
     private String name = "";
     private String phone = "";
 
+    // 이메일 인증 다이얼로그 객체 생성
     private AuthemailDialog authemailDialog;
 
     @Override
@@ -75,12 +76,12 @@ public class SignupActivity extends AppCompatActivity {
         // id가 write_phone인 editText에 대한 메서드 저장
         editTextPhone = findViewById(R.id.write_phone);
 
-        // 파라미터에 리스너 등록
+        // 다이얼로그의 리스너 등록
         authemailDialog = new AuthemailDialog(this, positiveListener);
 
     }
 
-    // 이메일 인증 다이얼로그에 확인버튼 클릭시
+    // 이메일 인증 다이얼로그의 확인버튼 클릭시 다이얼로그 종료 및 로그인 화면으로 이동
     private View.OnClickListener positiveListener = new View.OnClickListener() {
         public void onClick(View v) {
             authemailDialog.dismiss();
@@ -116,11 +117,9 @@ public class SignupActivity extends AppCompatActivity {
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        // 회원가입에 성공하면 "회원가입 성공" 토스트를 보여줌
-                                                        Toast.makeText(SignupActivity.this, R.string.success_signup, Toast.LENGTH_SHORT).show();
+                                                        // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송 후 이메일 인증 다이얼로그 보여줌
                                                         sendEmailVerification();
                                                         authemailDialog.show();
-
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
@@ -132,7 +131,7 @@ public class SignupActivity extends AppCompatActivity {
                                                 });
 
                             } else {
-                                Toast.makeText(SignupActivity.this,"회원가입 양식을 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignupActivity.this,"이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -151,7 +150,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(SignupActivity.this,"이메일 인증 전송", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignupActivity.this,"인증 메일 전송", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

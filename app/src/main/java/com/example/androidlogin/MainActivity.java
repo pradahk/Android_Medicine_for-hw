@@ -172,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
                             // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            startActivity(intent);
                         } else {
                             // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
@@ -227,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            startActivity(intent);
                         }
 
                         else {
