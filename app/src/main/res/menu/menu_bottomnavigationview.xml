@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/infoItem"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:enabled="true"
+        android:title="info" />
+
+
+    <item
+        android:id="@+id/menuItem"
+        android:icon="@drawable/ic_local_hospital_black_24dp"
+        android:title="main"
+        android:enabled="true" />
+
+
+    <item
+        android:id="@+id/alramItem"
+        android:icon="@drawable/ic_alarm_black_24dp"
+        android:enabled="true"
+        android:title="alram" />
+
+</menu>

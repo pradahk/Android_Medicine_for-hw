@@ -106,6 +106,7 @@ public class FindIdActivity extends AppCompatActivity {
                                     // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
                                     else {
                                     textshowtext.setText("일치하는 회원정보가 없습니다.");
+                                    textshowid.setText("");
                                     }
                             }
                         }
