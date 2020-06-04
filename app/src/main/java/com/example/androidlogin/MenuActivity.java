@@ -1,9 +1,12 @@
 package com.example.androidlogin;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -25,6 +28,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth;
 
+
     // 프래그먼트 객체 생성
     private final int FRAGMENT1 = 1;
     private final int FRAGMENT2 = 2;
@@ -33,11 +37,15 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     // 탭 버튼 객체 생성
     private Button bt_tab1, bt_tab2, bt_tab3;
 
+    private Button singout_btn;
+    private Button signin_btn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
 
        // 위젯에 대한 참조
         bt_tab1 = findViewById(R.id.bt_tab1);
@@ -52,9 +60,20 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         // 어느 프레그먼트를 프레임레이아웃에 띄울 것인지를 결정
         callFragment(FRAGMENT1);
 
-
         // 로그아웃 버튼 객체 생성
-        Button singout_btn = findViewById(R.id.signOutbutton);
+        singout_btn = findViewById(R.id.signOutbutton);
+
+        // 로그인 버튼 객체 생성
+        signin_btn = findViewById(R.id.signInbutton);
+
+        signin_btn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         // 로그아웃 버튼 onclicklistener 생성
         singout_btn.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +83,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 show();
             }
         });
+
     }
 
     @Override
@@ -125,7 +145,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // "예" 클릭시 로그아웃
-                        firebaseAuth.signOut();
+                        FirebaseAuth.getInstance().signOut();
                         Toast.makeText(MenuActivity.this,"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -139,6 +159,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 });
         builder.show();
     }
+
+
 }
 
 
