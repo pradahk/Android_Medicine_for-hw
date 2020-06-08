@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -52,8 +53,6 @@ public class InfoDialog extends DialogFragment  {
        // dialog.setCanceledOnTouchOutside(false);
 
         editTextpassword = view.findViewById(R.id.inputpassword);
-
-        btninfo = view.findViewById(R.id.openinfo);
 
         positivebutton = view.findViewById(R.id.positivebutton);
         negativebutton = view.findViewById(R.id.negativebutton);

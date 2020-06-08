@@ -30,4 +30,5 @@ public class FragmentMainMenu extends Fragment {
 
         return view;
     }
+
 }

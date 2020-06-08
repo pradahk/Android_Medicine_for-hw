@@ -3,6 +3,7 @@ package com.example.androidlogin;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -52,10 +53,12 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         bt_tab2 = findViewById(R.id.bt_tab2);
         bt_tab3 = findViewById(R.id.bt_tab3);
 
+
         // 탭 버튼에 대한 리스너 연결
         bt_tab1.setOnClickListener(this);
         bt_tab2.setOnClickListener(this);
         bt_tab3.setOnClickListener(this);
+
 
         // 어느 프레그먼트를 프레임레이아웃에 띄울 것인지를 결정
         callFragment(FRAGMENT1);
@@ -65,6 +68,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         // 로그인 버튼 객체 생성
         signin_btn = findViewById(R.id.signInbutton);
+
 
         signin_btn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -100,6 +104,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.bt_tab3 :
                 callFragment(FRAGMENT3);
                 break;
+
         }
     }
 
