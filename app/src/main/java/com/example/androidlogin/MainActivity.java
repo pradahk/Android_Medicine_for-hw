@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
                             startActivity(intent);
                         }

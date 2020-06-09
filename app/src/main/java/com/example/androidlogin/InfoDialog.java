@@ -2,6 +2,7 @@ package com.example.androidlogin;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,15 +33,16 @@ public class InfoDialog extends DialogFragment  {
 
     // 파이어베이스 인증 객체 생성
     private FirebaseFirestore firebaseFirestore;
-
     private View.OnClickListener positiveListener, negativeListener;
 
-    private EditText editTextpassword;
+    // 입력한 이메일을 저장할 객체
+    private String writeemail = "";
 
-    private String pass = "";
-    private Button btninfo;
+    // 확인 버튼과 취소 버튼 객체 생성
     private Button positivebutton;
     private Button negativebutton;
+
+    private EditText editTextemail;
 
     public InfoDialog() {
     }
@@ -49,37 +52,40 @@ public class InfoDialog extends DialogFragment  {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.info_dialog, container, false);
 
-        //Dialog dialog = getDialog();
-       // dialog.setCanceledOnTouchOutside(false);
-
-        editTextpassword = view.findViewById(R.id.inputpassword);
+        editTextemail = view.findViewById(R.id.inputemail);
 
         positivebutton = view.findViewById(R.id.positivebutton);
         negativebutton = view.findViewById(R.id.negativebutton);
 
+        // 취소 버튼 클릭시 다이얼로그 사라짐
         negativebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 getDialog().dismiss();
             }
         });
 
+        // 확인 버튼 클릭시 이메일 값 비교
         positivebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                pass = editTextpassword.getText().toString();
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                writeemail = editTextemail.getText().toString();
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // 로그인 상태일 경우
                 if (user != null) {
-                    String checkpass = user.getEmail();
-                    if (pass.equals(checkpass)) {
-                        Toast.makeText(getActivity(), "비밀번호 확인 성공", Toast.LENGTH_SHORT).show();
+                    String checkmail = user.getEmail();
+                    // 작성한 이메일과 로그인한 유저의 이메일이 같을 경우
+                    if (writeemail.equals(checkmail)) {
+                        Toast.makeText(getActivity(), "이메일 확인 성공", Toast.LENGTH_SHORT).show();
+                        // 다이얼로그 사라짐
                         getDialog().dismiss();
-
                     }
                     else{
-                        Toast.makeText(getActivity(), "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "이메일 확인 실패", Toast.LENGTH_SHORT).show();
 
                     }
                 }
-            }
+                }
+
+
         });
 
 

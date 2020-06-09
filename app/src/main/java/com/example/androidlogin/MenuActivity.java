@@ -61,7 +61,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
 
         // 어느 프레그먼트를 프레임레이아웃에 띄울 것인지를 결정
-        callFragment(FRAGMENT1);
+        callFragment(FRAGMENT2);
 
         // 로그아웃 버튼 객체 생성
         singout_btn = findViewById(R.id.signOutbutton);

@@ -5,20 +5,11 @@
     android:orientation="vertical"
     >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="30dp"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        android:text="회원정보 페이지"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
+        <TextView
             android:id="@+id/write_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +18,7 @@
             android:layout_marginRight="50dp"
             android:inputType="textEmailAddress" />
 
-        <EditText
+        <TextView
             android:id="@+id/write_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +26,7 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp" />
 
-        <EditText
+        <TextView
             android:id="@+id/write_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,37 +35,14 @@
             android:layout_marginRight="50dp"
             android:inputType="phone" />
 
-        <EditText
+        <TextView
             android:id="@+id/signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_password"
             android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            android:inputType="textPassword" />
+            android:layout_marginRight="50dp" />
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/signup_password"
-            android:layout_centerHorizontal="true">
-
-            <Button
-                android:id="@+id/btn_ok"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="30dp"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_state"
-                android:onClick="singUp"
-                android:text="확인"
-                android:textColor="#ffffff" />
-
-
-        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_email"
@@ -123,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
-            android:text="@string/signup"
+            android:text="회원정보"
             android:textSize="30sp" />
 
 

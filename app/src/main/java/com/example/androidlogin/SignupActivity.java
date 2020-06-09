@@ -79,6 +79,8 @@ public class SignupActivity extends AppCompatActivity {
         // 다이얼로그의 리스너 등록
         authemailDialog = new AuthemailDialog(this, positiveListener);
 
+
+
     }
 
     // 이메일 인증 다이얼로그의 확인버튼 클릭시 다이얼로그 종료 및 로그인 화면으로 이동
