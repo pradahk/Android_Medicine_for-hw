@@ -114,7 +114,7 @@ public class SignupActivity extends AppCompatActivity {
                                         user.put("password", password);
                                         user.put("name", name);
                                         user.put("phone", phone);
-                                        firebaseFirestore.collection("users").document(name)
+                                        firebaseFirestore.collection("users").document(email)
                                                 .set(user)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
