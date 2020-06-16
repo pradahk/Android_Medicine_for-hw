@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -21,14 +22,18 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
 public class MenuActivity extends AppCompatActivity implements View.OnClickListener {
 
     // 파이어베이스 인증 객체 생성
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
+    // 파이어베이스 사용자 객체 생성
+    private FirebaseUser user;
 
     // 프래그먼트 객체 생성
     private final int FRAGMENT1 = 1;
@@ -40,6 +45,11 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button singout_btn;
     private Button signin_btn;
+
+    @Override public void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(firebaseAuthListener);
+    }
 
 
     @Override
@@ -87,6 +97,23 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 show();
             }
         });
+
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                // 로그인한 사용자가 있는 경우
+                if (user != null) {
+                    singout_btn.setVisibility(View.VISIBLE);
+                    signin_btn.setVisibility(View.GONE);
+                }
+                // 로그인한 사용자가 없는 경우
+                else {
+                  singout_btn.setVisibility(View.GONE);
+                  signin_btn.setVisibility(View.VISIBLE);
+                }
+            }
+        };
 
     }
 

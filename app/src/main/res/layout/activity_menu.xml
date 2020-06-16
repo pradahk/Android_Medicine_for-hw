@@ -16,9 +16,9 @@
 
         <Button
             android:id="@+id/signInbutton"
-            android:layout_marginLeft="280dp"
             android:layout_width="70dp"
             android:layout_height="40dp"
+            android:layout_marginLeft="280dp"
             android:background="#00FFFFFF"
             android:text="로그인" />
 

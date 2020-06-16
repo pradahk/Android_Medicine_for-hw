@@ -15,5 +15,6 @@
         android:textStyle="bold"
         android:text="알람 페이지"/>
 
+
 </FrameLayout>
 
