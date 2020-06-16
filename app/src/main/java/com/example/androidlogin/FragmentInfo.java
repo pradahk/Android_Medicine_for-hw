@@ -49,7 +49,7 @@ public class FragmentInfo extends Fragment {
     private ModifyPhoneDialog modifyPhoneDialog;
 
     // 이름 수정을 위한 modifyNameDialog 객체 생성
-
+    private ModifyNameDialog modifyNameDialog;
 
     // 작성한 이메일을 저장할 객체
     private String email = "";
@@ -61,10 +61,8 @@ public class FragmentInfo extends Fragment {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
-
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-
 
     // 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
     private TextView editTextEmail;
@@ -74,17 +72,19 @@ public class FragmentInfo extends Fragment {
     private TextView editTextName;
     private TextView editTextPhone;
 
+    // 수정 및 새로고침 버튼 객체 생성
     private ImageButton btn_modifypw;
     private ImageButton btn_modifypn;
     private ImageButton btn_modifyname;
     private ImageButton btn_refresh;
 
+    // 새로고침 버튼 클릭시 이메일 입력 다이얼로그가 재생성되는 것을 방지하기 위하여 count라는 변수 생성하여 0을 기본값으로 설정함
     private int count=0;
 
     public FragmentInfo() {
     }
 
-
+    // 파이어베이스 인증을 onStart에 넣어줌
     @Override public void onStart() {
         super.onStart();
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
@@ -99,10 +99,12 @@ public class FragmentInfo extends Fragment {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
+                    // 기본값인 count=0일 경우 이메일 입력 다이얼로그를 보여주고 count값을 1로 바꿔줌
                     if(count==0){
                         showDialog();
                         count =1;
                     }
+                    // count값이 1인 경우 이메일 입력 다이얼로그를 생략하고 info 메서드를 실행
                     if(count==1){
                         info();
                     }
@@ -116,7 +118,6 @@ public class FragmentInfo extends Fragment {
         };
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -132,7 +133,6 @@ public class FragmentInfo extends Fragment {
         // id가 write_phone인 editText에 대한 메서드 저장
         editTextPhone = view.findViewById(R.id.write_phone);
 
-
         // id가 modifybutton인 버튼에 대한 메서드 저장
         btn_modifypw = view.findViewById(R.id.modifybutton);
         btn_modifypn = view.findViewById(R.id.modifybutton2);
@@ -141,13 +141,14 @@ public class FragmentInfo extends Fragment {
         // id가 refreshButton인 버튼에 대한 메서드 저장
         btn_refresh = view.findViewById(R.id.refreshButton);
 
+        // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
         editTextEmail.setText("");
         editTextName.setText("");
         editTextPhone.setText("");
         editTextPassword.setText("");
 
-
-        // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
+        // 수정 이미지 버튼과 새로고침 버튼을 GONE하여 버튼과 그 공간까지 보이지 않게 처리
+        // 이메일 일치여부가 성공하여 수정할 수 있는 조건이 되면 VIDIBLE하여 보여줄 예정
         btn_modifypw.setVisibility(View.GONE);
         btn_modifypn.setVisibility(View.GONE);
         btn_modifyname.setVisibility(View.GONE);
@@ -186,9 +187,9 @@ public class FragmentInfo extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                // modifyPhoneDialog 호출
+                // modifyNameDialog 호출
                 ModifyNameDialog modifyNameDialog = new ModifyNameDialog();
-                // modifyPhoneDialog 스타일 설정
+                // modifyNameDialog 스타일 설정
                 modifyNameDialog.setStyle(DialogFragment.STYLE_NO_TITLE,android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
                 modifyNameDialog.show(requireActivity().getSupportFragmentManager(), "tag");
 
@@ -225,11 +226,11 @@ public class FragmentInfo extends Fragment {
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
                         editTextEmail.setText("");
                         editTextName.setText("");
                         editTextPhone.setText("");
                         editTextPassword.setText("");
-
                         // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
                         btn_modifypw.setVisibility(View.GONE);
                         btn_modifypn.setVisibility(View.GONE);
@@ -256,11 +257,11 @@ public class FragmentInfo extends Fragment {
                         }
                         // 다를 때
                         else{
+                            // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
                             editTextEmail.setText("");
                             editTextName.setText("");
                             editTextPhone.setText("");
                             editTextPassword.setText("");
-
                             // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
                             btn_modifypw.setVisibility(View.GONE);
                             btn_modifypn.setVisibility(View.GONE);
@@ -285,7 +286,7 @@ public class FragmentInfo extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때때
+                        // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때
                        if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult())
                             {
@@ -296,7 +297,7 @@ public class FragmentInfo extends Fragment {
                                     editTextName.setText(document.getData().get("name").toString());
                                     editTextPhone.setText(document.getData().get("phone").toString());
                                     editTextPassword.setText(document.getData().get("password").toString());
-                                   // 수정버튼 VISIBLE 처리하여 보여줌
+                                   // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
                                     btn_modifypw.setVisibility(View.VISIBLE);
                                     btn_modifypn.setVisibility(View.VISIBLE);
                                     btn_modifyname.setVisibility(View.VISIBLE);

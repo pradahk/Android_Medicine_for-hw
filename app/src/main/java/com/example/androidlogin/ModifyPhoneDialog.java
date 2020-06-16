@@ -34,17 +34,21 @@ public class ModifyPhoneDialog extends DialogFragment {
     private static final String TAG = "hi";
     private Fragment fragment;
 
+    // 파이어스토어에 저장된 "phone"이라는 이름의 값을 pass_key라는 문자에 저장
     private static final String pass_key = "phone";
 
     private FirebaseUser user;
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
+    // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
     private Button positivebutton;
     private Button negativebutton;
 
+    // 다이얼로그에 입력하는 phone 객체 생성
     private EditText phone;
 
+    // 새롭게 저장할 phone 값 객체 생성
     String newPhone ="";
 
     public ModifyPhoneDialog(){
@@ -55,30 +59,37 @@ public class ModifyPhoneDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modify2_dialog, container, false);
 
+        // 레이아웃에 postivebutton이라는 버튼 값과 negative이라는 버튼 값 저장
         positivebutton = view.findViewById(R.id.positivebutton);
         negativebutton = view.findViewById(R.id.negativebutton);
 
+        // 다이얼로그에 작성하는 phone값 저장
         phone = view.findViewById(R.id.write_phone);
 
-
-        // 취소 버튼 클릭시 다이얼로그 사라짐
+        // 취소 버튼 클릭시
         negativebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // 다이얼로그 사라짐
                 getDialog().dismiss();
             }
         });
 
+        // 확인 버튼 클릭시
         positivebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 // 로그인 상태일 경우
                 if(user != null){
+                    // 다이얼로그에 작성한 phone값을 string으로 처리하여 새로운 phone값인 newPhone에 저장
                     newPhone = phone.getText().toString();
+                    // 파이어스토어 collection 경로를 "uesrs"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
                     DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
+                    // 새로운 phone값으로 업데이트
                     contact.update(pass_key, newPhone)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    // 업데이트 성공시 다이얼로그 사라짐
                                     getDialog().dismiss();
                                 }
                             });

@@ -109,6 +109,7 @@ public class SignupActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                // 파이어스토에 입력한 email, password, name, phone 값을 저장
                                         Map<String, Object> user = new HashMap<>();
                                         user.put("email", email);
                                         user.put("password", password);
