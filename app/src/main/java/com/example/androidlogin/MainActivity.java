@@ -1,5 +1,6 @@
 package com.example.androidlogin;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -65,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private SignInButton signInButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

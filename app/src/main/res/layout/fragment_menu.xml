@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="메뉴 페이지"
+        android:text="@string/title"
         android:textColor="#000000"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="98dp"
         android:layout_marginTop="320dp"
-        android:text="리뷰 게시판"
+        android:text="@string/review"
         android:textSize="15sp" />
     <TextView
         android:id="@+id/textView4"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="270dp"
         android:layout_marginTop="320dp"
-        android:text="약국 찾기"
+        android:text="@string/drugmap"
         android:textSize="15sp" />
 
 

@@ -29,10 +29,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ModifyDialog extends DialogFragment {
     private static final String TAG = "hi";
     private Fragment fragment;
+
+    // 비밀번호 정규식
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
 
     private static final String pass_key = "password";
 
@@ -72,31 +76,30 @@ public class ModifyDialog extends DialogFragment {
             public void onClick(View v) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
               // 로그인 상태일 경우
-                if(user != null){
-                 newPassword = password.getText().toString();
-                    user.updatePassword(newPassword)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
-                                        ref
-                                                .update("password", newPassword)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        getDialog().dismiss();
+                if(user != null) {
+                    newPassword = password.getText().toString();
+                    if (isValidPasswd()) {
+                        user.updatePassword(newPassword)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
+                                            ref
+                                                    .update("password", newPassword)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            getDialog().dismiss();
+
+                                                        }
+                                                    });
 
 
-                                                    }
-                                                });
-
-
-
-
+                                        }
                                     }
-                                }
-                            });
+                                });
+                    }
                 }
             }
 
@@ -106,6 +109,20 @@ public class ModifyDialog extends DialogFragment {
 
     }
 
+    // 비밀번호 유효성 검사
+    private boolean isValidPasswd() {
+        if (newPassword.isEmpty()) {
+            // 비밀번호 칸이 공백이면 false
+            Toast.makeText(getActivity(),"변경할 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            // 비밀번호 형식이 불일치하면 false
+            Toast.makeText(getActivity(), "비밀번호 형식이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }
 

@@ -97,7 +97,7 @@ public class FindIdActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for(QueryDocumentSnapshot document : task.getResult()) {
                                 // doument의 id와 입력한 이름이 같고 저장된 휴대폰번호와 입력한 휴대폰 번호가 같으면 입력한 이름의 저장된 이메일을 보여줌
-                                    if (sendname.equals(document.getId()) && sendphone.equals(document.getData().get("phone"))) {
+                                    if (sendname.equals(document.getData().get("name")) && sendphone.equals(document.getData().get("phone"))) {
                                         textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
                                         textshowid.setText(document.getData().get("email").toString());
                                         btngotologin.setVisibility(View.VISIBLE);

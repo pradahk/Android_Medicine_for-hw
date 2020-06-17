@@ -27,7 +27,7 @@
         android:layout_marginLeft="50dp"
         android:layout_marginTop="200dp"
         android:layout_marginRight="50dp"
-        android:text="이메일을 입력하세요"
+        android:text="@string/writeemail"
         android:textColor="#FFFFFF" />
 
     <TextView
@@ -67,7 +67,7 @@
             android:layout_marginLeft="45dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="45dp"
-            android:text="발송된 메일을 통해 비밀번호를 재설정하실 수 있습니다."
+            android:text="@string/authemailpw"
             android:textColor="#FFFFFF" />
     </LinearLayout>
 

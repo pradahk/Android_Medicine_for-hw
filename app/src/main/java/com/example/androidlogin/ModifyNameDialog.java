@@ -72,16 +72,18 @@ public class ModifyNameDialog extends DialogFragment {
             public void onClick(View v) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 // 로그인 상태일 경우
-                if(user != null){
+                if(user != null) {
                     newName = name.getText().toString();
-                    DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
-                    contact.update(pass_key, newName)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    getDialog().dismiss();
-                                }
-                            });
+                    if (isValidName()) {
+                        DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
+                        contact.update(pass_key, newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        getDialog().dismiss();
+                                    }
+                                });
+                    }
                 }
             }
 
@@ -91,6 +93,16 @@ public class ModifyNameDialog extends DialogFragment {
 
     }
 
+    // 이름 유효성 검사
+    private boolean isValidName() {
+        if (newName.isEmpty()) {
+            // 이름 칸이 공백이면 false
+            Toast.makeText(getActivity(), "변경할 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }
 

@@ -2,12 +2,14 @@ package com.example.androidlogin;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,6 +36,8 @@ public class SignupActivity extends AppCompatActivity {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
     // 이메일 정규식
     public static final Pattern EMAIL_ADDRESS = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    // 전화번호 정규식
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", Pattern.CASE_INSENSITIVE);
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
@@ -60,6 +64,7 @@ public class SignupActivity extends AppCompatActivity {
     // 이메일 인증 다이얼로그 객체 생성
     private AuthemailDialog authemailDialog;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +83,6 @@ public class SignupActivity extends AppCompatActivity {
 
         // 다이얼로그의 리스너 등록
         authemailDialog = new AuthemailDialog(this, positiveListener);
-
 
 
     }
@@ -101,41 +105,42 @@ public class SignupActivity extends AppCompatActivity {
         name = editTextName.getText().toString();
         phone = editTextPhone.getText().toString();
 
-
         // 유효성 검사 후 회원가입 실행
-        if(isValidEmail() && isValidPasswd() && isValidPasswdcheck() && isValidName() && isValidPhone()) {
+        if (isValidEmail() && isValidPasswd() && isValidPasswdcheck() && isValidName() && isValidPhone()) {
             firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // 파이어스토에 입력한 email, password, name, phone 값을 저장
-                                        Map<String, Object> user = new HashMap<>();
-                                        user.put("email", email);
-                                        user.put("password", password);
-                                        user.put("name", name);
-                                        user.put("phone", phone);
-                                        firebaseFirestore.collection("users").document(email)
-                                                .set(user)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송 후 이메일 인증 다이얼로그 보여줌
-                                                        sendEmailVerification();
-                                                        authemailDialog.show();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        // 회원가입에 실패하면 "회원가입 실패" 토스트를 보여줌
-                                                        Toast.makeText(SignupActivity.this, R.string.failed_signup, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", email);
+                                user.put("password", password);
+                                user.put("name", name);
+                                user.put("phone", phone);
+                                firebaseFirestore.collection("users").document(email)
+                                        .set(user)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송 후 이메일 인증 다이얼로그 보여줌
+                                                sendEmailVerification();
+                                                authemailDialog.show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                // 회원가입에 실패하면 "회원가입 실패" 토스트를 보여줌
+                                                Toast.makeText(SignupActivity.this, R.string.failed_signup, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
 
                             } else {
-                                Toast.makeText(SignupActivity.this,"이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignupActivity.this, "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
                             }
+
+
                         }
                     });
         }
@@ -143,7 +148,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
     // 이메일 인증 메서드
-    public void sendEmailVerification(){
+    public void sendEmailVerification() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
 
@@ -152,8 +157,8 @@ public class SignupActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(SignupActivity.this,"인증 메일 전송", Toast.LENGTH_SHORT).show();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(SignupActivity.this, "인증 메일 전송", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -163,7 +168,7 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidEmail() {
         if (email.isEmpty()) {
             // 이메일 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this,"이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!EMAIL_ADDRESS.matcher(email).matches()) {
             // 이메일 형식이 불일치하면 false
@@ -174,11 +179,12 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
+
     // 비밀번호 유효성 검사
     private boolean isValidPasswd() {
         if (password.isEmpty()) {
             // 비밀번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this,"비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
             // 비밀번호 형식이 불일치하면 false
@@ -193,7 +199,7 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidPasswdcheck() {
         if (passwordCheck.isEmpty()) {
             // 비밀번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this,"비밀번호 확인칸을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "비밀번호 확인칸을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!password.equals(passwordCheck)) {
             // 비밀번호와 비밀번호 확인에 입력한 값이 불일치하면 false
@@ -208,7 +214,7 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidName() {
         if (name.isEmpty()) {
             // 이름 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this,"이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
@@ -219,15 +225,21 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidPhone() {
         if (phone.isEmpty()) {
             // 전화번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this,"전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PHONE_PATTERN.matcher(phone).matches()) {
+            Toast.makeText(SignupActivity.this, "전화번호 형식이 올바르지 않습니다. '-'없이 숫자만 작성해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
         }
     }
 
-
-
 }
+
+
+
+
+
 
 

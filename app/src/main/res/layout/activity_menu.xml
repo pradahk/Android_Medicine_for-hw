@@ -24,14 +24,14 @@
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:background="#00FFFFFF"
-            android:text="로그인" />
+            android:text="@string/signin" />
 
             <Button
                 android:id="@+id/signOutbutton"
                 android:layout_width="70dp"
                 android:layout_height="40dp"
                 android:background="#00FFFFFF"
-                android:text="로그아웃" />
+                android:text="@string/signout" />
         </LinearLayout>
     </FrameLayout>
 

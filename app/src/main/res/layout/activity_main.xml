@@ -122,7 +122,7 @@
             android:layout_marginLeft="30dp"
             android:layout_weight="1"
             android:background="#00FFFFFF"
-            android:text="이메일 찾기"
+            android:text="@string/findemail"
             android:layout_centerHorizontal="true"/>
 
         <Button
@@ -133,7 +133,7 @@
             android:layout_marginRight="30dp"
             android:layout_weight="1"
             android:background="#00FFFFFF"
-            android:text="비밀번호 재설정"
+            android:text="@string/findpw"
             android:layout_centerHorizontal="true"/>
 
     </LinearLayout>
@@ -146,7 +146,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:padding="30dp"
-        android:text="────── 다른 방법으로 로그인 ──────"
+        android:text="@string/dlogin"
         android:layout_centerHorizontal="true" />
 
     <com.google.android.gms.common.SignInButton
