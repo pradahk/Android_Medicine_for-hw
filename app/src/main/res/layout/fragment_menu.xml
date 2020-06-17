@@ -14,8 +14,8 @@
         android:textStyle="bold" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <ImageButton
                 android:id="@+id/reviewButton"
@@ -28,6 +28,30 @@
 
         <ImageButton
             android:id="@+id/mapButton"
+            android:layout_width="64dp"
+            android:layout_height="67dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="250dp"
+            android:background="@drawable/mainbutton_state"
+            android:src="@drawable/ic_add_location_black_24dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/ImageButton"
+            android:layout_width="64dp"
+            android:layout_height="67dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="400dp"
+            android:background="@drawable/mainbutton_state"
+            android:src="@drawable/ic_view_list_black_24dp" />
+
+        <ImageButton
+            android:id="@+id/Button"
             android:layout_width="64dp"
             android:layout_height="67dp"
             android:layout_marginLeft="100dp"

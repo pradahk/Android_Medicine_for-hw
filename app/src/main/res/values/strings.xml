@@ -50,6 +50,17 @@
 
     <string name="alram">알람</string>
 
+    <string name="detailText">상세정보</string>
+    <string name="textview3String">- 약 이름</string>
+    <string name="textViewString">helloworld</string>
+    <string name="textViewstr">helloworld</string>
+    <string name="editSearchStr">검색어를 입력하세요.</string>
+    <string name="buttonStr">검색</string>
+    <string name="nameText">품목명 :</string>
+    <string name="companyText">업소명:</string>
+    <string name="classNameText">분류명:</string>
+    <string name="ectOtcText">전문/일반 구분:</string>
+
 
 
 </resources>

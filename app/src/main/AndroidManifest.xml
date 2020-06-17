@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.androidlogin" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.androidlogin">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,6 +11,8 @@
         android:label="Android Login"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="m"
         android:theme="@style/AppTheme" >
         <activity android:name=".MainActivity" >
 
@@ -25,6 +28,12 @@
         <activity
             android:name=".FindIdActivity"
             android:label="FindIdActivity" >
+        </activity>
+        <activity
+            android:name=".NameMainActivity">
+        </activity>
+        <activity
+            android:name=".NameLookupActivity">
         </activity>
         <activity
             android:name=".MenuActivity"
