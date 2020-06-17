@@ -18,20 +18,20 @@
             android:id="@+id/edit"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:hint="동 이름으로 검색하세요" />
+            android:hint="@string/searchvillage" />
 
         <Button
             android:id="@+id/serach_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="mOnClick"
-            android:text="검색"
+            android:text="@string/buttonStr"
             android:textSize="12sp" />
         <Button
             android:id="@+id/pharm_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="근처 약국 찾기"
+            android:text="@string/searchneardrug"
             android:textSize="12sp"/>
     </LinearLayout>
     <!--지도 레이아웃 -->
@@ -68,7 +68,7 @@
                 android:id="@+id/handle"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="검색 결과를 보려면 위로 슬라이딩 하세요!" />
+                android:text="@string/slidingup" />
 
             <!--스크롤뷰 레이아웃 -->
             <LinearLayout

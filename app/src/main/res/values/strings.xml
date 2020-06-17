@@ -63,6 +63,10 @@
     <string name="classNameText">분류명:</string>
     <string name="ectOtcText">전문/일반 구분:</string>
 
+    <string name="searchvillage">동 이름으로 검색하세요.</string>
+    <string name="searchneardrug">내 주변 약국 찾기</string>
+    <string name="slidingup">검색 결과를 보려면 위로 슬라이딩 하세요!</string>
+
 
 
 </resources>
