@@ -67,9 +67,9 @@ public class FindpwActivity extends AppCompatActivity {
         }
     }
 
-    // 비밀번호 찾기 메서드
+    // 비밀번호를 찾기 위한 findpw 메서드
     private void findpw(String sendemail) {
-        // setMessgae에 작성한 Dialog를 보여줌
+        // 프로그래스 다이얼로그 생성하여 보여줌
         progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
         progressDialog.show();
             //비밀번호 재설정 이메일 보내기
@@ -87,7 +87,7 @@ public class FindpwActivity extends AppCompatActivity {
                                         // 이메일이 정상적으로 전송되지 않았다면 "이메일 발송에 실패하였습니다." 토스트를 보여줌
                                         Toast.makeText(FindpwActivity.this, R.string.emailfail, Toast.LENGTH_LONG).show();
                                     }
-                                    // Dialog 사라짐
+                                    // 프로그래스 다이얼로그 사라짐
                                     progressDialog.dismiss();
                                 }
                             });

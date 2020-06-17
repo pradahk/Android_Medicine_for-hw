@@ -86,20 +86,25 @@ public class FindIdActivity extends AppCompatActivity {
 
     // 아이디 찾기 메서드
     private void findid(final String sendname, final String sendphone) {
+        // 프로그레스 디이얼로그 생성하여 보여줌
         progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
         progressDialog.show();
+        // 파이어스토어 가져옴
         firebaseFirestore = FirebaseFirestore.getInstance();
+        // 파이어스토어의 collection 경로를 "users"로 생성
         firebaseFirestore.collection("users")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // 파이어스토어의 "users"에서 정보를 가져오는 것이 성공하면
                         if (task.isSuccessful()) {
                             for(QueryDocumentSnapshot document : task.getResult()) {
                                 // doument의 id와 입력한 이름이 같고 저장된 휴대폰번호와 입력한 휴대폰 번호가 같으면 입력한 이름의 저장된 이메일을 보여줌
                                     if (sendname.equals(document.getData().get("name")) && sendphone.equals(document.getData().get("phone"))) {
                                         textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
                                         textshowid.setText(document.getData().get("email").toString());
+                                        // 로그인 화면으로 가는 버튼을 VISIBLE 처리하여 보여줌
                                         btngotologin.setVisibility(View.VISIBLE);
                                         break;
                                     }
@@ -110,7 +115,7 @@ public class FindIdActivity extends AppCompatActivity {
                                     }
                             }
                         }
-                        // Dialog 사라짐
+                        // 프로그래스 다이얼로그 사라짐
                         progressDialog.dismiss();
                     }
                 });

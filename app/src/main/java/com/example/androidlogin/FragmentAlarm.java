@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 public class FragmentAlarm extends Fragment {
 
    public FragmentAlarm(){
-
    }
 
     @Override
@@ -22,7 +21,6 @@ public class FragmentAlarm extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_alarm,container,false);
 
         return view;

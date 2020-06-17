@@ -55,6 +55,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText editTextName;
     private EditText editTextPhone;
 
+    // 회원정보에 저장할 값 객체 생성
     private String email = "";
     private String password = "";
     private String passwordCheck = "";
@@ -87,10 +88,12 @@ public class SignupActivity extends AppCompatActivity {
 
     }
 
-    // 이메일 인증 다이얼로그의 확인버튼 클릭시 다이얼로그 종료 및 로그인 화면으로 이동
+    // 이메일 인증 다이얼로그의 확인버튼 클릭시
     private View.OnClickListener positiveListener = new View.OnClickListener() {
         public void onClick(View v) {
+            // 다이얼로그 종료
             authemailDialog.dismiss();
+            // 로그인 화면으로 이동
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         }
@@ -112,7 +115,7 @@ public class SignupActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                // 파이어스토에 입력한 email, password, name, phone 값을 저장
+                                // 입력한 email, password, name, phone 값을 파이어스토어에 저장
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("email", email);
                                 user.put("password", password);
@@ -123,8 +126,9 @@ public class SignupActivity extends AppCompatActivity {
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송 후 이메일 인증 다이얼로그 보여줌
+                                                // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송
                                                 sendEmailVerification();
+                                                //  이메일 인증 다이얼로그 보여줌
                                                 authemailDialog.show();
                                             }
                                         })
@@ -149,9 +153,11 @@ public class SignupActivity extends AppCompatActivity {
 
     // 이메일 인증 메서드
     public void sendEmailVerification() {
+        // 파이어베이스 인승 객체 가져옴
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        // 현재 사용자 가져옴
         FirebaseUser user = auth.getCurrentUser();
-
+        // 사용자가 있을 때
         assert user != null;
         user.sendEmailVerification()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

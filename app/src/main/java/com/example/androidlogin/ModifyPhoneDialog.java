@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ModifyPhoneDialog extends DialogFragment {
-    private static final String TAG = "hi";
     private Fragment fragment;
 
     // 파이어스토어에 저장된 "phone"이라는 이름의 값을 pass_key라는 문자에 저장
@@ -63,7 +62,7 @@ public class ModifyPhoneDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modify2_dialog, container, false);
 
-        // 레이아웃에 postivebutton이라는 버튼 값과 negative이라는 버튼 값 저장
+        // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
         positivebutton = view.findViewById(R.id.positivebutton);
         negativebutton = view.findViewById(R.id.negativebutton);
 
@@ -81,11 +80,13 @@ public class ModifyPhoneDialog extends DialogFragment {
         // 확인 버튼 클릭시
         positivebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // 로그인 중인 사용자 가져오기
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 // 로그인 상태일 경우
                 if(user != null) {
                     // 다이얼로그에 작성한 phone값을 string으로 처리하여 새로운 phone값인 newPhone에 저장
                     newPhone = phone.getText().toString();
+                    // 전화번호 유효성 검사
                     if (isValidPhone()) {
                         // 파이어스토어 collection 경로를 "uesrs"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
                         DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
@@ -114,6 +115,7 @@ public class ModifyPhoneDialog extends DialogFragment {
             Toast.makeText(getActivity(), "변경할 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!PHONE_PATTERN.matcher(newPhone).matches()) {
+            // 전화번호 형식이 불일치하면 false
             Toast.makeText(getActivity(), "전화번호 형식이 올바르지 않습니다. '-'없이 숫자만 작성해주세요.", Toast.LENGTH_SHORT).show();
             return false;
         } else {

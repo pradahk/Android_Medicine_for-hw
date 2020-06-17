@@ -11,10 +11,12 @@ import androidx.annotation.NonNull;
 
 public class AuthemailDialog extends Dialog {
 
+    // 확인 버튼 생성
     private Button positivebutton;
+    // 확인 버튼의 onClickListner 생성
     private View.OnClickListener positiveListener;
 
-    // 생성자 생성
+    // 이메일 인증 다이얼로그
     public AuthemailDialog(@NonNull Context context, View.OnClickListener positiveListener) {
         super(context);
         this.positiveListener = positiveListener;
@@ -31,7 +33,7 @@ public class AuthemailDialog extends Dialog {
         getWindow().setAttributes(layoutParams);
         setContentView(R.layout.authemail_dialog);
 
-        // 버튼
+        // 확인 버튼
         positivebutton = findViewById(R.id.positivebutton);
         // 클릭 리스너
         positivebutton.setOnClickListener(positiveListener);

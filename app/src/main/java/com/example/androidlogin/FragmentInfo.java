@@ -108,7 +108,6 @@ public class FragmentInfo extends Fragment {
                     if(count==1){
                         info();
                     }
-
                 }
                 // 로그인한 사용자가 없는 경우
                 else {
@@ -116,7 +115,6 @@ public class FragmentInfo extends Fragment {
                 }
             }
         };
-
     }
 
     @Override
@@ -161,10 +159,7 @@ public class FragmentInfo extends Fragment {
             public void onClick(View v) {
                 // modifyDialog 호출
                 ModifyDialog modifyDialog = new ModifyDialog();
-                // modifyDialog 스타일 설정
-                modifyDialog.setStyle(DialogFragment.STYLE_NO_TITLE,android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
                 modifyDialog.show(requireActivity().getSupportFragmentManager(), "tag");
-
             }
         });
 
@@ -175,10 +170,7 @@ public class FragmentInfo extends Fragment {
             public void onClick(View v) {
                 // modifyPhoneDialog 호출
                 ModifyPhoneDialog modifyPhoneDialog = new ModifyPhoneDialog();
-                // modifyPhoneDialog 스타일 설정
-                modifyPhoneDialog.setStyle(DialogFragment.STYLE_NO_TITLE,android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
                 modifyPhoneDialog.show(requireActivity().getSupportFragmentManager(), "tag");
-
             }
         });
 
@@ -189,10 +181,7 @@ public class FragmentInfo extends Fragment {
             public void onClick(View v) {
                 // modifyNameDialog 호출
                 ModifyNameDialog modifyNameDialog = new ModifyNameDialog();
-                // modifyNameDialog 스타일 설정
-                modifyNameDialog.setStyle(DialogFragment.STYLE_NO_TITLE,android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
                 modifyNameDialog.show(requireActivity().getSupportFragmentManager(), "tag");
-
             }
         });
 

@@ -147,12 +147,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        // GoogleSignInApi.getSignInIntent로 부터 결과 반환;
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
+                // 구글 로그인이 성공하면, 파이어베이스에 로그인 인증 등록
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 assert account != null;
                 firebaseAuthWithGoogle(account);
@@ -233,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
                             startActivity(intent);
                         }
-
                         else {
                             // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();

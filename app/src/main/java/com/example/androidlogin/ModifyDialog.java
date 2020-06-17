@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,23 +33,23 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ModifyDialog extends DialogFragment {
-    private static final String TAG = "hi";
     private Fragment fragment;
 
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
 
-    private static final String pass_key = "password";
-
     private FirebaseUser user;
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
+    // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
     private Button positivebutton;
     private Button negativebutton;
 
+    // 다이얼로그에 입력하는 password 객체 생성
     private EditText password;
 
+    // 새롭게 저장할 password 값 객체 생성
     String newPassword ="";
 
     public ModifyDialog(){
@@ -60,42 +61,50 @@ public class ModifyDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modify_dialog, container, false);
 
+        // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
         positivebutton = view.findViewById(R.id.positivebutton);
         negativebutton = view.findViewById(R.id.negativebutton);
 
+        // 다이얼로그에 작성하는 password값 저장
         password = view.findViewById(R.id.signup_password);
 
-        // 취소 버튼 클릭시 다이얼로그 사라짐
+        // 취소 버튼 클릭시
         negativebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // 다이얼로그 사라짐
                 getDialog().dismiss();
             }
         });
 
+        //확인 버튼 클릭시
         positivebutton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // 로그인 중인 사용자 가져오기
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
               // 로그인 상태일 경우
                 if(user != null) {
+                    // 다이얼로그에 작성한 password값을 string으로 처리하여 새로운 password값인 newPassword에 저장
                     newPassword = password.getText().toString();
                     if (isValidPasswd()) {
+                        // 로그인 중인 사용자의 password를 newPassword로 업데이트
                         user.updatePassword(newPassword)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
+                                            // 업데이트에 성공하면 파이어스토어에 저장된 password도 업데이트
+                                            // 파이어스토어 collection의 경로를 "users"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
                                             DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
-                                            ref
-                                                    .update("password", newPassword)
+                                           // 새로운 password값으로 업데이트
+                                            ref.update("password", newPassword)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
+                                                            // 업데이트 성공시 다이얼로그 사라짐
                                                             getDialog().dismiss();
 
                                                         }
                                                     });
-
-
                                         }
                                     }
                                 });
