@@ -1,21 +1,14 @@
 package com.example.androidlogin;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -23,30 +16,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-
     // 비밀번호 정규식
     Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
 
@@ -229,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                             // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
                             FirebaseUser user = firebaseAuth.getCurrentUser();
+                            // MenuActivity로 화면 전환
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
                             startActivity(intent);
                         }
@@ -239,8 +220,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
-
 
 }
