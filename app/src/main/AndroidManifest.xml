@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.androidlogin">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,9 +15,16 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         tools:targetApi="m"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".MainActivity" >
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup,android:label">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDd9ZoPqAJSM9VH0Sbun-MKeS2JMl--wBs"/>
+
+
+        <activity
+            android:name=".MainActivity" >
         </activity>
         <activity
             android:name=".SignupActivity"
@@ -34,6 +43,9 @@
         </activity>
         <activity
             android:name=".NameLookupActivity">
+        </activity>
+        <activity
+            android:name=".MapMainActivity">
         </activity>
         <activity
             android:name=".MenuActivity"

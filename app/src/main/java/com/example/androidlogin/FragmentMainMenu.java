@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 public class FragmentMainMenu extends Fragment {
 
     private ImageButton btn_image;
+    private ImageButton btn_map;
 
     public FragmentMainMenu(){
 
@@ -31,11 +32,20 @@ public class FragmentMainMenu extends Fragment {
         View view = inflater.inflate(R.layout.fragment_menu,container,false);
 
         btn_image = view.findViewById(R.id.ImageButton);
+        btn_map = view.findViewById(R.id.mapButton);
 
         btn_image.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(getActivity(),NameMainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btn_map.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(getActivity(),MapMainActivity.class);
                 startActivity(intent);
             }
         });
