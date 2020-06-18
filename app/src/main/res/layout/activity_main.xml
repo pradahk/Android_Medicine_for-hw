@@ -7,6 +7,15 @@
     android:background="@drawable/main_header_selector"
     tools:context=".MainActivity">
 
+    <ImageButton
+        android:id="@+id/gohome"
+        android:layout_width="40dp"
+        android:layout_height="42dp"
+        android:layout_marginLeft="380dp"
+        android:background="#00ffffff"
+        android:src="@drawable/ic_home_black_24dp">
+    </ImageButton>
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -151,10 +160,10 @@
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/signInButton"
-        android:layout_width="200dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="550dp"
-        android:layout_centerHorizontal="true">
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="550dp">
     </com.google.android.gms.common.SignInButton>
 
 

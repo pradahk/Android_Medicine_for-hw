@@ -67,6 +67,16 @@
     <string name="searchneardrug">내 주변 약국 찾기</string>
     <string name="slidingup">검색 결과를 보려면 위로 슬라이딩 하세요!</string>
 
+    <string name="titleEditTextString">제목</string>
+    <string name="contentEditTextString">내용</string>
+    <string name="itemPostTitle">타이틀</string>
+    <string name="contentsTextViewString">TextView</string>
+    <string name="dateString">2020-05-11</string>
+    <string name="titleText">게시글    작성</string>
+    <string name="stringtitle">REVIEW</string>
+
+    <string name="deletString">삭제</string>
+
 
 
 </resources>

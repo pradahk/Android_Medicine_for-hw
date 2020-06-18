@@ -43,7 +43,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

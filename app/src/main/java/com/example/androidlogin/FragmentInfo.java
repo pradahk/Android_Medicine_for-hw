@@ -37,15 +37,6 @@ import java.util.Objects;
 
 public class FragmentInfo extends Fragment {
 
-    // 비밀번호 수정을 위한 modifyDialog 객체 생성
-    private ModifyDialog modifyDialog;
-
-    // 전화번호 수정을 위한 modifyPhoneDialog 객체 생성
-    private ModifyPhoneDialog modifyPhoneDialog;
-
-    // 이름 수정을 위한 modifyNameDialog 객체 생성
-    private ModifyNameDialog modifyNameDialog;
-
     // 작성한 이메일을 저장할 객체
     private String email = "";
 
