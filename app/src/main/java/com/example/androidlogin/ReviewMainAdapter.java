@@ -80,27 +80,28 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
 
         //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
         // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+        /*
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
         assert user != null;
         email = user.getEmail();
 
-        for(int i = 0 ; i < mainViewHolder.getAdapterPosition() ; i++) {
-            if (email.equals(mDataset.get(i).getEmail())) {
-                CardView cardView2= cardView.findViewById(R.id.menu);
+        cardView1= cardView.findViewById(R.id.menu);
 
-                cardView2.setVisibility(View.VISIBLE);
+            if (email.equals()) {
+                cardView1.setVisibility(View.VISIBLE);
 
-                cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                cardView1.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         showPopup(view, mainViewHolder.getAdapterPosition());
                     }
                 });
             } else {
-                cardView.findViewById(R.id.menu).setVisibility(View.GONE);
+                cardView1.setVisibility(View.GONE);
             }
-        }
 
+
+         */
         return mainViewHolder;
     }
 
@@ -127,7 +128,6 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
         textEmail = cardView.findViewById(R.id.textView2);
         textEmail.setText(mDataset.get(position).getEmail());
 
-        cardView1 = cardView.findViewById(R.id.menu);
 
     }
 
