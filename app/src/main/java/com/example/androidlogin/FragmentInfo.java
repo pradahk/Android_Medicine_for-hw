@@ -37,9 +37,6 @@ import java.util.Objects;
 
 public class FragmentInfo extends Fragment {
 
-    // 작성한 이메일을 저장할 객체
-    private String email = "";
-
     // 파이어베이스 사용자 객체 생성
     private FirebaseUser user;
 
@@ -201,16 +198,6 @@ public class FragmentInfo extends Fragment {
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
-                        editTextEmail.setText("");
-                        editTextName.setText("");
-                        editTextPhone.setText("");
-                        editTextPassword.setText("");
-                        // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
-                        btn_modifypw.setVisibility(View.GONE);
-                        btn_modifypn.setVisibility(View.GONE);
-                        btn_modifyname.setVisibility(View.GONE);
-                        btn_refresh.setVisibility(View.GONE);
                     }
                 })
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {

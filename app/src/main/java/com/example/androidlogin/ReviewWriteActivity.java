@@ -27,6 +27,10 @@ public class ReviewWriteActivity extends ReviewMainActivity {
     private EditText titleEditText;
     private ReviewPostInfo reviewPostInfo2;//database에 올린 결과들을 가져오는 변수
 
+    //user가져오는 변수
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,7 @@ public class ReviewWriteActivity extends ReviewMainActivity {
     View.OnClickListener onClickListener = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
-            if (view.getId() == R.id.check) { //check버튼을 누르면 firebase에 전송
+            if (view.getId() == R.id.check) { //확인버튼을 누르면 firebase에 전송
                 loadrLayout.setVisibility(View.VISIBLE);
                 contentsUpdate();//데이터 베이스에 contents가 업데이트됨
                 myStartActivity(ReviewMainActivity.class);//MainActivity화면으로 넘어감
@@ -62,17 +66,19 @@ public class ReviewWriteActivity extends ReviewMainActivity {
         final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
         final String contents = ((EditText) findViewById(R.id.contentEditText)).getText().toString();
         final Date date = reviewPostInfo2 ==null? new Date() : reviewPostInfo2.getCreatedAt();//날짜가 존재하지 않으면 현재 날짜를 불러오고, 수정 시 날짜가 존재하니까 그때는 그 날짜 그대로 유지시켜줌
-
         //제목과 글이 둘 다 입력 되었을 때 실행됨
         if(title.length() > 0 && contents.length()>0){
             loadrLayout.setVisibility(View.VISIBLE);
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();//나중에 DB에서 게시글을 올린 사람 찾기를 위한 메서드.
-            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date);
+           // FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();//나중에 DB에서 게시글을 올린 사람 찾기를 위한 메서드.
+            user = firebaseAuth.getCurrentUser();
+            assert user != null;
+            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date, user.getEmail());
             uploader(reviewPostInfo);//값들이 postinfo로 들어와 uploader 메서드로 들어감
         }else {//그렇지 않으면 게시글을 입력해달라는 toast가 띄워짐
             startToast("게시글을 입력해주세요");
         }
     }
+
     //데이터베이스에 직접 업로드 되는 코드
     private void uploader(ReviewPostInfo reviewPostInfo){
         //post collection에 contentsUpdate()에서 받아온 정보를 입력함.
@@ -101,12 +107,14 @@ public class ReviewWriteActivity extends ReviewMainActivity {
                 }
             });
     }
+
     private void postInit (){//수정버튼을 눌렀을 때 그 전의 값들을 넣어주는 역할을 함
         if(reviewPostInfo2 !=null){
             titleEditText.setText(reviewPostInfo2.getTitle());
             contentEditText.setText(reviewPostInfo2.getContents());
         }
     }
+
     private void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
         Toast.makeText(this,msg, Toast.LENGTH_SHORT).show();
     }

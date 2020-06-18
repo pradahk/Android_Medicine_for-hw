@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,8 +42,9 @@ public class ReviewMainActivity extends AppCompatActivity {
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
-
+    private FirebaseUser user;
     FragmentMainMenu fragmentMainMenu;
+
 
     @Override public void onStart() {
         super.onStart();
@@ -56,13 +58,15 @@ public class ReviewMainActivity extends AppCompatActivity {
         //이 파일에서는 activity_main.xml창을 보여줄것임.
         setContentView(R.layout.review_activity_main);
 
+
+
         fragmentMainMenu = new FragmentMainMenu();
 
         // 로그인 중인 사용자가 있는 지 판단
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                 user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
                     Log.e("로그","리뷰게시판입니다.");
@@ -124,10 +128,13 @@ public class ReviewMainActivity extends AppCompatActivity {
                                         document.getData().get("title").toString(),
                                         document.getData().get("contents").toString(),
                                         new Date(document.getDate("createdAt").getTime()),
-                                        document.getId()));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴
+                                        document.getData().get("user").toString()
+                                        //firebaseFirestore.collection("users").document().getId()//user의 email값을 가져옴.
+                                ));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴
                                 //들어간 데이터 로그로 확인하기
                                 Log.e("로그","title : "+ document.getData().get("title").toString());
                                 Log.e("로그","data : "+ document.getData().get("contents").toString());
+                                //Log.e("로그","email : "+ firebaseFirestore.collection("users").document().getId());
                             }
                             //게시물 업데이트(새로고침)을 위한 메서드. 데이터가 업데이트 되면 adapter를 다시 바꿔줘야함.
                             //MainAdaper에서 넘겨줌.
@@ -141,6 +148,9 @@ public class ReviewMainActivity extends AppCompatActivity {
 
                     }
                 });
+
+
+
     }
     OnPostListener onPostListener = new OnPostListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
         @Override
@@ -167,6 +177,8 @@ public class ReviewMainActivity extends AppCompatActivity {
             myStartActivity(ReviewWriteActivity.class,postList.get(position));
         }
     };
+
+
     //Main화면에서 다른 화면으로 념겨주는 intent기능을 따로 함수로 만들었음.
     private void myStartActivity(Class c) {//게시물을 추가하는 경우 WritePostActivity 화면으로 넘겨주는 코드
         Intent intent = new Intent(this, c);

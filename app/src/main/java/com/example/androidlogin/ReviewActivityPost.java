@@ -10,6 +10,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -19,7 +29,11 @@ import listener.OnPostListener;
 public class ReviewActivityPost extends ReviewMainActivity {
     private ReviewPostInfo reviewPostInfo;
     private ReviewPostAdapter reviewPostAdapter;
-
+    FirebaseFirestore firebaseFirestore;
+    Button modify2;
+    Button delete2;
+    private String email;
+    private TextView textName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +54,28 @@ public class ReviewActivityPost extends ReviewMainActivity {
         final TextView contentsTextView = findViewById(R.id.contentsTextView);
         contentsTextView.setText(reviewPostInfo.getContents());
 
+        textName = findViewById(R.id.textName);
+        textName.setText(reviewPostInfo.getEmail());
+
+        modify2 = findViewById(R.id.modify2);
+        delete2 = findViewById(R.id.delete2);
+
+
+
+
+        //user 값 비교
+        // 로그인 중인 사용자를 불러옴
+
+        // 로그인 중인 사용자의 이메일 값
+        //String checkmail = user.getEmail();
+        // 다이얼로그에 입력한 이메일 값
+
+        userCheck();
+
         reviewPostAdapter = new ReviewPostAdapter(this);
         reviewPostAdapter.setOnPostListener(onPostListener);//ReviewPostAdapter에 연결해줌.
 
-        buttonClick();
+
     }
     OnPostListener onPostListener = new OnPostListener() {
         @Override
@@ -60,9 +92,6 @@ public class ReviewActivityPost extends ReviewMainActivity {
 
     //수정버튼, 삭제버튼 클릭 시 실행해주는 메서드를 구현함
     private void buttonClick(){
-
-        Button modify2 = findViewById(R.id.modify2);
-        Button delete2 = findViewById(R.id.delete2);
 
         //dialog를 이용해서 삭제를 재 확인 해주는 메서드를 구현함.
         final AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
@@ -106,6 +135,28 @@ public class ReviewActivityPost extends ReviewMainActivity {
         });
     }
 
+    private void userCheck(){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
+        assert user != null;
+        email = user.getEmail();
+
+        firebaseFirestore =  FirebaseFirestore.getInstance();
+
+        if (email.equals(reviewPostInfo.getEmail())) {
+            //Log.e("log : ",document.getData().get("user").toString());
+            Log.e("log : ",reviewPostInfo.getEmail());
+            modify2.setVisibility(View.VISIBLE);
+            delete2.setVisibility(View.VISIBLE);
+            buttonClick();
+        }
+        // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
+        else {
+            //Log.e("log : ",document.getData().get("user").toString());
+            Log.e("log : ",reviewPostInfo.getEmail());
+            modify2.setVisibility(View.GONE);
+            delete2.setVisibility(View.GONE);
+        }
+    }
     private void myStartActivity (Class c, ReviewPostInfo reviewPostInfo){//intent를 이용하여 id 값을 전달해줄것임.
         Intent intent = new Intent(this, c);
         intent.putExtra("postInfo", reviewPostInfo);//앞에는 key값, 뒤에는 실제 값

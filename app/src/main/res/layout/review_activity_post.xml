@@ -74,6 +74,12 @@
                 android:text="@string/contentsTextViewString"
                 android:textSize="12sp" />
 
+            <TextView
+                android:id="@+id/textName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,14 +91,16 @@
                     android:id="@+id/modify2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/modify" />
+                    android:text="@string/modify"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/delete2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="50dp"
-                    android:text="@string/deletString" />
+                    android:text="@string/deletString"
+                    android:visibility="gone"/>
 
             </LinearLayout>
         </LinearLayout>
