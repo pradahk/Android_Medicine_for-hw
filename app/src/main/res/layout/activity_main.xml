@@ -7,14 +7,17 @@
     android:background="@drawable/main_header_selector"
     tools:context=".MainActivity">
 
-    <ImageButton
-        android:id="@+id/gohome"
-        android:layout_width="40dp"
-        android:layout_height="42dp"
-        android:layout_marginLeft="380dp"
-        android:background="#00ffffff"
-        android:src="@drawable/ic_home_black_24dp">
-    </ImageButton>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+        <ImageButton
+            android:id="@+id/gohome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_home_black_24dp"
+            android:background="#00ffffff"/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView"

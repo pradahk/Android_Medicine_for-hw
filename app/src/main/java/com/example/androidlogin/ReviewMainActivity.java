@@ -51,14 +51,17 @@ public class ReviewMainActivity extends AppCompatActivity {
         // 파이어베이스에 로그인 중인지 판단
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
     }
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplication(),MenuActivity.class));
+        super.onBackPressed();
 
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //이 파일에서는 activity_main.xml창을 보여줄것임.
         setContentView(R.layout.review_activity_main);
-
-
 
         fragmentMainMenu = new FragmentMainMenu();
 
@@ -66,7 +69,7 @@ public class ReviewMainActivity extends AppCompatActivity {
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                 user = firebaseAuth.getCurrentUser();
+               user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
                     Log.e("로그","리뷰게시판입니다.");
@@ -89,18 +92,19 @@ public class ReviewMainActivity extends AppCompatActivity {
         postUpdate();
 
         findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);//게시글 추가 버튼을 클릭 시
+        findViewById(R.id.gohome).setOnClickListener(onClickListener);
     }
 
     private void login() {
-       AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-       dialog.setMessage("로그인 후 이용해주세요.")
-               .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int i) {
-                     finish();
-                   }
-               })
-               .show();
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setMessage("로그인 후 이용해주세요.")
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        finish();
+                    }
+                })
+                .show();
     }
 
     //게시글 추가 버튼을 클릭할 때 처리하는 기능
@@ -109,6 +113,9 @@ public class ReviewMainActivity extends AppCompatActivity {
         public void onClick(View view) {//게시글 추가 버튼을 눌렀을 때 WritePostActivity.java로 넘겨줌
             if (view.getId() == R.id.floatingActionButton) {
                 myStartActivity(ReviewWriteActivity.class);
+            }
+            else if (view.getId() == R.id.gohome){
+                myStartActivity(MenuActivity.class);
             }
         }
     };
@@ -128,6 +135,7 @@ public class ReviewMainActivity extends AppCompatActivity {
                                         document.getData().get("title").toString(),
                                         document.getData().get("contents").toString(),
                                         new Date(document.getDate("createdAt").getTime()),
+                                        document.getId(),
                                         document.getData().get("user").toString()
                                         //firebaseFirestore.collection("users").document().getId()//user의 email값을 가져옴.
                                 ));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴

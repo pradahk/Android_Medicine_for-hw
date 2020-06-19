@@ -6,14 +6,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-        <TextView
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+        <ImageButton
+            android:id="@+id/gohome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_home_black_24dp"
+            android:background="#00ffffff"/>
+    </LinearLayout>
+
+    <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="35dp"
             android:gravity="center"
-            android:text="@string/title"
+            android:text="@string/stringtitle"
             android:textSize="60sp"
             />
         <ScrollView
@@ -78,7 +91,10 @@
                 android:id="@+id/textName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:layout_marginTop="40dp"
+                android:gravity="right"
+                android:text="@string/texttext"
+                android:textSize="12sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

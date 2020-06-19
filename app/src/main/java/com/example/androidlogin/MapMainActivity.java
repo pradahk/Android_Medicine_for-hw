@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,7 +78,6 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION,
                                       Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
 
-
     Location mCurrentLocatiion;
     LatLng currentPosition;
 
@@ -130,7 +130,22 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         parser.edit = (EditText)findViewById(R.id.edit);
         parser.text = (TextView)findViewById(R.id.result);
 
+        // 홈으로 이동하는 버튼 객체 생성
+        ImageButton btn_home = findViewById(R.id.gohome);
+
+        // 홈 버튼 onclicklistener 생성
+        btn_home.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // 버튼을 누르면 메인화면으로 이동
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(intent);
+            }
+
+        });
+
     }
+
 
     //맵이 실행됐을때 처리 과정
     @Override

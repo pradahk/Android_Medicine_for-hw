@@ -6,6 +6,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,11 +37,9 @@ public class MainActivity extends AppCompatActivity {
     // 작성한 이메일 값과 비밀번호 값과 이름 값을 저장할 객체 생성
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private EditText editTextName;
 
     private String email = "";
     private String password = "";
-    private String name = "";
 
     // 구글 로그인 객체 생성
     private GoogleSignInClient mGoogleSignInClient;
@@ -70,6 +69,19 @@ public class MainActivity extends AppCompatActivity {
         // 구글 로그인 버튼 객체 생성
         signInButton = findViewById(R.id.signInButton);
 
+        // 홈으로 이동하는 버튼 객체 생성
+        ImageButton btn_home = findViewById(R.id.gohome);
+
+        // 홈 버튼 onclicklistener 생성
+        btn_home.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // 버튼을 누르면 메인화면으로 이동
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(intent);
+            }
+
+        });
 
         // 회원가입 버튼 onclicklistener 생성
         signup_btn.setOnClickListener(new View.OnClickListener(){

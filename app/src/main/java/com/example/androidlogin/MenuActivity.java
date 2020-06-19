@@ -37,11 +37,17 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     private Button singout_btn;
     private Button signin_btn;
 
-    @Override public void onStart() {
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
+        @Override public void onStart() {
         super.onStart();
         // 파이어베이스에 로그인 중인지 판단
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

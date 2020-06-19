@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FirebaseEmail</string>
-    <string name="title">약 쏙</string>
+    <string name="title">약   쏙</string>
     <string name="ok">확인</string>
     <string name="cancel">취소</string>
     <string name="modify">수정</string>
@@ -74,6 +74,7 @@
     <string name="dateString">2020-05-11</string>
     <string name="titleText">게시글    작성</string>
     <string name="stringtitle">REVIEW</string>
+    <string name="texttext">TextView</string>
 
     <string name="deletString">삭제</string>
 

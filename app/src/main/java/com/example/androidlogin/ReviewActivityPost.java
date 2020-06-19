@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +75,20 @@ public class ReviewActivityPost extends ReviewMainActivity {
 
         reviewPostAdapter = new ReviewPostAdapter(this);
         reviewPostAdapter.setOnPostListener(onPostListener);//ReviewPostAdapter에 연결해줌.
+
+        // 홈으로 이동하는 버튼 객체 생성
+        ImageButton btn_home = findViewById(R.id.gohome);
+
+        // 홈 버튼 onclicklistener 생성
+        btn_home.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // 버튼을 누르면 메인화면으로 이동
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(intent);
+            }
+
+        });
 
 
     }

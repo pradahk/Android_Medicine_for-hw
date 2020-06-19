@@ -80,28 +80,31 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
 
         //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
         // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
-        /*
+
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
         assert user != null;
-        email = user.getEmail();
 
-        cardView1= cardView.findViewById(R.id.menu);
-
-            if (email.equals()) {
+        if(user != null)  {
+            email = user.getEmail();
+            cardView1= cardView.findViewById(R.id.menu);
+            if (email.equals(mDataset.get(viewType).getEmail())) {
                 cardView1.setVisibility(View.VISIBLE);
-
-                cardView1.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        showPopup(view, mainViewHolder.getAdapterPosition());
-                    }
-                });
             } else {
                 cardView1.setVisibility(View.GONE);
             }
+        }
+        else {
+            Log.e("error : ", "error");
+        }
 
 
-         */
+
+        cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopup(view, mainViewHolder.getAdapterPosition());
+            }
+        });
         return mainViewHolder;
     }
 
@@ -138,36 +141,38 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
 
     //popup메뉴를 만들기 위한 메서드. view로 받아오기 위해 activity사용함. 여기서 popup메뉴는 수정 삭제가 내려오는 메뉴임.
     public void showPopup(View v, final int position) {//android studio에서 제공하는 팝업 메뉴 표시 기능
-       //db값을 갖고오고, 선택된 post값을 알아오기 위해 사용함. view와 위치값(position)을 갖고와서 사용하기. 하나의 postID를 알아야함.
+        //db값을 갖고오고, 선택된 post값을 알아오기 위해 사용함. view와 위치값(position)을 갖고와서 사용하기. 하나의 postID를 알아야함.
         //postID를 알아야 그 post를 삭제할수있음.->postInfo.java수정
 
         //TextView textEmailView = cardView.findViewById(R.id.textView2);
 
 
-            //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
-            // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
+        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
 
-            PopupMenu popup = new PopupMenu(activity,v);
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    switch (menuItem.getItemId()){
-                        case R.id.modify ://modify버튼을 눌렀을 때
-                            onPostListener.onModify(position);//인터페이스의 onModify를 이용
-                            return true;
-                        case R.id.delete://delete버튼을 눌렀을 때
-                            // 게시글 삭제를 위한 메서드. db에서도 삭제함.
-                            onPostListener.onDelete(position);//인터페이스의 onDelete를 이용
-                            return true;
-                        default:
-                            return false;
-                    }
+
+
+        PopupMenu popup = new PopupMenu(activity,v);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.modify ://modify버튼을 눌렀을 때
+                        onPostListener.onModify(position);//인터페이스의 onModify를 이용
+                        return true;
+                    case R.id.delete://delete버튼을 눌렀을 때
+                        // 게시글 삭제를 위한 메서드. db에서도 삭제함.
+                        onPostListener.onDelete(position);//인터페이스의 onDelete를 이용
+                        return true;
+                    default:
+                        return false;
                 }
-            });
-            MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
-            inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
-            popup.show();
-     }
+            }
+        });
+        MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
+        inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
+        popup.show();
+    }
 
 
 

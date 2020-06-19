@@ -1,12 +1,14 @@
 package com.example.androidlogin;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +45,7 @@ public class NameMainActivity extends AppCompatActivity {
     //로딩중을 띄워주는 progressDialog
     private ProgressDialog progressDialog;
 
-    @Override
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.name_activity_main);
@@ -60,6 +62,21 @@ public class NameMainActivity extends AppCompatActivity {
 
         // progressDialog 객체 선언
         progressDialog = new ProgressDialog(this);
+
+
+        // 홈으로 이동하는 버튼 객체 생성
+        ImageButton btn_home = findViewById(R.id.gohome);
+
+        // 홈 버튼 onclicklistener 생성
+        btn_home.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // 버튼을 누르면 메인화면으로 이동
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(intent);
+            }
+
+        });
 
     }
 
@@ -139,7 +156,7 @@ public class NameMainActivity extends AppCompatActivity {
 
                 //실질적으로 파싱해서 inputstream해주는 코드
                 URL url = new URL(requestDrugUrl); //공공데이터 파싱 주소를 url에 넣음음
-               InputStream is = url.openStream(); //Stream파일로 읽어들이기 위해 가져온 url을 연결함.
+                InputStream is = url.openStream(); //Stream파일로 읽어들이기 위해 가져온 url을 연결함.
                 XmlPullParserFactory factory = XmlPullParserFactory.newInstance();//Tag 및 데이터를 가지고 올 때 필요함.
                 XmlPullParser parser = factory.newPullParser();//string을 xml로 바꾸어 넣을 곳
                 parser.setInput(new InputStreamReader(is, "UTF-8"));//string을 xml로.

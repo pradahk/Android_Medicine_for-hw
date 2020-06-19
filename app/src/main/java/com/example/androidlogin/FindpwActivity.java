@@ -27,6 +27,13 @@ public class FindpwActivity extends AppCompatActivity {
     // 사용자에게 실시간 진행상태를 알려주는 ProgressDialog 객체 생성
     private ProgressDialog progressDialog;
 
+    // 뒤로가기 버튼 클릭시 로그인 화면 갱신
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplication(),MainActivity.class));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
