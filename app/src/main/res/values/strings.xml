@@ -63,9 +63,10 @@
     <string name="classNameText">분류명:</string>
     <string name="ectOtcText">전문/일반 구분:</string>
 
+    <string name="mapTitle">약국 찾기</string>
     <string name="searchvillage">동 이름으로 검색하세요.</string>
     <string name="searchneardrug">내 주변 약국 찾기</string>
-    <string name="slidingup">검색 결과를 보려면 위로 슬라이딩 하세요!</string>
+    <string name="slidingup">약국 검색 후 이곳에서 결과를 확인할 수 있습니다.</string>
 
     <string name="titleEditTextString">제목</string>
     <string name="contentEditTextString">내용</string>
@@ -121,7 +122,7 @@
     <string name="Markserach">──── 식별 표시로 검색────</string>
     <string name="TextFront">식별자 앞 : </string>
     <string name="TextBack">식별자 뒤 : </string>
-    <string name="search">검색</string>
+    <string name="markedit">"대소문자를 구분하여 입력하여 주세요!"</string>
     <!--초기화 버튼-->
     <string name="buttonResearch">검색 초기화</string>
 

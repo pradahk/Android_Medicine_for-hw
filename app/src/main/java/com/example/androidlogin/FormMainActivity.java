@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-public class FormMainActivity extends AppCompatActivity implements Button.OnClickListener {
+public class FormMainActivity extends AppCompatActivity {
     private static final String TAG = "Ma";
     private ProgressDialog progressDialog; //로딩중 progressDialog
 
@@ -55,6 +56,19 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity_main);
 
+        // 홈으로 이동
+        ImageButton btn_home = findViewById(R.id.gohome);
+
+        // 홈 버튼 클릭이벤트
+        btn_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 버튼을 누르면 메인화면으로 이동
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                startActivity(intent);
+            }
+
+        });
 
         //색상 버튼 눌린것 텍스트뷰로 띄워줄것
         textcolor = (TextView) findViewById(R.id.choosecolor);
@@ -62,7 +76,7 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
         texttype = (TextView) findViewById(R.id.choosetype);
 
         //로딩중 progressdialog
-        progressDialog = new ProgressDialog(this);
+        //  progressDialog = new ProgressDialog(this);
 
         thiscolor = textcolor.getText().toString();
         thisshape = textshape.getText().toString();
@@ -102,8 +116,8 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
 
                     for(int j=0; j<colorBtn.length; j++){
                         if(!colorBtn[j].getText().toString().equals(choosecolor)) {
-                                    colorBtn[j].setBackgroundResource(R.drawable.basic_button);
-                                    colorBtn[j].setTextColor(Color.BLACK);
+                            colorBtn[j].setBackgroundResource(R.drawable.basic_button);
+                            colorBtn[j].setTextColor(Color.BLACK);
                         }if(colorBtn[j].getText().toString().equals(thiscolor)){
                             colorBtn[j].setBackgroundResource(R.drawable.basic_button);
                             colorBtn[j].setTextColor(Color.BLACK);
@@ -241,12 +255,6 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
 
 
 
-    //색상, 모양, 제형 버튼 클릭 함수
-    @Override
-    public void onClick(View v) {
-
-    }
-
 
     //식별자 앞 edittext값 초기화, 저장
     public void takeMarkfront(){
@@ -274,11 +282,11 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
     //검색 결과 버튼
     public void click_result(View view) {
 
-      //  progressDialog.setMessage("로딩중입니다.");
-       // progressDialog.show();
+        //  progressDialog.setMessage("로딩중입니다.");
+        // progressDialog.show();
 
-       //takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
-       //takeMarkBack();
+        //takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
+        //takeMarkBack();
 
         Intent intent = new Intent(getApplicationContext(), FormSearchActivity.class);
 
@@ -294,8 +302,8 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
 
     //식별자 검색 결과 버튼
     public void click_markresult(View view) {
-        progressDialog.setMessage("로딩중입니다.");
-        progressDialog.show();
+        //progressDialog.setMessage("로딩중입니다.");
+        //progressDialog.show();
 
         takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
         takeMarkBack();
@@ -315,8 +323,7 @@ public class FormMainActivity extends AppCompatActivity implements Button.OnClic
         choosecolor = null;
         chooseshape = null;
         choosetype = null;
-       // textcolor.setText("");
-       // textshape.setText("");
+
         Toast myToast = Toast.makeText(this.getApplicationContext(),"선택이 초기화 되었습니다.", Toast.LENGTH_SHORT);
         myToast.show();
 

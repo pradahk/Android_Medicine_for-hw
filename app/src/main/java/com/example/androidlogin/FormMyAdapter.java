@@ -2,10 +2,7 @@ package com.example.androidlogin;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +18,6 @@ import com.bumptech.glide.Glide;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -32,8 +28,7 @@ import java.util.ArrayList;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHolder>{
-
-    //private static final int count=1;
+    private static final String sort = "form";
 
     private String drugString;
     private ArrayList<FormDrug> mList;
@@ -42,6 +37,7 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
     private String data = null;
     private Intent intent;
     private String searchString;
+
     FormMyAdapter(Context context, ArrayList<FormDrug> mList) {//생성자를 context와 배열로 초기화해줌
         this.mList = mList;
         this.mInflate = LayoutInflater.from(context);
@@ -62,13 +58,13 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         Glide.with(holder.itemView)
-                  .load(mList.get(position).getImage())
-                .into(holder.image);
+                .load(mList.get(position).getImage())
+                .into(holder.list_image);
 
-        holder.name.setText(mList.get(position).getName());
-        holder.shape.setText(mList.get(position).getShape());
-        holder.color.setText(mList.get(position).getColor());
-        holder.type.setText(mList.get(position).getType());
+        holder.tv_name.setText(mList.get(position).getDrugName());
+        holder.tv_company.setText(mList.get(position).getCompany());
+        holder.tv_className.setText(mList.get(position).getClassName());
+        holder.tv_etcOtcName.setText(mList.get(position).getEtcOtcName());
 
         //해당하는 holder를 눌렀을 때 intent를 이용해서 상세정보 페이지로 넘겨줌
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -82,16 +78,17 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
                         // TODO Auto-generated method stub
                         //알고싶은 약의 상세정보를 누르면 그 약의 이름을 받아와 다시 파싱을 시작함
                         //그렇기 때문에 약의 이름을 drugString에 저장해준 후 그 이름을 getXmlData()의 메서드로 넘겨줌
-                        drugString = mList.get(position).getName();
+                        drugString = mList.get(position).getDrugName();
                         data = getXmlData(drugString);//drugString에 해당하는 데이터를 string형식으로 가져와 data변수에 저장해줌
 
-                        intent = new Intent(mContext, NameLookupActivity.class);//intent를 초기화해주는 코드
+                        intent = new Intent(mContext, LookupActivity.class);//intent를 초기화해주는 코드
 
                         //앞에는 key값, 뒤에는 실제 값
                         intent.putExtra("Drug", drugString);//drug의 이름을 넘겨줌
                         intent.putExtra("data", data);//파싱한 데이터들을 "data"의 키로 넘겨줌
                         intent.putExtra("image", mList.get(position).getImage());
-                        intent.putExtra("count",1);
+                        intent.putExtra("sort", sort);
+
                         //이미지의 용량을 작게 해주는 코드
                         //-> intent로 이미지를 넘길 떼 이미지의 용량이  100kb로 제한되어있기 때문에 그 사이즈에 맞춰서 넘겨줘야함
                         //이미지의 용량을 임의로 지정하여 intent로 넘겨주는 코드
@@ -103,7 +100,7 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
                         bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
                          */
                         //byte[] b = BitmapToByteArray(bitmap);
-                       // intent.putExtra("image",b); //image의 크기를 낮춰준 후 intent로 넘겨줌
+                        // intent.putExtra("image",b); //image의 크기를 낮춰준 후 intent로 넘겨줌
 
                         //전체의 intent를 실제로 넘겨주는 코드.
                         mContext.startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
@@ -114,11 +111,7 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
         });
 
     }
-    public static byte[] BitmapToByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        return baos.toByteArray();
-    }
+
     @Override
     public int getItemCount() {
         return (mList != null ? mList.size() : 0);
@@ -126,23 +119,27 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image;
-        public TextView name;
-        public TextView color;
-        public TextView shape;
-        public TextView type;
+        public ImageView list_image;
+        public TextView tv_name;
+        public TextView tv_company;
+        public TextView tv_etcOtcName;
+        public TextView tv_className;
         public View mView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-            name = itemView.findViewById(R.id.name);
-            color = itemView.findViewById(R.id.color);
-            image = itemView.findViewById(R.id.image);
-            shape = itemView.findViewById(R.id.shape);
-            type = itemView.findViewById(R.id.type);
+            list_image = itemView.findViewById(R.id.list_image);  // 이름 list_image??
+            tv_name = itemView.findViewById(R.id.tv_name);
+            tv_company = itemView.findViewById(R.id.tv_company);
+            tv_etcOtcName = itemView.findViewById(R.id.tv_etcOtcName);
+            tv_className = itemView.findViewById(R.id.tv_className);
         }
     }
+
+
+
+    /*
     public static Bitmap StringToBitmap(String encodedString) {
         try {
             byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
@@ -153,6 +150,8 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
             return null;
         }
     }
+
+     */
     //두번째 공공데이터 파싱하는 부분
     String getXmlData(String seq){
 

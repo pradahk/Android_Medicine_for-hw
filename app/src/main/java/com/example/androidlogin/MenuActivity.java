@@ -3,6 +3,7 @@ package com.example.androidlogin;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -11,6 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -36,6 +42,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     // 로그인 및 로그아웃 버튼 객체 생성
     private Button singout_btn;
     private Button signin_btn;
+
 
     @Override
     public void onBackPressed() {
@@ -91,6 +98,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 show();
             }
         });
+
+
 
         // 로그인 중인 사용자가 있는 지 판단
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -171,7 +180,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     void show(){
         // Alert 다이얼로그 객체 생성
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if(!this.isFinishing()){
+        if((!this.isFinishing())){
             // 생성한 다이얼로그을 보여줌
             builder.create().show();
             // 다이얼로그 셋팅
@@ -183,7 +192,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                         public void onClick(DialogInterface dialog, int which) {
                             // "예" 클릭시 로그아웃
                             FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(MenuActivity.this,"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                     });
             builder.setNegativeButton("아니오",

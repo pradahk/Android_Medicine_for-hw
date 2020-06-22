@@ -3,7 +3,6 @@ package com.example.androidlogin;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHolder> {
+    private static final String sort = "name";
 
     private String drugString;
     private String searchString;
@@ -58,7 +58,7 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //최초 view에 대한 list item에 대한 view를 생성함.
         //onBindViewHolder한테 실질적으로 매칭해주는 역할을 함.
-        View view = mInflate.inflate(R.layout.name_list_item, parent, false);
+        View view = mInflate.inflate(R.layout.list_item, parent, false);
         final MyViewHolder viewHolder = new MyViewHolder(view);
 
         return viewHolder;
@@ -98,7 +98,7 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         drugString = mList.get(position).getDrugName();
                         data = getXmlData(drugString);//drugString에 해당하는 데이터를 string형식으로 가져와 data변수에 저장해줌
 
-                        intent = new Intent(mContext, NameLookupActivity.class);//intent를 초기화해주는 코드
+                        intent = new Intent(mContext, LookupActivity.class);//intent를 초기화해주는 코드
 
                         //앞에는 key값, 뒤에는 실제 값
                         intent.putExtra("Drug", mList.get(position).getDrugName());//drug의 이름을 넘겨줌
@@ -113,6 +113,7 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         byte[] b = stream.toByteArray();
                         intent.putExtra("image", b); //image의 크기를 낮춰준 후 intent로 넘겨줌
                         intent.putExtra("count", 1);
+                        intent.putExtra("sort",sort);
 
                         //전체의 intent를 실제로 넘겨주는 코드.
                         mContext.startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
@@ -205,6 +206,10 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         }
                         if (parser.getName().equals("DOC")) {
                             articleEnd = true;
+                        }
+                        if(parser.getName().equals("body")){
+                            buffer.append("\n");
+                            buffer.append("※ 허가 취소된 의약품이거나 상세정보를 제공하지 않는 의약품입니다. ※");
                         }
                         break;
                     case XmlPullParser.START_TAG://eventType이 START_TAG일 경우, 태그가 시작되는 부분

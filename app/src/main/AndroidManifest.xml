@@ -42,7 +42,7 @@
             android:name=".NameMainActivity">
         </activity>
         <activity
-            android:name=".NameLookupActivity">
+            android:name=".LookupActivity">
         </activity>
         <activity
             android:name=".MapMainActivity">

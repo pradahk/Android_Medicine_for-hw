@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
@@ -25,7 +26,7 @@ public class FormSearchActivity extends AppCompatActivity {
     String searchmarkfront;
     String searchmarkback;
 
-
+    private LinearLayoutManager linearLayoutManager;
 
 
     @Override
@@ -47,6 +48,8 @@ public class FormSearchActivity extends AppCompatActivity {
         choosetype = getIntent().getStringExtra("choosetype");
         searchmarkfront = getIntent().getStringExtra("searchmarkfront");
         searchmarkback = getIntent().getStringExtra("searchmarkback");
+
+
         Log.e("result : ", choosecolor + "/ " + chooseshape + "/ " + choosetype + "/" + searchmarkfront + "/" + searchmarkback);
 
         if (choosecolor == null && chooseshape == null && choosetype ==null) {
@@ -59,6 +62,10 @@ public class FormSearchActivity extends AppCompatActivity {
         }
         recyclerView = (RecyclerView)findViewById(R.id.rv_recyclerview);//리사이클러뷰 초기화
         recyclerView.setHasFixedSize(true);//리사이클러뷰 기존 성능 강화
+
+        //리니어레이아웃을 사용하여 리사이클러뷰에 넣어줄것임
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         mAdapter = new FormMyAdapter(getApplicationContext(), list);
         recyclerView.setAdapter(mAdapter);
@@ -90,11 +97,15 @@ public class FormSearchActivity extends AppCompatActivity {
                     if ((jsonObject.getString("색상앞").contains(choosecolor))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("1번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
+                        //formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
+                        //formDrug.setShape(jsonObject.getString("의약품제형"));
+                        //formDrug.setType(jsonObject.getString("제형코드명"));
+
                         list.add(formDrug);
                     }
                 }
@@ -103,11 +114,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if ((jsonObject.getString("색상앞").contains(choosecolor)) && (jsonObject.getString("의약품제형").equals(chooseshape))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("2번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -116,11 +127,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if ((jsonObject.getString("색상앞").contains(choosecolor)) && (choosetype.contains(jsonObject.getString("제형코드명")))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("3번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -129,11 +140,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if (jsonObject.getString("의약품제형").equals(chooseshape)) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("4번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -142,11 +153,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if (jsonObject.getString("의약품제형").equals(chooseshape)) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("5번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -155,11 +166,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if (choosetype.contains(jsonObject.getString("제형코드명"))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("6번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -168,11 +179,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     if((jsonObject.getString("색상앞").contains(choosecolor)) && jsonObject.getString("의약품제형").equals(chooseshape) && (choosetype.contains(jsonObject.getString("제형코드명")))){
                         FormDrug formDrug = new FormDrug();
                         Log.e("7번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }
@@ -207,12 +218,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     {
                         FormDrug formDrug = new FormDrug();
                         Log.e("8번째 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
-
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
 
@@ -222,12 +232,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     {
                         FormDrug formDrug = new FormDrug();
                         Log.e("9번째 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
-
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }//10. 표시뒤만
@@ -236,12 +245,11 @@ public class FormSearchActivity extends AppCompatActivity {
                     {
                         FormDrug formDrug = new FormDrug();
                         Log.e("10번째 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
-                        formDrug.setColor(jsonObject.getString("색상앞"));
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
-                        formDrug.setName(jsonObject.getString("품목명"));
-                        formDrug.setShape(jsonObject.getString("의약품제형"));
-                        formDrug.setType(jsonObject.getString("제형코드명"));
-
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
                         list.add(formDrug);
                     }
                 }

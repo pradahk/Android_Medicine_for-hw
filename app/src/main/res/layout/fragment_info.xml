@@ -141,6 +141,16 @@
             android:layout_marginTop="100dp"
             android:text="@string/userinfo"
             android:textSize="30sp" />
+        <TextView
+            android:id="@+id/tv_beforelogin"
+            android:layout_below="@+id/textViewinfo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
+
+
 
 
     </RelativeLayout>

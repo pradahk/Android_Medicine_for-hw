@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 assert account != null;
                 firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
+            } catch (ApiException ignored) {
             }
         }
     }

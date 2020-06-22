@@ -63,6 +63,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
     String data;
     private GoogleMap mMap;
     private Marker currentMarker = null;
+    Button handle_btn;
+
 
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 1000; //권한 설정을 한 activity에 request값으로 받아올 변수 설정
@@ -76,7 +78,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
     // 앱을 실행하기 위해 필요한 퍼미션 정의
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION,
-                                      Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
+            Manifest.permission.ACCESS_COARSE_LOCATION};  // 외부 저장소
 
     Location mCurrentLocatiion;
     LatLng currentPosition;
@@ -97,6 +99,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.map_activity_main);
 
         previous_marker = new ArrayList<Marker>();
+
+        handle_btn = (Button) findViewById(R.id.handle);
 
         //약국 찾기 버튼 눌렀을때
         Button button = (Button)findViewById(R.id.pharm_btn);
@@ -196,7 +200,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         }
         //결과 맵에 띄우기
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        // mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
@@ -421,10 +425,10 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
             }
 
             if ( check_result ) {
-
                 // 퍼미션을 허용했다면 위치 업데이트를 시작
                 startLocationUpdates();
             }
+
             else {
 
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료함
@@ -445,7 +449,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
                 }else {
 
-                   //사용자가 "다시 묻지 않음"을 누르고 퍼미션을 거부하면 설정-앱 정보에서 퍼미션을 허용해야 사용 가능함을 알림
+                    //사용자가 "다시 묻지 않음"을 누르고 퍼미션을 거부하면 설정-앱 정보에서 퍼미션을 허용해야 사용 가능함을 알림
                     Snackbar.make(mLayout, "퍼미션이 거부되었습니다. 활성화하려면 설정-앱 정보 에서 퍼미션을 허용해주세요. ",
                             Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
 
@@ -570,13 +574,16 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
                 .listener(MapMainActivity.this)
                 .key("AIzaSyDd9ZoPqAJSM9VH0Sbun-MKeS2JMl--wBs")
                 .latlng(location.latitude, location.longitude)//현재 위치
-                .radius(2000)// 반경
+                .radius(2500)// 반경
                 .type(PlaceType.PHARMACY) //약국
                 .build()
                 .execute();
     }
+
     //약국 검색 버튼
     public void mOnClick(View v){
+
+        handle_btn.setText("검색 결과를 보려면 위로 슬라이딩 해주세요.");
         switch (v.getId()){
             case R.id.serach_btn :
                 new Thread(new Runnable(){

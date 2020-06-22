@@ -28,6 +28,7 @@ import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,6 +57,9 @@ public class FragmentInfo extends Fragment {
     private TextView editTextName;
     private TextView editTextPhone;
 
+    // 로그인이 되어있지 않을 경우 보여주는 텍스트뷰 객체 생성
+    private TextView tv_beforelogin;
+
     // 수정 및 새로고침 버튼 객체 생성
     private ImageButton btn_modifypw;
     private ImageButton btn_modifypn;
@@ -77,15 +81,16 @@ public class FragmentInfo extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
+                    tv_beforelogin.setText("");
                     // 기본값인 count=0일 경우 이메일 입력 다이얼로그를 보여주고 count값을 1로 바꿔줌
                     if(count==0){
-                        Toast.makeText(getActivity(),"구글 로그인 회원은 회원정보를 제공하지 않습니다.", Toast.LENGTH_LONG).show();
                         showDialog();
                         count =1;
                     }
@@ -96,7 +101,7 @@ public class FragmentInfo extends Fragment {
                 }
                 // 로그인한 사용자가 없는 경우
                 else {
-                    Toast.makeText(getActivity(), "로그인을 먼저 진행해주세요.", Toast.LENGTH_SHORT).show();
+                    tv_beforelogin.setText("로그인 후 이용해주세요.");
                 }
             }
         };
@@ -116,6 +121,8 @@ public class FragmentInfo extends Fragment {
         // id가 write_phone인 editText에 대한 메서드 저장
         editTextPhone = view.findViewById(R.id.write_phone);
 
+        tv_beforelogin = view.findViewById(R.id.tv_beforelogin);
+
         // id가 modifybutton인 버튼에 대한 메서드 저장
         btn_modifypw = view.findViewById(R.id.modifybutton);
         btn_modifypn = view.findViewById(R.id.modifybutton2);
@@ -129,6 +136,7 @@ public class FragmentInfo extends Fragment {
         editTextName.setText("");
         editTextPhone.setText("");
         editTextPassword.setText("");
+        tv_beforelogin.setText("로그인 후 이용해주세요.");
 
         // 수정 이미지 버튼과 새로고침 버튼을 GONE하여 버튼과 그 공간까지 보이지 않게 처리
         // 이메일 일치여부가 성공하여 수정할 수 있는 조건이 되면 VIDIBLE하여 보여줄 예정
@@ -194,13 +202,12 @@ public class FragmentInfo extends Fragment {
         final EditText edittext = new EditText(getActivity());
         // 다이얼로그 호출
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-        if((!getActivity().isFinishing())){
-            dialog.setMessage("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
+            dialog.setTitle("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
+                    .setMessage("(구글 로그인 회원은 회원정보를 제공하지 않습니다.)")
                     .setView(edittext)  // 이메일을 입력하기 위한 edittext
                     .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-
                         }
                     })
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -211,6 +218,7 @@ public class FragmentInfo extends Fragment {
                             // 다이얼로그에 입력한 이메일 값
                             final String email = edittext.getText().toString();
                             // 로그인 중인 사용자의 이메일 값
+                            assert user != null;
                             String checkmail = user.getEmail();
                             // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
                             // 같을 때
@@ -227,9 +235,7 @@ public class FragmentInfo extends Fragment {
                         }
 
                     })
-                    .show();
-
-        }
+                  .show();
 
 
     }
@@ -255,6 +261,7 @@ public class FragmentInfo extends Fragment {
                                     editTextName.setText(document.getData().get("name").toString());
                                     editTextPhone.setText(document.getData().get("phone").toString());
                                     editTextPassword.setText(document.getData().get("password").toString());
+                                    tv_beforelogin.setText("");
                                     // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
                                     btn_modifypw.setVisibility(View.VISIBLE);
                                     btn_modifypn.setVisibility(View.VISIBLE);
@@ -291,6 +298,7 @@ public class FragmentInfo extends Fragment {
                                     editTextName.setText(document.getData().get("name").toString());
                                     editTextPhone.setText(document.getData().get("phone").toString());
                                     editTextPassword.setText(document.getData().get("password").toString());
+                                    tv_beforelogin.setText("");
                                     // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
                                     btn_modifypw.setVisibility(View.VISIBLE);
                                     btn_modifypn.setVisibility(View.VISIBLE);

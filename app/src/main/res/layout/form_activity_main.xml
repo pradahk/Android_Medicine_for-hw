@@ -14,19 +14,29 @@
         android:layout_weight="0.7"
         android:orientation="vertical"
         android:background="@android:color/white">
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="@string/SearchList"
-            android:textSize="27dp"
-            android:textStyle="bold"/>
-    </LinearLayout>
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="@string/SearchList"
+                android:textSize="30sp"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_marginStart="10dp" />
+            <ImageButton
+                android:id="@+id/gohome"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#00ffffff"
+                android:src="@drawable/ic_home_black_24dp">
+            </ImageButton>
+        </LinearLayout>
     </LinearLayout>
 
 
@@ -45,7 +55,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Colorlist"
-                android:textStyle="bold"
                 android:layout_marginRight="2dp"
                 android:textSize="25sp"/>
             <TextView
@@ -200,128 +209,127 @@
 
     <!--모양 버튼-->
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="@string/Shapelist"
+                android:textSize="25sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/Shapelist"
-                    android:textStyle="bold"
-                    android:textSize="25sp" />
+            <TextView
+                android:id="@+id/chooseshape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blanktext"/>
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/chooseshape"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blanktext"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/shape_btn1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonCircle"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonOval"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonSemicircle"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonTriangle"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonSquare"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonDiamond"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/shape_btn7"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonRectangle"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn8"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonPentagon"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn9"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonHexagon"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn10"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/buttonOctagon"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-                <Button
-                    android:id="@+id/shape_btn11"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="@string/buttonEct"
-                    android:background="@drawable/basic_button"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/shape_btn1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonCircle"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonOval"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonSemicircle"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonTriangle"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonSquare"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonDiamond"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/shape_btn7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonRectangle"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonPentagon"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonHexagon"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/buttonOctagon"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+            <Button
+                android:id="@+id/shape_btn11"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/buttonEct"
+                android:background="@drawable/basic_button"
+                android:textSize="12sp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!--제형 버튼-->
@@ -339,7 +347,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Typelist"
-                android:textStyle="bold"
                 android:textSize="25sp"/>
             <TextView
                 android:id="@+id/choosetype"
@@ -402,28 +409,28 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-        <Button
-            android:id="@+id/searchbtn"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="50dp"
-            android:text="@string/search"
-            android:textStyle="bold"
-            android:background="@drawable/button_state"
-            android:textColor="@android:color/white"
-            android:onClick="click_result"
-            android:layout_gravity="center" />
-        <Button
-            android:id="@+id/researchbtn"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonResearch"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:background="@drawable/button_state"
-            android:onClick="click_research"
-            android:layout_gravity="center" />
-         </LinearLayout>
+            <Button
+                android:id="@+id/searchbtn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:text="@string/buttonStr"
+                android:textStyle="bold"
+                android:background="@drawable/button_state"
+                android:textColor="@android:color/white"
+                android:onClick="click_result"
+                android:layout_gravity="center" />
+            <Button
+                android:id="@+id/researchbtn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/buttonResearch"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button_state"
+                android:onClick="click_research"
+                android:layout_gravity="center" />
+        </LinearLayout>
     </LinearLayout>
 
     <!--식별자 표시 Edit-->
@@ -467,6 +474,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:hint="@string/markedit"
                     android:textSize="15sp"/>
             </LinearLayout>
 
@@ -484,6 +492,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:hint="@string/markedit"
                     android:textSize="15sp"/>
             </LinearLayout>
             <Button
@@ -491,7 +500,7 @@
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/search"
+                android:text="@string/buttonStr"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:background="@drawable/button_state"
