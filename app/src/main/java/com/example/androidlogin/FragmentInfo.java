@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -84,12 +85,13 @@ public class FragmentInfo extends Fragment {
                 if (user != null) {
                     // 기본값인 count=0일 경우 이메일 입력 다이얼로그를 보여주고 count값을 1로 바꿔줌
                     if(count==0){
+                        Toast.makeText(getActivity(),"구글 로그인 회원은 회원정보를 제공하지 않습니다.", Toast.LENGTH_LONG).show();
                         showDialog();
                         count =1;
                     }
-                    // count값이 1인 경우 이메일 입력 다이얼로그를 생략하고 info 메서드를 실행
-                    if(count==1){
-                        info();
+                    else{
+                        // 다이얼로그 인증을 끝낸 후 새로고침을 했을 경우 다이얼로그 없이 바로 수정된 회원정보를 보여줌
+                      showInfo();
                     }
                 }
                 // 로그인한 사용자가 없는 경우
@@ -188,70 +190,52 @@ public class FragmentInfo extends Fragment {
 
     // 회원정보 열람시 호출할 이메일 입력 다이얼로그
     private void showDialog(){
-
         // 입력하는 이메일 값을 저장할 변수
         final EditText edittext = new EditText(getActivity());
         // 다이얼로그 호출
-        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity(),android.R.style.Theme_Material_Light);
-        dialog.setMessage("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
-                .setView(edittext)
-                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
-                        editTextEmail.setText("");
-                        editTextName.setText("");
-                        editTextPhone.setText("");
-                        editTextPassword.setText("");
-                        // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
-                        btn_modifypw.setVisibility(View.GONE);
-                        btn_modifypn.setVisibility(View.GONE);
-                        btn_modifyname.setVisibility(View.GONE);
-                        btn_refresh.setVisibility(View.GONE);
-
-                    }
-                })
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                       // 로그인 중인 사용자를 불러옴
-                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        // 다이얼로그에 입력한 이메일 값
-                        String email = edittext.getText().toString();
-                        // 로그인 중인 사용자의 이메일 값
-                        String checkmail = user.getEmail();
-                        // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
-                        // 같을 때
-                        if(email.equals(checkmail)){
-                            Toast.makeText(getActivity(),"이메일 확인 성공", Toast.LENGTH_SHORT).show();
-                            // "확인" 버튼 클릭시 info 메서드 호출
-                            info();
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        if((!getActivity().isFinishing())){
+            dialog.setMessage("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
+                    .setView(edittext)  // 이메일을 입력하기 위한 edittext
+                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
                         }
-                        // 다를 때
-                        else{
-                            // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
-                            editTextEmail.setText("");
-                            editTextName.setText("");
-                            editTextPhone.setText("");
-                            editTextPassword.setText("");
-                            // 수정 이미지 버튼 GONE하여 버튼과 그 공간까지 보이지 않게 처리
-                            btn_modifypw.setVisibility(View.GONE);
-                            btn_modifypn.setVisibility(View.GONE);
-                            btn_modifyname.setVisibility(View.GONE);
-                            btn_refresh.setVisibility(View.GONE);
-
-                            Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                    })
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // 로그인 중인 사용자를 불러옴
+                            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            // 다이얼로그에 입력한 이메일 값
+                            final String email = edittext.getText().toString();
+                            // 로그인 중인 사용자의 이메일 값
+                            String checkmail = user.getEmail();
+                            // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
+                            // 같을 때
+                            if(email.equals(checkmail)){
+                                Toast.makeText(getActivity(),"이메일 확인 성공", Toast.LENGTH_SHORT).show();
+                                // "확인" 버튼 클릭시 info 메서드 호출
+                                // 입력한 이메일 값을 파이어스토어의 이메일 값과 비교해야하기 때문에 info메서드에 email값을 넣어줌
+                                info(email);
+                            }
+                            // 다를 때
+                            else{
+                                Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
 
-                })
-                .show();
+                    })
+                    .show();
+
+        }
+
 
     }
 
-    // info 메서드
-   private void info(){
+    // 이메일 인증 다이얼로그로 인증이 완료된 후 새로고침을 했을 때 다이얼로그 없이 보여주기 위해 회원정보가 저장된 텍스트를 바로 띄워주기 위한 메서드 생성
+    private void showInfo(){
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // firestore의 collection 경로를  "users"로 설정
         firebaseFirestore.collection("users")
@@ -260,17 +244,18 @@ public class FragmentInfo extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때
-                       if (task.isSuccessful()) {
+                        if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult())
                             {
                                 assert user != null;
-                                if(user.getEmail().equals(document.getData().get("email"))) {
+                                // 로그인 중인 사용자의 이메일과 파이어베이스의 이메일이 같을 때
+                               if(user.getEmail().equals(document.getData().get("email"))) {
                                     // editText에 파이어스토에 저장된 값을 setText해줌
                                     editTextEmail.setText(document.getData().get("email").toString());
                                     editTextName.setText(document.getData().get("name").toString());
                                     editTextPhone.setText(document.getData().get("phone").toString());
                                     editTextPassword.setText(document.getData().get("password").toString());
-                                   // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
+                                    // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
                                     btn_modifypw.setVisibility(View.VISIBLE);
                                     btn_modifypn.setVisibility(View.VISIBLE);
                                     btn_modifyname.setVisibility(View.VISIBLE);
@@ -283,7 +268,43 @@ public class FragmentInfo extends Fragment {
                     }
                 });
 
+        }
+
+
+    // 입력한 이메일값과 파이어베이스에 들어있는 이메일 값을 비교해서 회원정보를 보여줄 info 메서드 생성
+    private void info(final String string){
+        // firestore의 collection 경로를  "users"로 설정
+        firebaseFirestore.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult())
+                            {
+                                assert user != null;
+                                // 입력한 string값과 파이어베이스의 이메일 비교하여 같을 때 처리
+                                if(string.equals(document.getData().get("email"))) {
+                                    // editText에 파이어스토에 저장된 값을 setText해줌
+                                    editTextEmail.setText(document.getData().get("email").toString());
+                                    editTextName.setText(document.getData().get("name").toString());
+                                    editTextPhone.setText(document.getData().get("phone").toString());
+                                    editTextPassword.setText(document.getData().get("password").toString());
+                                    // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
+                                    btn_modifypw.setVisibility(View.VISIBLE);
+                                    btn_modifypn.setVisibility(View.VISIBLE);
+                                    btn_modifyname.setVisibility(View.VISIBLE);
+                                    btn_refresh.setVisibility(View.VISIBLE);
+
+                                }
+
+                            }
+                        }
+                    }
+                });
     }
+
 
     }
 

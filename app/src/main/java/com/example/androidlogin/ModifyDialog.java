@@ -38,6 +38,8 @@ public class ModifyDialog extends DialogFragment {
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
 
+    private final String pass_key = "password";
+
     private FirebaseUser user;
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -50,11 +52,10 @@ public class ModifyDialog extends DialogFragment {
     private EditText password;
 
     // 새롭게 저장할 password 값 객체 생성
-    String newPassword ="";
+    private String newPassword ="";
 
     public ModifyDialog(){
     }
-
 
     @Nullable
     @Override
@@ -85,6 +86,7 @@ public class ModifyDialog extends DialogFragment {
                 if(user != null) {
                     // 다이얼로그에 작성한 password값을 string으로 처리하여 새로운 password값인 newPassword에 저장
                     newPassword = password.getText().toString();
+                    // 입력한 비밀번호의 유효성 검사
                     if (isValidPasswd()) {
                         // 로그인 중인 사용자의 password를 newPassword로 업데이트
                         user.updatePassword(newPassword)
@@ -96,7 +98,7 @@ public class ModifyDialog extends DialogFragment {
                                             // 파이어스토어 collection의 경로를 "users"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
                                             DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
                                            // 새로운 password값으로 업데이트
-                                            ref.update("password", newPassword)
+                                            ref.update(pass_key, newPassword)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {

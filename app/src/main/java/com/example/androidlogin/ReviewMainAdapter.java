@@ -151,7 +151,6 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
         // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
 
 
-
         PopupMenu popup = new PopupMenu(activity,v);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
@@ -169,11 +168,9 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
                 }
             }
         });
+
         MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
         inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
         popup.show();
     }
-
-
-
 }

@@ -97,14 +97,19 @@ public class ReviewMainActivity extends AppCompatActivity {
 
     private void login() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setMessage("로그인 후 이용해주세요.")
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        finish();
-                    }
-                })
-                .show();
+        if((!this.isFinishing())){
+            dialog.setMessage("로그인 후 이용해주세요.")
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.cancel();
+                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
+        }
+
     }
 
     //게시글 추가 버튼을 클릭할 때 처리하는 기능

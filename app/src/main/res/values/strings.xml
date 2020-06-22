@@ -78,6 +78,54 @@
 
     <string name="deletString">삭제</string>
 
+    <string name="SearchList">모양으로 검색</string>
+    <!--색상 버튼-->
+    <string name="Colorlist">색상</string>
+    <string name="buttonWhite">하양</string>
+    <string name="buttonYellow">노랑</string>
+    <string name="buttonOrange">주황</string>
+    <string name="buttonPink">분홍</string>
+    <string name="buttonRed">빨강</string>
+    <string name="buttonBrown">갈색</string>
+    <string name="buttonYellowgreen">연두</string>
+    <string name="buttonGreen">초록</string>
+    <string name="buttonBluishgreen">청록</string>
+    <string name="buttonBlue">파랑</string>
+    <string name="buttonNavy">남색</string>
+    <string name="buttonPurple">자주</string>
+    <string name="buttonViolet">보라</string>
+    <string name="buttonGray">회색</string>
+    <string name="buttonBlack">검정</string>
+    <string name="buttonTransparente">투명</string>
+    <string name="blanktext"> </string>
+    <!--모양 버튼-->
+    <string name="Shapelist">모양</string>
+    <string name="buttonCircle">원형</string>
+    <string name="buttonOval">타원</string>
+    <string name="buttonSemicircle">반원</string>
+    <string name="buttonTriangle">삼각형</string>
+    <string name="buttonSquare">사각형</string>
+    <string name="buttonDiamond">마름모</string>
+    <string name="buttonRectangle">장방형</string>
+    <string name="buttonPentagon">오각형</string>
+    <string name="buttonHexagon">육각형</string>
+    <string name="buttonOctagon">팔각형</string>
+    <string name="buttonEct">기타</string>
+    <!--제형 버튼-->
+    <string name="Typelist">제형</string>
+    <string name="buttonTablet">정제류</string>
+    <string name="buttonHardcapsule">경질캡슐</string>
+    <string name="buttonSoftcapsul">연질캡슐</string>
+    <string name="buttonEct2">기타</string>
+    <!--식별자 표시 edit-->
+    <string name="Markserach">──── 식별 표시로 검색────</string>
+    <string name="TextFront">식별자 앞 : </string>
+    <string name="TextBack">식별자 뒤 : </string>
+    <string name="search">검색</string>
+    <!--초기화 버튼-->
+    <string name="buttonResearch">검색 초기화</string>
+
+
 
 
 </resources>

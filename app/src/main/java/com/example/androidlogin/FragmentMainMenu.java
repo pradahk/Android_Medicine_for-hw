@@ -36,6 +36,7 @@ public class FragmentMainMenu extends Fragment {
     private ImageButton btn_image;
     private ImageButton btn_map;
     private ImageButton btn_review;
+    private ImageButton btn_shape;
 
     public FragmentMainMenu(){
     }
@@ -57,6 +58,7 @@ public class FragmentMainMenu extends Fragment {
         btn_image = view.findViewById(R.id.ImageButton);
         btn_map = view.findViewById(R.id.mapButton);
         btn_review = view.findViewById(R.id.reviewButton);
+        btn_shape = view.findViewById(R.id.shapeButton);
 
         btn_image.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -82,6 +84,15 @@ public class FragmentMainMenu extends Fragment {
 
             }
         });
+
+        btn_shape.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), FormMainActivity.class);
+                startActivity(intent);
+            }
+            });
+
 
         return view;
     }

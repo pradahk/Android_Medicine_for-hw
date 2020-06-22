@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:largeHeap="true"
         tools:targetApi="m"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
@@ -52,6 +53,9 @@
         </activity>
         <activity android:name=".ReviewActivityPost">
         </activity>
+        <activity android:name=".FormSearchActivity"/>
+        <activity android:name=".FormMainActivity"/>
+
         <activity
             android:name=".MenuActivity"
             android:label="MenuActivity" >

@@ -46,9 +46,15 @@ public class ReviewWriteActivity extends ReviewMainActivity {
         //초기화해줌. MainActivity.java의 intent putExtra에서 넣어준 값을 받아옴
         reviewPostInfo2 = (ReviewPostInfo)getIntent().getSerializableExtra("postInfo");
         postInit();//수정버튼을 눌렀을 때 그 전의 게시물을 불러오는 메서드를 onCreate에서 선언해줌
-
-
     }
+
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplication(), ReviewMainActivity.class));
+        finish();
+    }
+
 
     View.OnClickListener onClickListener = new View.OnClickListener(){
         @Override
@@ -69,7 +75,7 @@ public class ReviewWriteActivity extends ReviewMainActivity {
         //제목과 글이 둘 다 입력 되었을 때 실행됨
         if(title.length() > 0 && contents.length()>0){
             loadrLayout.setVisibility(View.VISIBLE);
-           // FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();//나중에 DB에서 게시글을 올린 사람 찾기를 위한 메서드.
+            // FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();//나중에 DB에서 게시글을 올린 사람 찾기를 위한 메서드.
             user = firebaseAuth.getCurrentUser();
             assert user != null;
             ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date, user.getEmail());
@@ -91,21 +97,21 @@ public class ReviewWriteActivity extends ReviewMainActivity {
 
         //게시물에서 입력한 텍스트들을 받아와서 database의 document부분에 넣어줌.
         documentReference.set(reviewPostInfo.getPostInfo())
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {//성공시
-                    Log.d(TAG,"id");
-                    loadrLayout.setVisibility(View.GONE);//로딩화면 띄워주는 코드
-                    finish();
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override// 실패 시
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG,"Error",e);
-                    loadrLayout.setVisibility(View.GONE);//로딩화면 띄워주는 코드
-                }
-            });
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {//성공시
+                        Log.d(TAG,"id");
+                        loadrLayout.setVisibility(View.GONE);//로딩화면 띄워주는 코드
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override// 실패 시
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG,"Error",e);
+                        loadrLayout.setVisibility(View.GONE);//로딩화면 띄워주는 코드
+                    }
+                });
     }
 
     private void postInit (){//수정버튼을 눌렀을 때 그 전의 값들을 넣어주는 역할을 함

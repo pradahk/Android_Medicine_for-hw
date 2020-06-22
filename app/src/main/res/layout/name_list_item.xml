@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:layout_margin="13dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/layout">
@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_centerInParent="true"
-        android:background="#e3e3e3"/>
+        android:background="#e3e3e3"
+        android:layout_marginBottom="20dp"/>
 
 
     <LinearLayout
@@ -22,24 +23,33 @@
 
 
         <ImageView
+            android:layout_marginLeft="3dp"
             android:id="@+id/list_image"
-            android:layout_width="121dp"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             tools:text="이미지" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:background="#e3e3e3"
+            android:layout_marginLeft="15dp"/>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="15dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -47,13 +57,19 @@
                     android:text="@string/nameText" />
 
                 <TextView
+                    android:layout_marginLeft="5dp"
                     android:id="@+id/tv_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/background_dark"
                     android:textSize="15dp" />
             </LinearLayout>
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerInParent="true"
+                android:background="#e3e3e3"
+                android:layout_marginBottom="20dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,6 +85,7 @@
                     android:id="@+id/tv_company"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
 
@@ -87,6 +104,7 @@
                     android:id="@+id/tv_className"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
 
@@ -105,6 +123,7 @@
                     android:id="@+id/tv_etcOtcName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
         </LinearLayout>
@@ -112,6 +131,7 @@
 
     <!--구분선-->
     <View
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="1dp"

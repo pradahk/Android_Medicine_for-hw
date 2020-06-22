@@ -42,7 +42,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         finish();
         super.onBackPressed();
     }
-        @Override public void onStart() {
+    @Override public void onStart() {
         super.onStart();
         // 파이어베이스에 로그인 중인지 판단
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
@@ -54,7 +54,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-       // 위젯에 대한 참조
+        // 위젯에 대한 참조
         bt_tab1 = findViewById(R.id.bt_tab1);
         bt_tab2 = findViewById(R.id.bt_tab2);
         bt_tab3 = findViewById(R.id.bt_tab3);
@@ -107,9 +107,9 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 // 로그인한 사용자가 없는 경우
                 else {
                     // 로그아웃 중이라면 로그아웃 버튼은 필요하지 않으므로 로그아웃 버튼은 GONE 처리하여 버튼 영역까지 보이지 않게 처리
-                  singout_btn.setVisibility(View.GONE);
-                  // 로그인을 할 수 있게 로그인 버튼을 보여줌
-                  signin_btn.setVisibility(View.VISIBLE);
+                    singout_btn.setVisibility(View.GONE);
+                    // 로그인을 할 수 있게 로그인 버튼을 보여줌
+                    signin_btn.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -124,12 +124,12 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 // FRAGMENT 1 보여줌
                 callFragment(FRAGMENT1);
                 break;
-                // 두번째 tab 클릭시
+            // 두번째 tab 클릭시
             case R.id.bt_tab2 :
                 // FRAGMENT 2 보여줌
                 callFragment(FRAGMENT2);
                 break;
-                // 세번째 tab 클릭시
+            // 세번째 tab 클릭시
             case R.id.bt_tab3 :
                 // FRAGMENT 3 보여줌
                 callFragment(FRAGMENT3);
@@ -171,33 +171,35 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     void show(){
         // Alert 다이얼로그 객체 생성
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // 생성한 다이얼로그을 보여줌
-        builder.create().show();
-        // 다이얼로그 셋팅
-        builder.setTitle("로그아웃");
-        builder.setMessage("정말 로그아웃을 하시겠습니까?");
-        builder.setPositiveButton("예",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // "예" 클릭시 로그아웃
-                        FirebaseAuth.getInstance().signOut();
-                        Toast.makeText(MenuActivity.this,"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-        builder.setNegativeButton("아니오",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // "아니오" 클릭시 다이얼로그 취소
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
-    }
+        if(!this.isFinishing()){
+            // 생성한 다이얼로그을 보여줌
+            builder.create().show();
+            // 다이얼로그 셋팅
+            builder.setTitle("로그아웃");
+            builder.setMessage("정말 로그아웃을 하시겠습니까?");
+            builder.setPositiveButton("예",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // "예" 클릭시 로그아웃
+                            FirebaseAuth.getInstance().signOut();
+                            Toast.makeText(MenuActivity.this,"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            builder.setNegativeButton("아니오",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // "아니오" 클릭시 다이얼로그 취소
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+        }
+        }
+
 
 
 }
-
 
 

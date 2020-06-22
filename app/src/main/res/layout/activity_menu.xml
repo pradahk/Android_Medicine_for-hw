@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MenuActivity"
-   >
-
+    >
 
     <FrameLayout
         android:id="@+id/fragment_container"
@@ -20,12 +19,12 @@
             android:layout_height="wrap_content"
             android:gravity="right">
 
-        <Button
-            android:id="@+id/signInbutton"
-            android:layout_width="70dp"
-            android:layout_height="40dp"
-            android:background="#00FFFFFF"
-            android:text="@string/signin" />
+            <Button
+                android:id="@+id/signInbutton"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:background="#00FFFFFF"
+                android:text="@string/signin" />
             <Button
                 android:id="@+id/signOutbutton"
                 android:layout_width="70dp"
@@ -40,7 +39,8 @@
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:layout_marginBottom="5dp">
 
         <Button
             android:layout_weight="1"
@@ -48,7 +48,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00ffffff"
-            android:drawableTop="@drawable/ic_person_black_24dp" />
+            android:drawableTop="@drawable/ic_person_black_24dp"
+            android:text="마이페이지"
+            android:textSize="12sp"/>
 
         <Button
             android:layout_weight="1"
@@ -56,7 +58,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00ffffff"
-            android:drawableTop="@drawable/ic_local_hospital_black_24dp" />
+            android:drawableTop="@drawable/ic_home_black_24dp"
+            android:text="홈"
+            android:textSize="12sp"/>
 
         <Button
             android:layout_weight="1"
@@ -64,7 +68,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#00ffffff"
-            android:drawableTop="@drawable/ic_alarm_black_24dp" />
+            android:drawableTop="@drawable/ic_alarm_black_24dp"
+            android:text="알람"
+            android:textSize="12sp"
+            />
 
     </LinearLayout>
 

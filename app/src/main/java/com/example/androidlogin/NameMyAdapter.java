@@ -3,6 +3,7 @@ package com.example.androidlogin;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,9 +109,10 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         //이미지의 용량을 임의로 지정하여 intent로 넘겨주는 코드
                         Bitmap bitmap = mList.get(position).getImage();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] b = stream.toByteArray();
-                        intent.putExtra("image",b); //image의 크기를 낮춰준 후 intent로 넘겨줌
+                        intent.putExtra("image", b); //image의 크기를 낮춰준 후 intent로 넘겨줌
+                        intent.putExtra("count", 1);
 
                         //전체의 intent를 실제로 넘겨주는 코드.
                         mContext.startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
@@ -150,12 +152,15 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
     }
 
     //두번째 공공데이터 파싱하는 부분
-    String getXmlData(String seq){
 
-        StringBuffer buffer=new StringBuffer();
+
+
+    String getXmlData(String string){
+
+        StringBuffer buffer = new StringBuffer();
 
         try {//인코딩을 위한 try catch문
-            searchString = URLEncoder.encode(seq, "UTF-8");
+            searchString = URLEncoder.encode(string, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -198,7 +203,7 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         if (parser.getName().equals("item")) {//Tag 이름이 item일경우
                             Log.e("END_TAG : ", "END");
                         }
-                        if(parser.getName().equals("DOC")){
+                        if (parser.getName().equals("DOC")) {
                             articleEnd = true;
                         }
                         break;
@@ -209,18 +214,18 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                         //Tag가 시작될 때 다 true로 변경함
 
                         //xml파일은 Doc안에 Article안에 paragraph내에 text가 있는 구조임. 그래서 그 안의 구조를 가져오기 위해 이렇게 선언함.
-                        if (parser.getName().equals("DOC")){
+                        if (parser.getName().equals("DOC")) {
 
                             //xml파일에서 Tag의 title에 적힌 값을 읽어오기 위한 코드.
-                            String arti = parser.getAttributeValue(null,"title");
+                            String arti = parser.getAttributeValue(null, "title");
                             buffer.append("\n\n");
                             buffer.append("< ").append(arti).append(" >");
-                            articleEnd=false;//article의 End부분은 false로 선언해줌. 이것을 이용하여 문서의 끝을 알림.
+                            articleEnd = false;//article의 End부분은 false로 선언해줌. 이것을 이용하여 문서의 끝을 알림.
                             doc = true;
                         }
-                        if (parser.getName().equals("ARTICLE")){
+                        if (parser.getName().equals("ARTICLE")) {
                             //xml파일에서 Tag의 title에 적힌 값을 읽어오기 위한 코드.
-                            String arti = parser.getAttributeValue(null,"title");
+                            String arti = parser.getAttributeValue(null, "title");
                             buffer.append(arti);
                             article = true;
                         }
@@ -228,20 +233,20 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                             paragraph = true;
                         }
                         if (parser.getName().equals("EE_DOC_DATA")) ee_doc_data = true;//효능효과
-                        if (parser.getName().equals("UD_DOC_DATA")){//용법용량
+                        if (parser.getName().equals("UD_DOC_DATA")) {//용법용량
                             ud_doc_data = true;
                         }
-                        if (parser.getName().equals("NB_DOC_DATA")){//사용상의주의사항
+                        if (parser.getName().equals("NB_DOC_DATA")) {//사용상의주의사항
                             Nb_doc_data = true;
                         }
                         break;
 
                     case XmlPullParser.TEXT://eventType이 TEXT일 경우
-                        if(ee_doc_data) {//효능효과부분을 가져오는 코드
-                            if(doc){//doc 데이터 안에
-                                if(!articleEnd){//article부분이 끝날때까지 돌리기 위해 사용됨
-                                    if(article){//article 부분에
-                                        if(paragraph){//paragraph부분. 이곳에 text가 있음.
+                        if (ee_doc_data) {//효능효과부분을 가져오는 코드
+                            if (doc) {//doc 데이터 안에
+                                if (!articleEnd) {//article부분이 끝날때까지 돌리기 위해 사용됨
+                                    if (article) {//article 부분에
+                                        if (paragraph) {//paragraph부분. 이곳에 text가 있음.
                                             //parsing부분
                                             String ee_text = parser.getText();//text를 가져옴
                                             //Log.e("GBN_NAME : ", ee_text);
@@ -253,38 +258,36 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
                                 }
                             }
                             ee_doc_data = false;
-                        }
-                        else if(ud_doc_data) {//용법용량부분을 가져오는 코드
-                                if(doc){
-                                    if(!articleEnd){
-                                        if(article){
-                                            if(paragraph){
-                                                String ud_text = parser.getText();
-                                                if(ud_text.contains("<")|| ud_text.contains("&")){//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
-                                                    buffer.append(Html.fromHtml(ud_text));
+                        } else if (ud_doc_data) {//용법용량부분을 가져오는 코드
+                            if (doc) {
+                                if (!articleEnd) {
+                                    if (article) {
+                                        if (paragraph) {
+                                            String ud_text = parser.getText();
+                                            if (ud_text.contains("<") || ud_text.contains("&")) {//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
+                                                buffer.append(Html.fromHtml(ud_text));
 
-                                                }else{//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
-                                                    buffer.append(ud_text);
-                                                }
+                                            } else {//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
+                                                buffer.append(ud_text);
                                             }
                                         }
-                                        buffer.append("\n");
-                                        break;
                                     }
+                                    buffer.append("\n");
+                                    break;
                                 }
+                            }
                             ud_doc_data = false;
-                        }
-                        else if(Nb_doc_data) {//사용상의주의사항부분
-                            if(doc){
+                        } else if (Nb_doc_data) {//사용상의주의사항부분
+                            if (doc) {
 
-                                if(!articleEnd){
-                                    if(article){
-                                        if(paragraph){
+                                if (!articleEnd) {
+                                    if (article) {
+                                        if (paragraph) {
                                             String nb_doc_data = parser.getText();
                                             //Log.e("GBN_NAME : ", nb_doc_data);
-                                            if(nb_doc_data.contains("<")|| nb_doc_data.contains("&")){//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
+                                            if (nb_doc_data.contains("<") || nb_doc_data.contains("&")) {//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
                                                 buffer.append(Html.fromHtml(nb_doc_data));
-                                            }else{//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
+                                            } else {//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
                                                 buffer.append(nb_doc_data);
                                             }
                                         }
@@ -301,6 +304,7 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  buffer.toString();//buffer를 String형식으로 return해줌
+        return buffer.toString();//buffer를 String형식으로 return해줌
     }
+
 }
