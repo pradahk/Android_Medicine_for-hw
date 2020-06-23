@@ -125,6 +125,7 @@ public class SignupActivity extends AppCompatActivity {
                                                 sendEmailVerification();
                                                 //  이메일 인증 다이얼로그 보여줌
                                                 authemailDialog.show();
+
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -237,7 +238,6 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 }
-
 
 
 

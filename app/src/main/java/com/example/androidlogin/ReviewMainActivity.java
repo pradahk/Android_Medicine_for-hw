@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,7 +46,6 @@ public class ReviewMainActivity extends AppCompatActivity {
     private FirebaseUser user;
     FragmentMainMenu fragmentMainMenu;
 
-
     @Override public void onStart() {
         super.onStart();
         // 파이어베이스에 로그인 중인지 판단
@@ -53,10 +53,11 @@ public class ReviewMainActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(getApplication(),MenuActivity.class));
+        finish();
         super.onBackPressed();
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +70,7 @@ public class ReviewMainActivity extends AppCompatActivity {
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-               user = firebaseAuth.getCurrentUser();
+                user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
                     Log.e("로그","리뷰게시판입니다.");
@@ -107,6 +108,7 @@ public class ReviewMainActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     })
+                    .setCancelable(false)
                     .show();
         }
 
@@ -120,7 +122,10 @@ public class ReviewMainActivity extends AppCompatActivity {
                 myStartActivity(ReviewWriteActivity.class);
             }
             else if (view.getId() == R.id.gohome){
-                myStartActivity(MenuActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             }
         }
     };

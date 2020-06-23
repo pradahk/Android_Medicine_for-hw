@@ -96,7 +96,7 @@ public class FragmentInfo extends Fragment {
                     }
                     else{
                         // 다이얼로그 인증을 끝낸 후 새로고침을 했을 경우 다이얼로그 없이 바로 수정된 회원정보를 보여줌
-                      showInfo();
+                        showInfo();
                     }
                 }
                 // 로그인한 사용자가 없는 경우
@@ -202,40 +202,44 @@ public class FragmentInfo extends Fragment {
         final EditText edittext = new EditText(getActivity());
         // 다이얼로그 호출
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-            dialog.setTitle("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
-                    .setMessage("(구글 로그인 회원은 회원정보를 제공하지 않습니다.)")
-                    .setView(edittext)  // 이메일을 입력하기 위한 edittext
-                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+        dialog.setTitle("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
+                .setMessage("(구글 로그인 회원은 회원정보를 제공하지 않습니다.)")
+                .setView(edittext)  // 이메일을 입력하기 위한 edittext
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // 로그인 중인 사용자를 불러옴
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        // 다이얼로그에 입력한 이메일 값
+                        final String email = edittext.getText().toString();
+                        // 로그인 중인 사용자의 이메일 값
+                        assert user != null;
+                        String checkmail = user.getEmail();
+                        // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
+                        // 같을 때
+                        if(email.equals(checkmail)){
+                            Toast.makeText(getActivity(),"이메일 확인 성공", Toast.LENGTH_SHORT).show();
+                            // "확인" 버튼 클릭시 info 메서드 호출
+                            // 입력한 이메일 값을 파이어스토어의 이메일 값과 비교해야하기 때문에 info메서드에 email값을 넣어줌
+                            info(email);
                         }
-                    })
-                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // 로그인 중인 사용자를 불러옴
-                            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            // 다이얼로그에 입력한 이메일 값
-                            final String email = edittext.getText().toString();
-                            // 로그인 중인 사용자의 이메일 값
-                            assert user != null;
-                            String checkmail = user.getEmail();
-                            // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
-                            // 같을 때
-                            if(email.equals(checkmail)){
-                                Toast.makeText(getActivity(),"이메일 확인 성공", Toast.LENGTH_SHORT).show();
-                                // "확인" 버튼 클릭시 info 메서드 호출
-                                // 입력한 이메일 값을 파이어스토어의 이메일 값과 비교해야하기 때문에 info메서드에 email값을 넣어줌
-                                info(email);
-                            }
-                            // 다를 때
-                            else{
-                                Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
-                            }
+                        else if(email.getBytes().length<1){
+                            Toast.makeText(getActivity(),"이메일을 입력해주세요" +
+                                    ".", Toast.LENGTH_SHORT).show();
                         }
+                        // 다를 때
+                        else{
+                            Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                    })
-                  .show();
+                })
+                .show();
 
 
     }
@@ -255,7 +259,7 @@ public class FragmentInfo extends Fragment {
                             {
                                 assert user != null;
                                 // 로그인 중인 사용자의 이메일과 파이어베이스의 이메일이 같을 때
-                               if(user.getEmail().equals(document.getData().get("email"))) {
+                                if(user.getEmail().equals(document.getData().get("email"))) {
                                     // editText에 파이어스토에 저장된 값을 setText해줌
                                     editTextEmail.setText(document.getData().get("email").toString());
                                     editTextName.setText(document.getData().get("name").toString());
@@ -275,7 +279,7 @@ public class FragmentInfo extends Fragment {
                     }
                 });
 
-        }
+    }
 
 
     // 입력한 이메일값과 파이어베이스에 들어있는 이메일 값을 비교해서 회원정보를 보여줄 info 메서드 생성
@@ -314,6 +318,5 @@ public class FragmentInfo extends Fragment {
     }
 
 
-    }
-
+}
 

@@ -49,11 +49,14 @@ public class ReviewWriteActivity extends ReviewMainActivity {
     }
 
 
+    /*
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplication(), ReviewMainActivity.class));
         finish();
     }
+
+     */
 
 
     View.OnClickListener onClickListener = new View.OnClickListener(){
@@ -63,6 +66,7 @@ public class ReviewWriteActivity extends ReviewMainActivity {
                 loadrLayout.setVisibility(View.VISIBLE);
                 contentsUpdate();//데이터 베이스에 contents가 업데이트됨
                 myStartActivity(ReviewMainActivity.class);//MainActivity화면으로 넘어감
+
             }
         }
     };
@@ -126,6 +130,10 @@ public class ReviewWriteActivity extends ReviewMainActivity {
     }
     private void myStartActivity(Class c) {//화면 전환을 위한 메서드를 함수로 정의함
         Intent intent = new Intent(this, c);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivityForResult(intent, 1);
+        finish();
     }
+
+
 }

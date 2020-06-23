@@ -3,6 +3,7 @@ package com.example.androidlogin;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,21 +21,16 @@ public class FormSearchActivity extends AppCompatActivity {
     ArrayList<FormDrug> list = null;
     FormMyAdapter mAdapter;
 
-    String choosecolor;
-    String chooseshape;
-    String choosetype;
-    String searchmarkfront;
-    String searchmarkback;
+    //선택한 색상, 모양 제형 저장할 변수
+    // 표시앞,뒤
+    private String choosecolor;
+    private String chooseshape;
+    private String choosetype;
+    private String searchmarkfront;
+    private String searchmarkback;
 
     private LinearLayoutManager linearLayoutManager;
-
-
-    @Override
-    public void onBackPressed() {
-        //startActivity(new Intent(getApplication(),MainActivity.class));
-        super.onBackPressed();
-        //finish();
-    }
+    private TextView drug_result;
 
 
 
@@ -42,6 +38,8 @@ public class FormSearchActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_shape_search_list);
+
+        drug_result = (TextView) findViewById(R.id.drug_result);
 
         choosecolor = getIntent().getStringExtra("choosecolor");
         chooseshape = getIntent().getStringExtra("chooseshape");
@@ -70,6 +68,13 @@ public class FormSearchActivity extends AppCompatActivity {
         mAdapter = new FormMyAdapter(getApplicationContext(), list);
         recyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
+
+        if (list.size() != 0) {
+            drug_result.setText(" ");
+
+        } else {
+            drug_result.setText("검색 결과와 일치하는 약이 없습니다.");
+        }
 
     }
 

@@ -2,6 +2,7 @@ package com.example.androidlogin;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,10 +12,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,9 +51,16 @@ public class NameMainActivity extends AppCompatActivity {
     String imag;
     String key = "gyhnkvw8BuHNtPGQzXT5Nluh3Ri3hGlcpEnheMdjI1gjDbZhPSEpy05ofIMaFu2a96c%2FUX%2FzOVblYrTa%2B%2Fu%2Bjg%3D%3D"; //약국 공공데이터 서비스키
 
+    private String getedit;
 
     //로딩중을 띄워주는 progressDialog
     private ProgressDialog progressDialog;
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +92,9 @@ public class NameMainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
 
         });
@@ -91,16 +103,22 @@ public class NameMainActivity extends AppCompatActivity {
 
 
     public void mOnClick(final View view) { //검색 버튼을 클릭 시
+        //edit 검색 후 키보드 숨기기
+        InputMethodManager mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        mInputMethodManager.hideSoftInputFromWindow(edit.getWindowToken(),0);
 
-        //검색 결과가 다 뜰때까지 로딩중을 띄워줌 -> 공공데이터 파싱을 이용하기 때문에 오래 걸리기 때문이다.
-        progressDialog.setMessage("로딩중입니다.");
-        progressDialog.show();
+        getedit = edit.getText().toString();
+        if(getedit.getBytes().length <= 0)
+        {
+            Toast.makeText(getApplicationContext(),"검색어를 입력해주세요.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //검색 결과가 다 뜰때까지 로딩중을 띄워줌 -> 공공데이터 파싱을 이용하기 때문에 오래 걸리기 때문이다.
+            progressDialog.setMessage("로딩중입니다.");
+            progressDialog.show();
 
-
-
-        if (view.getId() == R.id.buttonNameSearch) {//버튼을 클릭 시 Thread 발생, 공공데이터를 search하여 불러오는 메서드 실행
-            //Android 4.0 이상 부터는 네트워크를 이용할 때 반드시 Thread 사용해야 함
-
+            if (view.getId() == R.id.buttonNameSearch) {//버튼을 클릭 시 Thread 발생, 공공데이터를 search하여 불러오는 메서드 실행
+                //Android 4.0 이상 부터는 네트워크를 이용할 때 반드시 Thread 사용해야 함
 
 /*
             @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
@@ -120,39 +138,35 @@ public class NameMainActivity extends AppCompatActivity {
 
  */
 
+                new Thread(new Runnable() {
+                    //데이터가 많을 때 별도로 스레드를 만들어 사용하면 빠르게 실행된다.
 
+                    //안드로이드는 싱글 쓰레드 체제이며, 오직 메인 쓰레드(UI 쓰레드)만이 뷰의 값을 바꿀 수 있는 권한을 갖고 있다.
+                    //그래서 뷰의 값에 간섭하는 작업을 하는 쓰레드만을 만들고 뷰에 접근하려 시도하면, 안드로이드 자체적으로 앱을 죽여버린다.
+                    // 이 경우를 막기 위해 안드로이드 개발자들은 핸들러라는 것을 만들어서 쓰는 것이다.
 
-            new Thread(new Runnable() {
-                //데이터가 많을 때 별도로 스레드를 만들어 사용하면 빠르게 실행된다.
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        //아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
+                        runOnUiThread(new Runnable() { //스레드 사용 시 Ui를 이용하기 때문에 runOnUiThread가 필요하다.
+                            //지금 작업을 수행하는 쓰레드가 메인 쓰레드라면 즉시 작업을 시작하고
+                            //메인 쓰레드가 아니라면 쓰레드 이벤트 큐에 쌓아두는 기능을 하는 게 runOnUiThread다.
 
-                //안드로이드는 싱글 쓰레드 체제이며, 오직 메인 쓰레드(UI 쓰레드)만이 뷰의 값을 바꿀 수 있는 권한을 갖고 있다.
-                //그래서 뷰의 값에 간섭하는 작업을 하는 쓰레드만을 만들고 뷰에 접근하려 시도하면, 안드로이드 자체적으로 앱을 죽여버린다.
-                // 이 경우를 막기 위해 안드로이드 개발자들은 핸들러라는 것을 만들어서 쓰는 것이다.
+                            //Runnable : 특정 동작을 UI 스레드에서 동작하도록 합니다. 만약 현재 스레드가 UI 스레드이면 그 동작은 즉시 수행됩니다.
+                            //Thread에서 UI에 접근하여 변경할 때 필요한것이다.
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                MyAsyncTask myAsyncTask = new MyAsyncTask();
+                                myAsyncTask.execute();
+                            }
+                        });
+                    }
+                }).start();
+            }
 
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    //아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
-                    runOnUiThread(new Runnable() { //스레드 사용 시 Ui를 이용하기 때문에 runOnUiThread가 필요하다.
-                        //지금 작업을 수행하는 쓰레드가 메인 쓰레드라면 즉시 작업을 시작하고
-                        //메인 쓰레드가 아니라면 쓰레드 이벤트 큐에 쌓아두는 기능을 하는 게 runOnUiThread다.
-
-                        //Runnable : 특정 동작을 UI 스레드에서 동작하도록 합니다. 만약 현재 스레드가 UI 스레드이면 그 동작은 즉시 수행됩니다.
-                        //Thread에서 UI에 접근하여 변경할 때 필요한것이다.
-                        @Override
-                        public void run() {
-                            // TODO Auto-generated method stub
-                            MyAsyncTask myAsyncTask = new MyAsyncTask();
-                            myAsyncTask.execute();
-                        }
-                    });
-                }
-            }).start();
         }
-
-
-
-
     }
 
     //MyAsyncTask의 첫번째 인자는 doInBackground의 파라미터 타입이 될것이다.
@@ -171,6 +185,7 @@ public class NameMainActivity extends AppCompatActivity {
 
             String str = edit.getText().toString();//EditText에 작성된 Text얻어오기
             String drugSearch = null;//약 이름으로 검색하기 위해 null로 초기화해줌
+
 
 
             try {//인코딩을 위한 try catch문

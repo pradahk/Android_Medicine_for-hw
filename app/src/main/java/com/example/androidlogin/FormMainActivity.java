@@ -48,9 +48,15 @@ public class FormMainActivity extends AppCompatActivity {
     private String thistype; // 비교할 색상 값
 
 
-
     TextView textcolor, textshape, texttype;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onBackPressed() {
+        //startActivity(new Intent(getApplication(),MenuActivity.class));
+        finish();
+        super.onBackPressed();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +71,9 @@ public class FormMainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
 
         });

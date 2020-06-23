@@ -44,10 +44,6 @@ public class ModifyDialog extends DialogFragment {
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-    // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
-    private Button positivebutton;
-    private Button negativebutton;
-
     // 다이얼로그에 입력하는 password 객체 생성
     private EditText password;
 
@@ -63,8 +59,9 @@ public class ModifyDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.modify_dialog, container, false);
 
         // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
-        positivebutton = view.findViewById(R.id.positivebutton);
-        negativebutton = view.findViewById(R.id.negativebutton);
+        // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
+        Button positivebutton = view.findViewById(R.id.positivebutton);
+        Button negativebutton = view.findViewById(R.id.negativebutton);
 
         // 다이얼로그에 작성하는 password값 저장
         password = view.findViewById(R.id.signup_password);
@@ -82,7 +79,7 @@ public class ModifyDialog extends DialogFragment {
             public void onClick(View v) {
                 // 로그인 중인 사용자 가져오기
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-              // 로그인 상태일 경우
+                // 로그인 상태일 경우
                 if(user != null) {
                     // 다이얼로그에 작성한 password값을 string으로 처리하여 새로운 password값인 newPassword에 저장
                     newPassword = password.getText().toString();
@@ -97,7 +94,7 @@ public class ModifyDialog extends DialogFragment {
                                             // 업데이트에 성공하면 파이어스토어에 저장된 password도 업데이트
                                             // 파이어스토어 collection의 경로를 "users"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
                                             DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
-                                           // 새로운 password값으로 업데이트
+                                            // 새로운 password값으로 업데이트
                                             ref.update(pass_key, newPassword)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
@@ -136,4 +133,3 @@ public class ModifyDialog extends DialogFragment {
     }
 
 }
-

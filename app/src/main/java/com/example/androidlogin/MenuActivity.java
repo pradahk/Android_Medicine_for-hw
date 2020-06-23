@@ -1,5 +1,6 @@
 package com.example.androidlogin;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.Auth;
@@ -43,12 +45,27 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     private Button singout_btn;
     private Button signin_btn;
 
-
+    //뒤로가기 2번 클릭 시 종료
+    private long lastTimeBackPressed; //뒤로가기 버튼이 클릭된 시간
     @Override
-    public void onBackPressed() {
-        finish();
-        super.onBackPressed();
+    public void onBackPressed()
+    {
+        //2초 이내에 뒤로가기 버튼을 재 클릭 시 앱 종료
+        if (System.currentTimeMillis() - lastTimeBackPressed < 2000)
+        {
+            moveTaskToBack(true);
+            finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+
+            return;
+        }
+
+        //'뒤로' 버튼 한번 클릭 시 메시지
+        Toast.makeText(this, "버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show();
+        //lastTimeBackPressed에 '뒤로'버튼이 눌린 시간을 기록
+        lastTimeBackPressed = System.currentTimeMillis();
     }
+
     @Override public void onStart() {
         super.onStart();
         // 파이어베이스에 로그인 중인지 판단
@@ -205,10 +222,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                     });
             builder.show();
         }
-        }
-
-
+    }
 
 }
-
 

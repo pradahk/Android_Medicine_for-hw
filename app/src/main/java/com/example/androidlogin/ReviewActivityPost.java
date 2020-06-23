@@ -37,6 +37,14 @@ public class ReviewActivityPost extends ReviewMainActivity {
     private TextView textName;
 
     @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
+
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //이 java파일에서는 activity_write_post창을 보여줄것임.
@@ -85,7 +93,9 @@ public class ReviewActivityPost extends ReviewMainActivity {
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
 
         });
@@ -146,6 +156,7 @@ public class ReviewActivityPost extends ReviewMainActivity {
             @Override
             public void onClick(View v) {
                 myStartActivity(ReviewWriteActivity.class, reviewPostInfo);//바로 ReviewWriteActivity창으로 넘겨줌. 다시 게시물을 작성할 수 있는 창으로 넘겨주는것임.
+
             }
         });
     }
@@ -175,10 +186,14 @@ public class ReviewActivityPost extends ReviewMainActivity {
     private void myStartActivity (Class c, ReviewPostInfo reviewPostInfo){//intent를 이용하여 id 값을 전달해줄것임.
         Intent intent = new Intent(this, c);
         intent.putExtra("postInfo", reviewPostInfo);//앞에는 key값, 뒤에는 실제 값
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         //id값을 보내주면 WritePostActivity에서 받아서 쓸것임
         startActivity(intent);
+        finish();
     }
     private void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
+
+
 }

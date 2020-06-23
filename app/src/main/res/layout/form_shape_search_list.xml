@@ -8,10 +8,10 @@
 
 
     <TextView
-        android:id="@+id/no_result"
+        android:paddingLeft="10dp"
+        android:id="@+id/drug_result"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </TextView>
+        android:layout_height="20dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_recyclerview"

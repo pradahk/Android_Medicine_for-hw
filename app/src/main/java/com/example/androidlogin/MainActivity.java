@@ -2,6 +2,7 @@ package com.example.androidlogin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth;
 
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
     // 작성한 이메일 값과 비밀번호 값과 이름 값을 저장할 객체 생성
     private EditText editTextEmail;
     private EditText editTextPassword;
@@ -44,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     // 구글 로그인 객체 생성
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
-    private SignInButton signInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         Button findid_btn = findViewById(R.id.btn_findid);
 
         // 구글 로그인 버튼 객체 생성
-        signInButton = findViewById(R.id.signInButton);
+        SignInButton signInButton = findViewById(R.id.signInButton);
 
         // 홈으로 이동하는 버튼 객체 생성
         ImageButton btn_home = findViewById(R.id.gohome);
@@ -78,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
 
         });
@@ -108,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 // 이메일 찾기 버튼을 누르면 이메일 찾기 레이아웃으로 이동
-                 Intent intent = new Intent(getApplicationContext(), FindIdActivity.class);
-                 startActivity(intent);
-        }
+                Intent intent = new Intent(getApplicationContext(), FindIdActivity.class);
+                startActivity(intent);
+            }
         });
 
         // 구글 로그인
@@ -124,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                Log.e("구글 로그인","버튼 클릭");
                 // 클릭시 구글 로그인 메서드 실행
                 signIn();
+
             }
         });
 
@@ -135,25 +142,33 @@ public class MainActivity extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+        Log.e("구글 로그인","메서드 실행");
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // GoogleSignInApi.getSignInIntent로 부터 결과 반환;
+        Log.e("구글 로그인","result 메서드");
+        // RC_SIGN_IN을 통해 로그인 확인여부 코드가 저상 전달되었다면
         if (requestCode == RC_SIGN_IN) {
+            Log.e("구글 로그인","로그인 여부");
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // 구글 로그인이 성공하면, 파이어베이스에 로그인 인증 등록
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 assert account != null;
+                // 구글 이용자가 확인된 사용자 정보를 파이어베이스로 넘기기
                 firebaseAuthWithGoogle(account);
+                Log.e("구글 로그인","구글 로그인 성공");
             } catch (ApiException ignored) {
+                Log.e("구글 로그인","구글 로그인 실패");
             }
         }
     }
 
     // 파이어베이스와 구글 로그인 연결
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.e("구글 로그인","파이어베이스랑 연결 중");
+        // 파이어베이스로 받은 구글 사용자가 확인된 이용자의 값을 토큰으로 받음
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -161,8 +176,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
                             startActivity(intent);
                         } else {
@@ -173,8 +188,9 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    // 이메일 로그인
-    public void signIn(View view) {
+    // 이메일 로그인 메서드
+    public void signInemail(View view) {
+
         // editText에 작성한 내용을 String으로 변환하여 객체에 저장
         email = editTextEmail.getText().toString();
         password = editTextPassword.getText().toString();
@@ -218,14 +234,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
-                            Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
-                            // MenuActivity로 화면 전환
-                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
-                            startActivity(intent);
-                        }
-                        else {
+                            if(firebaseAuth.getCurrentUser().isEmailVerified()){
+                                // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
+                                Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = firebaseAuth.getCurrentUser();
+                                // MenuActivity로 화면 전환
+                                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                                startActivity(intent);
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this,"이메일 인증을 완료해주세요.",Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
                             // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
                         }

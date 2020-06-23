@@ -64,7 +64,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
     private GoogleMap mMap;
     private Marker currentMarker = null;
     Button handle_btn;
-
+    EditText edit;
+    String getedit; //약국 동이름으로 검색하는 edittext
 
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 1000; //권한 설정을 한 activity에 request값으로 받아올 변수 설정
@@ -90,6 +91,11 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
     private View mLayout;  // Snackbar 사용하기 위해서 View가 필요
     List<Marker> previous_marker = null; //google place에서 얻어온 약국 마커 표시
 
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +107,9 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         previous_marker = new ArrayList<Marker>();
 
         handle_btn = (Button) findViewById(R.id.handle);
+        edit = (EditText) findViewById(R.id.edit);
 
-        //약국 찾기 버튼 눌렀을때
+        //약국 찾기 버튼 눌렀을때(마커 생성)
         Button button = (Button)findViewById(R.id.pharm_btn);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,8 +134,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         parser.edit = (EditText)findViewById(R.id.edit);
@@ -143,7 +149,9 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
 
         });
@@ -205,7 +213,6 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onMapClick(LatLng latLng) {
-
                 Log.d( TAG, "onMapClick :");
             }
         });
@@ -238,7 +245,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         }
     };
 
-    //gps서비스 상태 파악
+    //gps서비스 상태 파악, 현재 위치 업데이트
     private void startLocationUpdates() {
 
         if (!checkLocationServicesStatus()) {
@@ -281,7 +288,6 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
         }
 
-
     }
 
     @Override
@@ -296,7 +302,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-
+    // 지오코더로 gps를 주소로 변환함. 위도와 경도를 받아온 후에 onMap에서 실행해주면 현재 위치로 이동함
     public String getCurrentAddress(LatLng latlng) {
 
         //지오코더... GPS를 주소로 변환
@@ -305,7 +311,6 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
                     latlng.latitude,
                     latlng.longitude,
@@ -442,7 +447,6 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
                         @Override
                         public void onClick(View view) {
-
                             finish();
                         }
                     }).show();
@@ -514,6 +518,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
+
     //PlaceListener가 요구하는 메서드 4개
     @Override
     public void onPlacesFailure(PlacesException e) { }
@@ -580,30 +585,40 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
                 .execute();
     }
 
+
     //약국 검색 버튼
     public void mOnClick(View v){
-
-        handle_btn.setText("검색 결과를 보려면 위로 슬라이딩 해주세요.");
-        switch (v.getId()){
-            case R.id.serach_btn :
-                new Thread(new Runnable(){
-
-                    @Override
-                    public void run() {
-                        data = parser.getXmlData();
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                parser.text.setText(data);
-                            }
-                        });
-                    }
-                }).start();
-                break;
-        }
         //edit 검색 후 키보드 숨기기
         InputMethodManager mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(parser.edit.getWindowToken(),0);
+        getedit = edit.getText().toString();
+        if(getedit.getBytes().length <= 0)
+        {
+            Toast.makeText(getApplicationContext(),"검색어를 입력해주세요.", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            handle_btn.setText("검색 결과를 보려면 위로 슬라이딩 해주세요.");
+            switch (v.getId()){
+                case R.id.serach_btn :
+                    new Thread(new Runnable(){
+
+                        @Override
+                        public void run() {
+                            data = parser.getXmlData();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    parser.text.setText(data);
+                                }
+                            });
+                        }
+                    }).start();
+                    break;
+
+            }
+
+        }
+
     }
 }
