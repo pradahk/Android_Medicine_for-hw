@@ -74,7 +74,7 @@ public class FindIdActivity extends AppCompatActivity {
         btngotologin.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                // 이메일 찾기 버튼을 누르면 이메일 찾기 레이아웃으로 이동
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }

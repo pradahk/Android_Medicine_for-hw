@@ -55,14 +55,18 @@
         </activity>
         <activity android:name=".FormSearchActivity"/>
         <activity android:name=".FormMainActivity"/>
-
         <activity
             android:name=".MenuActivity"
             android:label="MenuActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        </activity>
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
         </activity>
     </application>
 
