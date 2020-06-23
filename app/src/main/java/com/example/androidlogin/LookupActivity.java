@@ -1,5 +1,6 @@
 package com.example.androidlogin;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -19,8 +20,13 @@ public class LookupActivity extends NameMainActivity {
     String str_detailStr;
     String image; //form 에서 넘어온 어댑터에서 이미지 넣어줄때 사용
 
-    String sort = null; // form, name 중 어느 어댑터에서 넘어온 건지 구부하기 위함
+    String sort = null; // form, name 중 어느 어댑터에서 넘어온 건지 구분하기 위함
 
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +42,7 @@ public class LookupActivity extends NameMainActivity {
         str_detailStr = getIntent().getStringExtra("data");
         //NameMyAdapter.java파일에서 intent로 넘겨준 image를 받아와 byte배열에 저장 후 decode하여 imageview에 보여줌.
         sort = getIntent().getStringExtra("sort");
-        Log.e("모양에서 왔니 이름에서 왔니???",sort);
+        Log.e("form/sort??",sort);
 
 
         // 이미지 넘겨주는 형식이 다르게 때문에 bitmap, string 구분하기 위해 if문 사용
@@ -48,7 +54,9 @@ public class LookupActivity extends NameMainActivity {
             textView.setText(drugString);
             detailStr.setText(str_detailStr);
             imageView.setImageBitmap(bitmap);
+
         }
+
         else if(sort.equals("form")){
             image = getIntent().getStringExtra("image");
             //Bitmap bitmap = BitmapFactory.decodeByteArray(b,0,b.length);

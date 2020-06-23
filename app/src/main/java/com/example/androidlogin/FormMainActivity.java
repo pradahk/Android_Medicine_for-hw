@@ -52,7 +52,10 @@ public class FormMainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onBackPressed() {
-        //startActivity(new Intent(getApplication(),MenuActivity.class));
+        // 버튼을 누르면 메인화면으로 이동
+        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
         super.onBackPressed();
     }
@@ -196,13 +199,13 @@ public class FormMainActivity extends AppCompatActivity {
                     choosetype = result_typebtn.getText().toString();
 
                     if(choosetype.contains("정")){
-                        choosetype = "나정, 필름코팅정, 서방정, 저작정, 구강붕해정, 장용성필름코팅정, 다층정";
+                        choosetype = "나정, 필름코팅정, 서방정, 저작정, 추어블정(저작정), 구강붕해정, 서방성필름코팅정, 장용성필름코팅정, 다층정, 분산정(현탁정), 정제";
                     }else if(choosetype.contains("경질")){
-                        choosetype = "경질캡슐제|산제, 경질캡슐제|과립제, 경질캡슐제|장용성과립제";
+                        choosetype = "경질캡슐제|산제, 경질캡슐제|과립제, 경질캡슐제|장용성과립제, 스팬슐, 서방성캡슐제|펠렛";
                     }else if(choosetype.contains("연질")){
                         choosetype ="연질캡슐제|현탁상, 연질캡슐제|액상";
                     } else if(choosetype.contains("기타")){
-                        choosetype = "껌제";
+                        choosetype = "껌제, 트로키제";
                     }
 
                     //texttype.setText(choosetype);
@@ -244,7 +247,7 @@ public class FormMainActivity extends AppCompatActivity {
                                 typeBtn[j].setBackgroundResource(R.drawable.basic_button);
                                 typeBtn[j].setTextColor(Color.BLACK);
                             }
-                            if(thisshape.contains("껌제")) {
+                            if(thisshape.contains("제")) {
                                 typeBtn[j].setBackgroundResource(R.drawable.basic_button);
                                 typeBtn[j].setTextColor(Color.BLACK);
                             }
@@ -290,28 +293,18 @@ public class FormMainActivity extends AppCompatActivity {
     //검색 결과 버튼
     public void click_result(View view) {
 
-        //  progressDialog.setMessage("로딩중입니다.");
-        // progressDialog.show();
-
-        //takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
-        //takeMarkBack();
-
         Intent intent = new Intent(getApplicationContext(), FormSearchActivity.class);
 
         intent.putExtra("choosecolor",choosecolor);
         intent.putExtra("chooseshape",chooseshape);
         intent.putExtra("choosetype",choosetype);
-        //intent.putExtra("searchmarkfront",searchmarkfront);
-        //intent.putExtra("searchmarkback", searchmarkback);
+
 
         startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
-        //progressDialog.dismiss();
     }
 
     //식별자 검색 결과 버튼
     public void click_markresult(View view) {
-        //progressDialog.setMessage("로딩중입니다.");
-        //progressDialog.show();
 
         takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
         takeMarkBack();
@@ -322,7 +315,6 @@ public class FormMainActivity extends AppCompatActivity {
 
 
         startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
-        //progressDialog.dismiss();
     }
 
 

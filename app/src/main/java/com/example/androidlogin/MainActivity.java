@@ -50,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
 
     @Override
+    public void onBackPressed() {
+        // 버튼을 누르면 메인화면으로 이동
+        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -94,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 // 회원가입 버튼을 누르면 회원가입 레이아웃으로 이동
                 Intent intent = new Intent(getApplicationContext(),SignupActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -104,7 +116,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 비밀번호 재설정 버튼을 누르면 비밀번호 찾기 레이아웃으로 이동
                 Intent intent = new Intent(getApplicationContext(),FindpwActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -114,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 // 이메일 찾기 버튼을 누르면 이메일 찾기 레이아웃으로 이동
                 Intent intent = new Intent(getApplicationContext(), FindIdActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -179,7 +195,9 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
+                            finish();
                         } else {
                             // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
                             Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
@@ -240,7 +258,9 @@ public class MainActivity extends AppCompatActivity {
                                 FirebaseUser user = firebaseAuth.getCurrentUser();
                                 // MenuActivity로 화면 전환
                                 Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
+                                finish();
                             }
                             else{
                                 Toast.makeText(MainActivity.this,"이메일 인증을 완료해주세요.",Toast.LENGTH_SHORT).show();

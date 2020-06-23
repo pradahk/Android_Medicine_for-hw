@@ -55,7 +55,6 @@ public class ReviewMainActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
         super.onBackPressed();
-
     }
 
     @Override
@@ -105,7 +104,9 @@ public class ReviewMainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int i) {
                             dialog.cancel();
                             Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
+                            finish();
                         }
                     })
                     .setCancelable(false)
@@ -202,6 +203,7 @@ public class ReviewMainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, c);
         startActivityForResult(intent, 1);
     }
+
     private void myStartActivity(Class c, ReviewPostInfo reviewPostInfo) {//intent를 이용하여 id 값을 전달해줄것임.
         Intent intent = new Intent(this,c);
         intent.putExtra("postInfo", reviewPostInfo);//앞에는 key값, 뒤에는 실제 값

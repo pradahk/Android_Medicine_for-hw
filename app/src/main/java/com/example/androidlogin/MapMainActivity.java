@@ -93,7 +93,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
     @Override
     public void onBackPressed() {
-        finish();
+        // 버튼을 누르면 메인화면으로 이동
+        myStartActivity();
         super.onBackPressed();
     }
 
@@ -118,8 +119,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        mLayout = findViewById(R.id.layout_main);
 
+        mLayout = findViewById(R.id.layout_main);
         locationRequest = new LocationRequest()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(UPDATE_INTERVAL_MS)
@@ -130,9 +131,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
         builder.addLocationRequest(locationRequest);
 
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -148,10 +147,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 // 버튼을 누르면 메인화면으로 이동
-                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                myStartActivity();
             }
 
         });
@@ -180,6 +176,7 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
             startLocationUpdates(); // 이미 퍼미션 가지고 있다면 위치 업데이트 시작
         }
+
         else {  //퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요.
 
             // 사용자가 퍼미션 거부를 한 적이 있는 경우
@@ -440,14 +437,14 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
                         || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
 
-
                     //사용자가 퍼미션을 거부했을때 뜨는 메시지
                     Snackbar.make(mLayout, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요. ",
                             Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View view) {
-                            finish();
+                            // 버튼을 누르면 메인화면으로 이동
+                            myStartActivity();
                         }
                     }).show();
 
@@ -459,8 +456,8 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
 
                         @Override
                         public void onClick(View view) {
-
-                            finish();
+                            // 버튼을 누르면 메인메뉴화면으로 이동
+                            myStartActivity();
                         }
                     }).show();
                 }
@@ -586,11 +583,12 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
 
-    //약국 검색 버튼
+    //'동'이름으로 약국 검색 버튼
     public void mOnClick(View v){
         //edit 검색 후 키보드 숨기기
         InputMethodManager mInputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         mInputMethodManager.hideSoftInputFromWindow(parser.edit.getWindowToken(),0);
+
         getedit = edit.getText().toString();
         if(getedit.getBytes().length <= 0)
         {
@@ -621,4 +619,15 @@ public class MapMainActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
     }
+
+
+    //메인화면으로 스택이 쌓이지 않고 이동하는 메서드
+    private void myStartActivity(){
+        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+
 }

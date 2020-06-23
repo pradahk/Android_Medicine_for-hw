@@ -30,9 +30,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
-    // 파이어베이스 사용자 객체 생성
-    private FirebaseUser user;
-
     // 프래그먼트 객체 생성
     private final int FRAGMENT1 = 1;
     private final int FRAGMENT2 = 2;
@@ -45,33 +42,33 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     private Button singout_btn;
     private Button signin_btn;
 
-    //뒤로가기 2번 클릭 시 종료
-    private long lastTimeBackPressed; //뒤로가기 버튼이 클릭된 시간
+    // 뒤로가기 버튼이 클릭된 시간
+    private long lastTimeBackPressed;
+
     @Override
     public void onBackPressed()
     {
-        //2초 이내에 뒤로가기 버튼을 재 클릭 시 앱 종료
+        // 2초 이내에 뒤로가기 버튼을 재 클릭 시 앱 종료
         if (System.currentTimeMillis() - lastTimeBackPressed < 2000)
         {
             moveTaskToBack(true);
             finish();
             android.os.Process.killProcess(android.os.Process.myPid());
-
             return;
         }
 
-        //'뒤로' 버튼 한번 클릭 시 메시지
+        // '뒤로' 버튼 한번 클릭 시 메시지
         Toast.makeText(this, "버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show();
         //lastTimeBackPressed에 '뒤로'버튼이 눌린 시간을 기록
         lastTimeBackPressed = System.currentTimeMillis();
     }
 
+    // 로그인 소식을 듣고 다음단계로 넘겨주는 역할인 firebaseAuthListener을 선언을 onStart에 넣어줌
     @Override public void onStart() {
         super.onStart();
         // 파이어베이스에 로그인 중인지 판단
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,18 +198,18 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             // 생성한 다이얼로그을 보여줌
             builder.create().show();
             // 다이얼로그 셋팅
-            builder.setTitle("로그아웃");
-            builder.setMessage("정말 로그아웃을 하시겠습니까?");
-            builder.setPositiveButton("예",
+            builder.setTitle(R.string.signout);
+            builder.setMessage(R.string.reallogout);
+            builder.setPositiveButton(R.string.yse,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // "예" 클릭시 로그아웃
                             FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(getApplicationContext(),"로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),R.string.logoutsuccess, Toast.LENGTH_SHORT).show();
                         }
                     });
-            builder.setNegativeButton("아니오",
+            builder.setNegativeButton(R.string.no,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

@@ -30,14 +30,14 @@ public class FormSearchActivity extends AppCompatActivity {
     private String searchmarkback;
 
     private LinearLayoutManager linearLayoutManager;
+
     private TextView drug_result;
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_shape_search_list);
+
 
         drug_result = (TextView) findViewById(R.id.drug_result);
 
@@ -79,7 +79,7 @@ public class FormSearchActivity extends AppCompatActivity {
     }
 
 
-    //json에서 조건에 맞는 것 검색(색상, 모양, 제형)
+    //json에서 조건에 맞는 것 검색(색상, 모양, 제형) 7가지.
     public void searchJson(){
         try{
             InputStream is = getAssets().open("druglist.json"); //assests파일에 저장된 druglist_final.json 파일 열기
@@ -96,20 +96,18 @@ public class FormSearchActivity extends AppCompatActivity {
             for(int i=0; i<jsonArray.length(); i++){
                 jsonObject = jsonArray.getJSONObject(i);
 
-                //'색상, 모양, 제형' 선택하고 검색하기(3개의 카테고리 중 하나만 선택 가능)
+                //'색상, 모양, 제형' 선택하고 검색하기(3개의 카테고리 중 하나만 선택 하고 검색 가능)
                 //1. 색상만 선택된 경우
                 if(choosecolor != null && chooseshape == null && choosetype == null){
                     if ((jsonObject.getString("색상앞").contains(choosecolor))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("1번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형"));
-                        //formDrug.setColor(jsonObject.getString("색상앞"));
+
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
                         formDrug.setDrugName(jsonObject.getString("품목명"));
                         formDrug.setCompany(jsonObject.getString("업소명"));
                         formDrug.setClassName(jsonObject.getString("분류명"));
                         formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
-                        //formDrug.setShape(jsonObject.getString("의약품제형"));
-                        //formDrug.setType(jsonObject.getString("제형코드명"));
 
                         list.add(formDrug);
                     }
@@ -119,6 +117,7 @@ public class FormSearchActivity extends AppCompatActivity {
                     if ((jsonObject.getString("색상앞").contains(choosecolor)) && (jsonObject.getString("의약품제형").equals(chooseshape))) {
                         FormDrug formDrug = new FormDrug();
                         Log.e("2번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
+
                         formDrug.setImage(jsonObject.getString("큰제품이미지"));
                         formDrug.setDrugName(jsonObject.getString("품목명"));
                         formDrug.setCompany(jsonObject.getString("업소명"));
@@ -200,7 +199,7 @@ public class FormSearchActivity extends AppCompatActivity {
     }
 
 
-    //json에서 조건에 맞는 것 검색(식별자)
+    //json에서 조건에 맞는 것 검색(식별자) 3가지.
     public void marksearchJson(){
         try{
             InputStream is = getAssets().open("druglist.json"); //assests파일에 저장된 druglist_final.json 파일 열기

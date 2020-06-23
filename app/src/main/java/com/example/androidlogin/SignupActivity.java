@@ -137,7 +137,7 @@ public class SignupActivity extends AppCompatActivity {
                                         });
 
                             } else {
-                                Toast.makeText(SignupActivity.this, "이미 존재하는 계정입니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignupActivity.this, R.string.alreadyemail, Toast.LENGTH_SHORT).show();
                             }
 
 
@@ -160,7 +160,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(SignupActivity.this, "인증 메일 전송", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignupActivity.this, R.string.sendverifyemail, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -170,11 +170,11 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidEmail() {
         if (email.isEmpty()) {
             // 이메일 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.writeemail, Toast.LENGTH_SHORT).show();
             return false;
         } else if (!EMAIL_ADDRESS.matcher(email).matches()) {
             // 이메일 형식이 불일치하면 false
-            Toast.makeText(SignupActivity.this, "이메일 형식이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.notvaildemail, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
@@ -186,11 +186,11 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidPasswd() {
         if (password.isEmpty()) {
             // 비밀번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.writepassword, Toast.LENGTH_SHORT).show();
             return false;
         } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
             // 비밀번호 형식이 불일치하면 false
-            Toast.makeText(SignupActivity.this, "비밀번호 형식이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.notvalidpassword, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
@@ -201,11 +201,11 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidPasswdcheck() {
         if (passwordCheck.isEmpty()) {
             // 비밀번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this, "비밀번호 확인칸을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.writecheckpassword, Toast.LENGTH_SHORT).show();
             return false;
         } else if (!password.equals(passwordCheck)) {
             // 비밀번호와 비밀번호 확인에 입력한 값이 불일치하면 false
-            Toast.makeText(SignupActivity.this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.notmatchpass, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
@@ -216,7 +216,7 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidName() {
         if (name.isEmpty()) {
             // 이름 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this, "이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.writename, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;
@@ -227,10 +227,10 @@ public class SignupActivity extends AppCompatActivity {
     private boolean isValidPhone() {
         if (phone.isEmpty()) {
             // 전화번호 칸이 공백이면 false
-            Toast.makeText(SignupActivity.this, "전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.writephone, Toast.LENGTH_SHORT).show();
             return false;
         } else if (!PHONE_PATTERN.matcher(phone).matches()) {
-            Toast.makeText(SignupActivity.this, "전화번호 형식이 올바르지 않습니다. '-'없이 숫자만 작성해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.notvalidphone, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;

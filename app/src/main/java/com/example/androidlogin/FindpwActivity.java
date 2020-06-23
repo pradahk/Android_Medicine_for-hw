@@ -31,7 +31,7 @@ public class FindpwActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(getApplication(),MainActivity.class));
+        //startActivity(new Intent(getApplication(),MainActivity.class));
     }
 
     @Override
@@ -79,27 +79,30 @@ public class FindpwActivity extends AppCompatActivity {
         // 프로그래스 다이얼로그 생성하여 보여줌
         progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
         progressDialog.show();
-            //비밀번호 재설정 이메일 보내기
-            firebaseAuth.sendPasswordResetEmail(sendemail)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        // 이메일이 정상적으로 전송됐으면 "이메일을 발송하였습니다." 토스트를 보여줌
-                                        Toast.makeText(FindpwActivity.this, R.string.emailsending, Toast.LENGTH_LONG).show();
-                                        finish();
-                                        // 이메일을 정상적으로 보낸 후 로그인 화면으로 이동
-                                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                    } else {
-                                        // 이메일이 정상적으로 전송되지 않았다면 "이메일 발송에 실패하였습니다." 토스트를 보여줌
-                                        Toast.makeText(FindpwActivity.this, R.string.emailfail, Toast.LENGTH_LONG).show();
-                                    }
-                                    // 프로그래스 다이얼로그 사라짐
-                                    progressDialog.dismiss();
-                                }
-                            });
+        //비밀번호 재설정 이메일 보내기
+        firebaseAuth.sendPasswordResetEmail(sendemail)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // 이메일이 정상적으로 전송됐으면 "이메일을 발송하였습니다." 토스트를 보여줌
+                            Toast.makeText(FindpwActivity.this, R.string.emailsending, Toast.LENGTH_LONG).show();
+                            // 버튼을 누르면 메인화면으로 이동
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                            // 이메일을 정상적으로 보낸 후 로그인 화면으로 이동
+                            //startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            // 이메일이 정상적으로 전송되지 않았다면 "이메일 발송에 실패하였습니다." 토스트를 보여줌
+                            Toast.makeText(FindpwActivity.this, R.string.emailfail, Toast.LENGTH_LONG).show();
+                        }
+                        // 프로그래스 다이얼로그 사라짐
+                        progressDialog.dismiss();
+                    }
+                });
     }
 }
-
 
 

@@ -58,7 +58,7 @@ public class NameMainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
+        // 버튼을 누르면 메인화면으로 이동
         super.onBackPressed();
     }
 

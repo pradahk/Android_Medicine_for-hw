@@ -105,7 +105,7 @@ public class ModifyNameDialog extends DialogFragment {
     private boolean isValidName() {
         if (newName.isEmpty()) {
             // 이름 칸이 공백이면 false
-            Toast.makeText(getActivity(), "변경할 이름을 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.plzinputname, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;

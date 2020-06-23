@@ -116,7 +116,7 @@ public class ModifyPhoneDialog extends DialogFragment {
             return false;
         } else if (!PHONE_PATTERN.matcher(newPhone).matches()) {
             // 전화번호 형식이 불일치하면 false
-            Toast.makeText(getActivity(), "전화번호 형식이 올바르지 않습니다. '-'없이 숫자만 작성해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.notvalidphone, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;

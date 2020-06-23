@@ -108,7 +108,11 @@
                 android:id="@+id/handle"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="@string/slidingup" />
+                android:text="@string/slidingup"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/choose_btton"
+                android:textColor="@android:color/white"/>
 
             <!--스크롤뷰 레이아웃 -->
             <LinearLayout

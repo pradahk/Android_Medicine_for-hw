@@ -83,6 +83,7 @@ public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHold
 
                         intent = new Intent(mContext, LookupActivity.class);//intent를 초기화해주는 코드
 
+
                         //앞에는 key값, 뒤에는 실제 값
                         intent.putExtra("Drug", drugString);//drug의 이름을 넘겨줌
                         intent.putExtra("data", data);//파싱한 데이터들을 "data"의 키로 넘겨줌

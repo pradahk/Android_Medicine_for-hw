@@ -53,6 +53,8 @@ public class NameMyAdapter extends RecyclerView.Adapter<NameMyAdapter.MyViewHold
         this.mContext = context;
     }
 
+
+
     @NonNull
     @Override//view holder를 생성하고 뷰를 붙여주는 부분
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

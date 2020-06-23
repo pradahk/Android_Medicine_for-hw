@@ -38,9 +38,9 @@ public class ModifyDialog extends DialogFragment {
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
 
+    // 파이어스토어에 저장된 "password"이라는 이름의 값을 pass_key라는 문자에 저장
     private final String pass_key = "password";
 
-    private FirebaseUser user;
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -121,11 +121,11 @@ public class ModifyDialog extends DialogFragment {
     private boolean isValidPasswd() {
         if (newPassword.isEmpty()) {
             // 비밀번호 칸이 공백이면 false
-            Toast.makeText(getActivity(),"변경할 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),R.string.plzinpytpassword, Toast.LENGTH_SHORT).show();
             return false;
         } else if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
             // 비밀번호 형식이 불일치하면 false
-            Toast.makeText(getActivity(), "비밀번호 형식이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.notvalidpassword, Toast.LENGTH_SHORT).show();
             return false;
         } else {
             return true;

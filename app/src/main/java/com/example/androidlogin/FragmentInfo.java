@@ -60,10 +60,11 @@ public class FragmentInfo extends Fragment {
     // 로그인이 되어있지 않을 경우 보여주는 텍스트뷰 객체 생성
     private TextView tv_beforelogin;
 
-    // 수정 및 새로고침 버튼 객체 생성
+    // 수정 버튼 객체 생성
     private ImageButton btn_modifypw;
     private ImageButton btn_modifypn;
     private ImageButton btn_modifyname;
+    // 새로고침 버튼 객체 생성
     private ImageButton btn_refresh;
 
     // 새로고침 버튼 클릭시 이메일 입력 다이얼로그가 재생성되는 것을 방지하기 위하여 count라는 변수 생성하여 0을 기본값으로 설정함
@@ -72,7 +73,7 @@ public class FragmentInfo extends Fragment {
     public FragmentInfo() {
     }
 
-    // 파이어베이스 인증을 onStart에 넣어줌
+    // 로그인 소식을 듣고 다음단계로 넘겨주는 역할인 firebaseAuthListener을 선언을 onStart에 넣어줌
     @Override public void onStart() {
         super.onStart();
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
@@ -82,9 +83,11 @@ public class FragmentInfo extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // firebaseAuthListener
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // 현재 로그인 중인 사용자를 가져옴
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 // 로그인한 사용자가 있는 경우
                 if (user != null) {
@@ -120,7 +123,7 @@ public class FragmentInfo extends Fragment {
         editTextName = view.findViewById(R.id.write_name);
         // id가 write_phone인 editText에 대한 메서드 저장
         editTextPhone = view.findViewById(R.id.write_phone);
-
+        // id가 tv_beforeLogin인 textview에 대한 메서드 저장
         tv_beforelogin = view.findViewById(R.id.tv_beforelogin);
 
         // id가 modifybutton인 버튼에 대한 메서드 저장
@@ -217,7 +220,7 @@ public class FragmentInfo extends Fragment {
                         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         // 다이얼로그에 입력한 이메일 값
                         final String email = edittext.getText().toString();
-                        // 로그인 중인 사용자의 이메일 값
+                        // 로그인 중인 사용자의 이메일 값을 checkmail이라는 string 변수값에 넣어줌
                         assert user != null;
                         String checkmail = user.getEmail();
                         // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
@@ -228,24 +231,22 @@ public class FragmentInfo extends Fragment {
                             // 입력한 이메일 값을 파이어스토어의 이메일 값과 비교해야하기 때문에 info메서드에 email값을 넣어줌
                             info(email);
                         }
+                        // 입력한 값이 없이 '확인'버튼을 누를 경우
                         else if(email.getBytes().length<1){
-                            Toast.makeText(getActivity(),"이메일을 입력해주세요" +
-                                    ".", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(),"이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
                         }
-                        // 다를 때
+                        // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값이 다를 때
                         else{
                             Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                 })
                 .show();
-
-
     }
 
     // 이메일 인증 다이얼로그로 인증이 완료된 후 새로고침을 했을 때 다이얼로그 없이 보여주기 위해 회원정보가 저장된 텍스트를 바로 띄워주기 위한 메서드 생성
     private void showInfo(){
+        // 현재 로그인이 되어있는 사용자를 가져옴
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // firestore의 collection 경로를  "users"로 설정
         firebaseFirestore.collection("users")
@@ -278,9 +279,7 @@ public class FragmentInfo extends Fragment {
                         }
                     }
                 });
-
     }
-
 
     // 입력한 이메일값과 파이어베이스에 들어있는 이메일 값을 비교해서 회원정보를 보여줄 info 메서드 생성
     private void info(final String string){
@@ -316,7 +315,6 @@ public class FragmentInfo extends Fragment {
                     }
                 });
     }
-
 
 }
 

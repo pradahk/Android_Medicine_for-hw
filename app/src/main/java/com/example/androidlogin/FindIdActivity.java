@@ -48,7 +48,7 @@ public class FindIdActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(getApplication(),MainActivity.class));
+        //startActivity(new Intent(getApplication(),MainActivity.class));
     }
 
     @Override
@@ -74,9 +74,11 @@ public class FindIdActivity extends AppCompatActivity {
         btngotologin.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-
+                //로그인으로 돌아가기 버튼을 누르면 MainActivity로 이동
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -108,18 +110,18 @@ public class FindIdActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for(QueryDocumentSnapshot document : task.getResult()) {
                                 // doument의 id와 입력한 이름이 같고 저장된 휴대폰번호와 입력한 휴대폰 번호가 같으면 입력한 이름의 저장된 이메일을 보여줌
-                                    if (sendname.equals(document.getData().get("name")) && sendphone.equals(document.getData().get("phone"))) {
-                                        textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
-                                        textshowid.setText(document.getData().get("email").toString());
-                                        // 로그인 화면으로 가는 버튼을 VISIBLE 처리하여 보여줌
-                                        btngotologin.setVisibility(View.VISIBLE);
-                                        break;
-                                    }
-                                    // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
-                                    else {
+                                if (sendname.equals(document.getData().get("name")) && sendphone.equals(document.getData().get("phone"))) {
+                                    textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
+                                    textshowid.setText(document.getData().get("email").toString());
+                                    // 로그인 화면으로 가는 버튼을 VISIBLE 처리하여 보여줌
+                                    btngotologin.setVisibility(View.VISIBLE);
+                                    break;
+                                }
+                                // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
+                                else {
                                     textshowtext.setText("일치하는 회원정보가 없습니다.");
                                     textshowid.setText("");
-                                    }
+                                }
                             }
                         }
                         // 프로그래스 다이얼로그 사라짐

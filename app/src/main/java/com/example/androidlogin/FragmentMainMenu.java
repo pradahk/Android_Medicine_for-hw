@@ -32,7 +32,7 @@ public class FragmentMainMenu extends Fragment {
     // 파이어스토어 인증 객체 생성
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-
+    // ImageButton 객체 생성
     private ImageButton btn_image;
     private ImageButton btn_map;
     private ImageButton btn_review;
@@ -41,7 +41,6 @@ public class FragmentMainMenu extends Fragment {
     public FragmentMainMenu(){
     }
 
-    // 파이어베이스 인증을 onStart에 넣어줌
     @Override public void onStart() {
         super.onStart();
     }
@@ -53,49 +52,57 @@ public class FragmentMainMenu extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // fragment_menu 화면을 inflate해서 보여줌
         View view = inflater.inflate(R.layout.fragment_menu,container,false);
 
+        // 이미지 버튼의 각 아이디 값에 맞는 버튼 저장
         btn_image = view.findViewById(R.id.ImageButton);
         btn_map = view.findViewById(R.id.mapButton);
         btn_review = view.findViewById(R.id.reviewButton);
         btn_shape = view.findViewById(R.id.shapeButton);
 
+        // 이름으로 검색하기 위한 이미지 버튼 클릭시
         btn_image.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                // NameMainActivity로 화면 전환
                 Intent intent = new Intent(getActivity(),NameMainActivity.class);
                 startActivity(intent);
             }
         });
 
+        // 사용자 근처 약국을 보여주기 위한 이미지 버튼 클릭시
         btn_map.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                // MapMainActivity로 화면 전환
                 Intent intent = new Intent(getActivity(),MapMainActivity.class);
                 startActivity(intent);
             }
         });
 
+        // 리뷰 게시판을 보여주기 위한 이미지 버튼 클릭시
         btn_review.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                // ReviewMainAcivity로 화면 전환
                 Intent intent  = new Intent(getActivity(),ReviewMainActivity.class);
                 startActivity(intent);
 
             }
         });
 
+        // 모양으로 검색하기 위한 이미지 버튼 클릭시
         btn_shape.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                // FormMainActivity로 화면 전환
                 Intent intent = new Intent(getActivity(), FormMainActivity.class);
                 startActivity(intent);
             }
             });
 
-
         return view;
     }
-
 
 }
