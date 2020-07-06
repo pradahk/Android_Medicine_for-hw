@@ -38,16 +38,16 @@
 ### 2-1 사용자 생성
 회원가입과 로그인 및 로그아웃을 위해 데이터를 저장해 놓을 Firebase가 필요하다.
 >#### 2-1-1 Firebase와 Android Studio 연동
-Firebase에 개발을 진행할 프로젝트를 등록한다. Google 로그인을 사용할 예정이므로 SHA-1 정보도 저장해준다.   
-이후 Firebase Android 구성 파일(google-services.json)을 다운로드하여 등록한 프로젝트에 추가한다.   
-앱에서 Firebase 제품을 사용할 수 있도록 google-services 플러그인을 Gradle 파일에 추가힌다.
+1) Firebase에 개발을 진행할 프로젝트를 등록한다. Google 로그인을 사용할 예정이므로 SHA-1 정보도 저장해준다.   
+2) Firebase Android 구성 파일(google-services.json)을 다운로드하여 등록한 프로젝트에 추가한다.   
+3) 어플에서 Firebase를 사용할 수 있도록 google-services 플러그인을 Gradle 파일에 추가힌다.
 ~~~java
 dependencies {
     classpath 'com.google.gms:google-services:4.2.0'  // Google Services plugin
   }
 }
 ~~~
-모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 다음 줄을 파일 하단에 추가한다.
+4) 모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 다음 줄을 파일 하단에 추가한다.
 ~~~java
 apply plugin: 'com.android.application'
 
@@ -56,14 +56,14 @@ android {
 }
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
 ~~~
-모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 핵심 Firebase SDK의 종속 항목을 추가한다.
+5) 모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 핵심 Firebase SDK의 종속 항목을 추가한다.
 ~~~java
 dependencies {
  implementation 'com.google.firebase:firebase-core:17.0.0'
  }
 ~~~
 >#### 2-1-2 회원가입
-아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다. 
+1) 아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다. 
 ~~~java
 public class SignupActivity extends AppCompatActivity {
   // 비밀번호 정규식
@@ -113,7 +113,7 @@ public class SignupActivity extends AppCompatActivity {
        editTextPhone = findViewById(R.id.write_phone);
        }
 ~~~   
-회원가입 버튼 클릭시
+2) 회원가입 버튼 클릭시
 ~~~java
     // onClick signup
     public void singUp(View view) {
@@ -165,7 +165,7 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 ~~~
-유효성 검사
+3) 유효성 검사
 ~~~java
    // 이메일 유효성 검사
     private boolean isValidEmail() {
@@ -241,8 +241,42 @@ public class SignupActivity extends AppCompatActivity {
 <img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">   
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">   
 
-회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
+4) 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
 전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.   
+이메일 인증 다이얼로그를 작성한 java파일
+~~~java
+public class AuthemailDialog extends Dialog {
+
+    // 확인 버튼 생성
+    private Button positivebutton;
+    // 확인 버튼의 onClickListner 생성
+    private View.OnClickListener positiveListener;
+
+    // 이메일 인증 다이얼로그
+    public AuthemailDialog(@NonNull Context context, View.OnClickListener positiveListener) {
+        super(context);
+        this.positiveListener = positiveListener;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // 다이얼로그 밖의 화면은 흐리게 함
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.8f;
+        getWindow().setAttributes(layoutParams);
+        setContentView(R.layout.authemail_dialog);
+
+        // 확인 버튼
+        positivebutton = findViewById(R.id.positivebutton);
+        // 클릭 리스너
+        positivebutton.setOnClickListener(positiveListener);
+    }
+}
+~~~
+5) SignUpActivity에 작성한 이메일 인증 다이얼로그
 ~~~java
  // 이메일 인증 다이얼로그 객체 생성
  private AuthemailDialog authemailDialog;
@@ -254,7 +288,7 @@ public class SignupActivity extends AppCompatActivity {
         authemailDialog = new AuthemailDialog(this, positiveListener);
         }
 ~~~   
-이메일 인증 다이얼로그의 확인버튼 클릭시   
+6) 이메일 인증 다이얼로그의 확인버튼 클릭시   
 ~~~java
     private View.OnClickListener positiveListener = new View.OnClickListener() {
         public void onClick(View v) {
@@ -269,9 +303,9 @@ public class SignupActivity extends AppCompatActivity {
 <img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="40%">   
                                                                                                                        
 >#### 2-1-3 로그인
-회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.   
+1) 회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.   
 <img src="https://user-images.githubusercontent.com/62936197/86550056-5324ec00-bf7c-11ea-86d6-bfb4b3b7c1d1.png" width="40%">          
-Firebase의 Auth에 저장된 값과 비교하여 입력한 값이 일치하면 로그인이 성공되고 메뉴 화면으로 전환된다.   
+2) Firebase의 Auth에 저장된 값과 비교하여 입력한 값이 일치하면 로그인이 성공되고 메뉴 화면으로 전환된다.   
 
 ~~~java                                                                                                                      
 public class MainActivity extends AppCompatActivity {
@@ -321,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
      }
      }
 ~~~   
-이메일 로그인 메서드   
+3) 이메일 로그인 메서드   
 ~~~java
 // 로그인 메서드
     private void loginUser(String email, String password) {
@@ -351,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 ~~~   
-이메일 및 비밀번호 유효성 검사 메서드   
+4) 이메일 및 비밀번호 유효성 검사 메서드   
 ~~~java
  // 이메일 유효성 검사
     private boolean isValidEmail() {
@@ -379,9 +413,113 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 ~~~   
-로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.    
+5) 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.    
 >#### 2-1-4 아이디 찾기 및 비밀번호 재설정
-사용자가 자신의 아이디를 잊었다면 회원가입 시 사용한 이름과 전화번호를 통해 사용자의 아이디를 찾을 수 있게 한다.   
+1) 사용자가 자신의 아이디를 잊었다면 회원가입 시 사용한 이름과 전화번호를 통해 사용자의 아이디를 찾을 수 있게 한다.   
 회원가입으로 인해 Firebase에 저장된 사용자의 이름, 전화번호 데이터와 아이디를 찾기 위해 Edittext에 입력한 이름, 전화번호 값이 모두 일치해야 사용자에게 이메일을 보여준다.   
-또한 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다. 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.   
-<img src="https://user-images.githubusercontent.com/62936197/86550165-a4cd7680-bf7c-11ea-9acf-818212ebd9d8.png" width="70%">   
+~~~java
+public class FindIdActivity extends AppCompatActivity {
+    // 파이어베이스 인증 객체 생성
+    private FirebaseFirestore firebaseFirestore;
+    
+    // 작성한 이름 값과 전화번호 값을 저장할 객체 생성
+    private EditText editTextName;
+    private EditText editTextPhone;
+    private String sendname = "";
+    private String sendphone = "";
+
+    // 회원의 이메일을 보여줄 textview 객체 생성
+    private TextView textshowid;
+    private TextView textshowtext;
+
+    // 로그인 화면으로 돌아가기 위한 버튼 객체 생성
+    private Button btngotologin;
+
+    // 사용자에게 실시간 진행상태를 알려주는 ProgressDialog 객체 생성
+    private ProgressDialog progressDialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_findid);
+
+        // id가 write_email인 editText에 대한 메서드 저장
+        editTextName = findViewById(R.id.write_name);
+        // id가 write_phone인 editText에 대한 메서드 저장
+        editTextPhone = findViewById(R.id.write_phone);
+        // id가 tv_showid인 textview에 대한 메서드 저장
+        textshowid = findViewById(R.id.tv_showid);
+        // id가 tv_showtext인 textview에 대한 메서드 저장
+        textshowtext = findViewById(R.id.tv_showtext);
+
+        // 로그인 화면으로 돌아가는 버튼에 대한 메서드 저장
+        btngotologin = findViewById(R.id.btn_gotologin);
+
+        // progressDialog 객체 선언
+        progressDialog = new ProgressDialog(this);
+
+        btngotologin.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //로그인으로 돌아가기 버튼을 누르면 MainActivity로 이동
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+~~~
+2) 아이디 찾기 버튼 클릭시
+~~~java
+    public void findEmail(View view)
+    {
+        // editText에 작성한 내용을 String으로 변환하여 객체에 저장
+        sendname = editTextName.getText().toString();
+        sendphone = editTextPhone.getText().toString();
+        // findid 메서드 실행
+        findid(sendname, sendphone);
+    }
+~~~
+3) findid 메서드
+~~~java
+    private void findid(final String sendname, final String sendphone) {
+        // 프로그레스 디이얼로그 생성하여 보여줌
+        progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
+        progressDialog.show();
+        // 파이어스토어 가져옴
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        // 파이어스토어의 collection 경로를 "users"로 생성
+        firebaseFirestore.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // 파이어스토어의 "users"에서 정보를 가져오는 것이 성공하면
+                        if (task.isSuccessful()) {
+                            for(QueryDocumentSnapshot document : task.getResult()) {
+                                // doument의 id와 입력한 이름이 같고 저장된 휴대폰번호와 입력한 휴대폰 번호가 같으면 입력한 이름의 저장된 이메일을 보여줌
+                                if (sendname.equals(document.getData().get("name")) && sendphone.equals(document.getData().get("phone"))) {
+                                    textshowtext.setText("회원님의 이메일은 다음과 같습니다.");
+                                    textshowid.setText(document.getData().get("email").toString());
+                                    // 로그인 화면으로 가는 버튼을 VISIBLE 처리하여 보여줌
+                                    btngotologin.setVisibility(View.VISIBLE);
+                                    break;
+                                }
+                                // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
+                                else {
+                                    textshowtext.setText("일치하는 회원정보가 없습니다.");
+                                    textshowid.setText("");
+                                }
+                            }
+                        }
+                        // 프로그래스 다이얼로그 사라짐
+                        progressDialog.dismiss();
+                    }
+                });
+    }
+}
+~~~
+4) 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다.   
+사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.   
+<img src="https://user-images.githubusercontent.com/62936197/86550165-a4cd7680-bf7c-11ea-9acf-818212ebd9d8.png" width="40%">   
