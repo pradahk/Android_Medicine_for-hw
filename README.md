@@ -14,8 +14,8 @@
 >>##### 2-1-1 Firebase와 Android Studio 연동
 >>##### 2-1-2 회원가입
 >>##### 2-1-3 로그인
->>##### 2-1-4 아이디 찾기 및 비밀번호 재설정
->>##### 2-1-5 구글 로그인
+>>##### 2-1-4 구글 로그인
+>>##### 2-1-5 아이디 찾기 및 비밀번호 재설정
 >>##### 2-1-6 회원정보 수정
 >#### 2-2 약국 찾기
 >>##### 2-1-1 위치 관련 퍼미션 허용과 GPS 활성화
@@ -113,7 +113,7 @@ public class SignupActivity extends AppCompatActivity {
        editTextPhone = findViewById(R.id.write_phone);
        }
 ~~~   
-2) 회원가입 버튼 클릭시
+##### 회원가입 버튼 클릭시
 ~~~java
     // onClick signup
     public void singUp(View view) {
@@ -165,7 +165,7 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 ~~~
-3) 유효성 검사
+##### 유효성 검사
 ~~~java
    // 이메일 유효성 검사
     private boolean isValidEmail() {
@@ -243,9 +243,9 @@ public class SignupActivity extends AppCompatActivity {
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="60%">   
 </div>
 
-4) 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
+2) 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
 전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.   
-이메일 인증 다이얼로그를 작성한 java파일
+##### 이메일 인증 다이얼로그를 작성한 java파일
 ~~~java
 public class AuthemailDialog extends Dialog {
 
@@ -278,7 +278,7 @@ public class AuthemailDialog extends Dialog {
     }
 }
 ~~~
-5) SignUpActivity에 작성한 이메일 인증 다이얼로그
+#####  SignUpActivity에 작성한 이메일 인증 다이얼로그
 ~~~java
  // 이메일 인증 다이얼로그 객체 생성
  private AuthemailDialog authemailDialog;
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
      }
      }
 ~~~   
-3) 이메일 로그인 메서드   
+##### 이메일 로그인 메서드   
 ~~~java
 // 로그인 메서드
     private void loginUser(String email, String password) {
@@ -387,8 +387,66 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 ~~~   
-5) 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.    
->#### 2-1-4 아이디 찾기 및 비밀번호 재설정
+5) 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.  
+>#### 2-1-4 Google 로그인
+계정 생성을 통한 로그인 외에 구글 아이디를 이용한 로그인 방법을 추가하였다.   
+사용자는 자신의 Google 아이디를 이용하여 어플에 로그인을 진행할 수 있으며 Google 로그인을 성공적으로 진행한 사용자는 게시판 이용 또한 가능해진다.
+#####  Google 로그인 메서드
+~~~java
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        Log.e("구글 로그인","메서드 실행");
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("구글 로그인","result 메서드");
+        // RC_SIGN_IN을 통해 로그인 확인여부 코드가 저상 전달되었다면
+        if (requestCode == RC_SIGN_IN) {
+            Log.e("구글 로그인","로그인 여부");
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // 구글 로그인이 성공하면, 파이어베이스에 로그인 인증 등록
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                assert account != null;
+                // 구글 이용자가 확인된 사용자 정보를 파이어베이스로 넘기기
+                firebaseAuthWithGoogle(account);
+                Log.e("구글 로그인","구글 로그인 성공");
+            } catch (ApiException ignored) {
+                Log.e("구글 로그인","구글 로그인 실패");
+            }
+        }
+    }
+~~~
+#####  Firebase와 Google 로그인 연결
+~~~java
+ // 파이어베이스와 구글 로그인 연결
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.e("구글 로그인","파이어베이스랑 연결 중");
+        // 파이어베이스로 받은 구글 사용자가 확인된 이용자의 값을 토큰으로 받음
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
+                            Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
+                            Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+~~~
+>#### 2-1-5 아이디 찾기 및 비밀번호 재설정
 1) 사용자가 자신의 아이디를 잊었다면 회원가입 시 사용한 이름과 전화번호를 통해 사용자의 아이디를 찾을 수 있게 한다.   
 회원가입으로 인해 Firebase에 저장된 사용자의 이름, 전화번호 데이터와 아이디를 찾기 위해 Edittext에 입력한 이름, 전화번호 값이 모두 일치해야 사용자에게 이메일을 보여준다.   
 ~~~java
@@ -444,7 +502,7 @@ public class FindIdActivity extends AppCompatActivity {
         });
     }
 ~~~
-2) 아이디 찾기 버튼 클릭시
+#####  아이디 찾기 버튼 클릭시
 ~~~java
     public void findEmail(View view)
     {
@@ -455,7 +513,7 @@ public class FindIdActivity extends AppCompatActivity {
         findid(sendname, sendphone);
     }
 ~~~
-3) findid 메서드
+#####  findid 메서드
 ~~~java
     private void findid(final String sendname, final String sendphone) {
         // 프로그레스 디이얼로그 생성하여 보여줌
@@ -495,7 +553,7 @@ public class FindIdActivity extends AppCompatActivity {
 }
 ~~~
 <img src="https://user-images.githubusercontent.com/62936197/86550165-a4cd7680-bf7c-11ea-9acf-818212ebd9d8.png" width="30%">   
-4) 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다.   
+2) 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다.   
 
 ~~~java
 public class FindpwActivity extends AppCompatActivity {
@@ -524,7 +582,7 @@ public class FindpwActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
     }
 ~~~
-5) 비밀번호 재전송 버튼 클릭시
+#####  비밀번호 재전송 버튼 클릭시
 ~~~java
     public void findPw(View view)
     {
@@ -537,7 +595,7 @@ public class FindpwActivity extends AppCompatActivity {
         }
     }
 ~~~
-6) findpw 메서드
+#####  findpw 메서드
 ~~~java
     private void findpw(String sendemail) {
         // 프로그래스 다이얼로그 생성하여 보여줌
@@ -570,6 +628,7 @@ public class FindpwActivity extends AppCompatActivity {
 }
 ~~~  
 <img src="https://user-images.githubusercontent.com/62936197/86553548-1100a800-bf86-11ea-9f8a-858e6a56c99e.png" width="60%">     
-7) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
+3) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
 <img src="https://user-images.githubusercontent.com/62936197/86553483-ced76680-bf85-11ea-86a1-750e9f48279a.png" width="30%">   
+
 
