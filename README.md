@@ -41,33 +41,27 @@
 Firebase에 개발을 진행할 프로젝트를 등록한다. Google 로그인을 사용할 예정이므로 SHA-1 정보도 저장해준다.   
 이후 Firebase Android 구성 파일(google-services.json)을 다운로드하여 등록한 프로젝트에 추가한다.   
 앱에서 Firebase 제품을 사용할 수 있도록 google-services 플러그인을 Gradle 파일에 추가힌다.
-<pre>
-<code>
+~~~java
 dependencies {
     classpath 'com.google.gms:google-services:4.2.0'  // Google Services plugin
   }
 }
-</code>
-</pre>
+~~~
 모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 다음 줄을 파일 하단에 추가한다.
-<pre>
-<code>
+~~~java
 apply plugin: 'com.android.application'
 
 android {
   // ...
 }
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
-</code>
-</pre>
+~~~
 모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 핵심 Firebase SDK의 종속 항목을 추가한다.
-<pre>
-<code>
+~~~java
 dependencies {
  implementation 'com.google.firebase:firebase-core:17.0.0'
  }
-</code>
-</pre>
+~~~
 >#### 2-1-2 회원가입
 아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다.
 ~~~java
@@ -77,17 +71,76 @@ public class MainActivity extends AppCompatActivity {
 
     // 파이어베이스 인증 객체 생성
     private FirebaseAuth firebaseAuth;
-
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-    // 작성한 이메일 값과 비밀번호 값과 이름 값을 저장할 객체 생성
+    
+    // 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
     private EditText editTextEmail;
     private EditText editTextPassword;
 
     private String email = "";
     private String password = "";
+     
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-~~~  
+        // 파이어베이스 인증 객체 선언
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        // id가 write_email인 editText에 대한 메서드 저장
+        editTextEmail = findViewById(R.id.et_eamil);
+        // id가 signup_password인 editText에 대한 메서드 저장
+        editTextPassword = findViewById(R.id.et_password);
+
+        // 회원가입 버튼 객체 생성
+        Button signup_btn = findViewById(R.id.btn_signUp);
+        // 비밀번호 재설정 버튼 객체 생성
+        Button findpw_btn = findViewById(R.id.btn_findpw);
+        // 이메일 찾기 버튼 객체 생성
+        Button findid_btn = findViewById(R.id.btn_findid);
+        }
+     
+     // 이메일 로그인 메서드
+     public void signInemail(View view) {
+     // editText에 작성한 내용을 String으로 변환하여 객체에 저장
+     email = editTextEmail.getText().toString();
+     password = editTextPassword.getText().toString();
+     // 유효성 검사 후 로그인 메서드 실행
+     if(isValidEmail() && isValidPasswd()) {
+     loginUser(email, password);
+     }
+     }
+~~~   
+이메일 로그인 메서드   
+~~~java
+// 로그인 메서드
+    private void loginUser(String email, String password) {
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            if(firebaseAuth.getCurrentUser().isEmailVerified()){
+                                // 로그인에 성공하면 "로그인 성공" 토스트를 보여줌
+                                Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = firebaseAuth.getCurrentUser();
+                                // MenuActivity로 화면 전환
+                                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this,"이메일 인증을 완료해주세요.",Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
+                            Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+~~~   
 <img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">   
 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
