@@ -27,6 +27,7 @@
 >>#### 2-3-1 firebase 연동
 >>#### 2-3-2 게시물 등록  
 >>#### 2-3-3 게시물 수정 및 삭제
+>>##### 2-3-4 사용자 정보 연동
 >#### 2-5 복용시간 알림
 >>##### 2-5-1 알림설정
 >>##### 2-5-2 푸시알림
@@ -1868,375 +1869,759 @@ public void mOnClick(View v){
 <img src="https://user-images.githubusercontent.com/57400913/86557019-eae00580-bf8f-11ea-8d11-b519cdf41e36.png" width="30%">       
 </div>   
 
-*****
->### 2-3 사용자 후기 게시판
->>#### 2-3-1 firebase 연동
-firebase와 연동하는 방법은 회원가입 부분에서 설명한 방법과 동일하다.      
->>#### 2-3-2 게시물 등록    
-recyclerView와 cardView를 이용하여 목록에서 firebase에 저장된 데이터들을 보여줄 것이다.    
-##### 1)getter와 setter를 정의해주는 ReviewPostInfo.java 파일 생성하기    
-외부에서 접근할 때 객체의 무결성을 보장하기 위해 getter와 setter를 정의하였다  
-게시글을 입력했을 때, 게시글의 제목과 내용, 등록한 날짜를 정의해준다.   
+*****   
+
+>### 2-5 복용시간 알림
+1)알림을 설정했을 때 firebase에 데이터를 저장을 하기 위해서 firebase와 연동을 해야한다. 
+firebase와의 연동은 위의 설명을 참고한다. 
+timepicker를 이용해서 알림을 설정하고, editetext를 이용해서 약이름을 입력하고 저장버튼을 누르면 firebase에 document별로 데이터가 저장이 된다.
+2)firebase에 저장된 데이터를 가져와서 알림리스트를 띄운다.
+3)설정한 시간이 되면 진동과 함께 notification이 푸시알림의 형태로 울리게 된다.
+4)한 cardview의 삭제버튼을 누르면 그 알림이 firebase에서 삭제가 되고, notification알림도 취소가 된다. 그리고 알림리스트가 update가 된다. 
+
+
+
+>>#### 2-5-1 알림설정
+##### floatingActionButton
+1)floatingActionButton을 추가하기 위해서 gradle에 다음과 같은 코드를 추가한다.
 ~~~java
-import java.io.Serializable;
-import java.util.Date;
-//getter와 setter를 정의해주는 코드
-public class ReviewPostInfo implements Serializable {
-    //intent에서 putExtra로 보내주기 위해 implements Serializable가 사용됨.
-    private String title;
-    private String contents;
-    private Date createdAt;
-    private String id;
-   public ReviewPostInfo(String title, String Contents, Date createdAt) {
-        this.title = title;
-        this.contents = Contents;
-        this.createdAt = createdAt;
-    }
-    //get set 메서드 이용
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getContents() {
-        return contents;
-    }
-    public void setContents(String contents) {
-        this.contents = contents;
-    }
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
+dependencies {
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation "com.google.android.material:material:1.1.0"
 }
 ~~~
-##### 2)게시물을 입력할 ReviewWriteActivity.java 파일 생성    
-위에서 정의해준 getter와 setter를 이용하여 사용자가 입력한 값을 ReviewPostInfo.java의 setter에 저장해준다.   
+
+
+
+2)floatingActionButton을 추가하기 위해서 alarm_activity_main.xml 레이아웃에 코드를 추가한다.
 ~~~java
-//text 업데이트를 위한 코드
-    private void contentsUpdate() {
-        //titleEditText과 contentEditText의 값을 받아서 string값으로 받아옴
-        final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
-        final String contents = ((EditText) findViewById(R.id.contentEditText)).getText().toString();
-        final Date date = reviewPostInfo2 ==null? new Date() : reviewPostInfo2.getCreatedAt();//날짜가 존재하지 않으면 현재 날짜를 불러오고, 수정 시 날짜가 존재하니까 그때는 그 날짜 그대로 유지시켜줌
-        //제목과 글이 둘 다 입력 되었을 때 실행됨
-        if(title.length() > 0 && contents.length()>0){
-            loadrLayout.setVisibility(View.VISIBLE);
-            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date);
-            uploader(reviewPostInfo);//값들이 postinfo로 들어와 uploader 메서드로 들어감
-        }else {//그렇지 않으면 게시글을 입력해달라는 toast가 띄워짐
-            startToast("게시글을 입력해주세요");
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/content">
+
+        <TextView
+            android:id="@+id/alarmView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="ALARM"
+            android:textSize="60sp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="100dp">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_height="80dp"
+            android:layout_width="80dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:src="@drawable/ic_add_black_24dp"
+            android:backgroundTint="#A8A8A8"/>
+
+
+
+</FrameLayout>
+~~~
+
+
+
+
+3)floatingActionButton을 누르면 알림을 설정할 수 있는 레이아웃으로 넘어가도록 다음과 같은 코드를 추가한다.
+
+~~~java
+  @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_alarm,container,false);
+        editText = (EditText)view.findViewById(R.id.editText);
+        timePicker = (TimePicker)view.findViewById(R.id.timepicker);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+        view.findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);
+        alarmUpdate();
+        return view;
+    }
+
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            myStartActivity(SettingAlarm.class);
+        }
+    };
+~~~
+
+
+
+
+4)알림설정을 하는 layout코드는 다음과 같다.
+~~~java
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AlarmMainActivity">
+
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="16dp"
+        android:hint="복용해야할 약 이름을 입력해주세요."
+        app:layout_constraintBottom_toTopOf="@+id/timepicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.446"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TimePicker
+        android:id="@+id/timepicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"
+        app:layout_constraintBottom_toTopOf="@id/btnset"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <Button
+        android:id="@+id/btnset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="저장"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toRightOf="@+id/btncancel"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timepicker" />
+
+    <Button
+        android:id="@+id/btncancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="취소"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/btnset"
+        app:layout_constraintTop_toBottomOf="@id/timepicker" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+~~~
+
+
+5)알림을 설정하고 저장버튼을 누르면 setAlarm메소드로 가고 알림리스트 창으로 가게한다.
+~~~java
+View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // 프래그먼트 사용을 위해 transaction 정의
+            if(v.getId() ==R.id.btnset){
+                setAlarm();
+               replaceFragment(fragmentAlarm);
+
+           }
+        }
+    };
+~~~
+
+6)timepicker와 edittext를 이용해서 알림을 설정하면 다음코드와 같이 저장되고 uploader메소드로 넘어가면서 firebase에 저장이 되도록한다.
+
+SettingAlarm.java
+~~~
+private void setAlarm() {//알림 설정
+
+        hourtime = timePicker.getCurrentHour().toString();
+        minutetime = timePicker.getCurrentMinute().toString();
+        notificationText = drugEditText.getText().toString();
+
+
+        final String timetimes = hourtime + minutetime;
+        //int hourtext = Integer.parseInt(hourtime);
+
+         String times = hourtime+minutetime;
+
+        int hourtest = Integer.parseInt(hourtime);
+        int minutetest = Integer.parseInt(minutetime);
+
+        String hourtext = "";
+        String minutetext = "";
+
+        String realTime = "";
+
+        if (hourtime.length() > 0 && minutetime.length() > 0) {
+            if (hourtest > 11 && hourtest < 24) {
+                ampm = "오후";
+                realTime = String.valueOf(hourtest - 12);
+            } else {
+                ampm = "오전";
+                realTime = String.valueOf(hourtest);
+            }
+
+
+            if (hourtest < 10) {
+                hourtext = " " + realTime + ":";
+
+            } else {
+                hourtext = realTime + ":";
+            }
+            if (minutetest < 10) {
+                minutetext = "0" + minutetest;
+            } else {
+                minutetext = minutetime;
+            }
+
+
+            alarmInfo = new AlarmInfo(hourtime, minutetime, notificationText, ampm,times);
+            uploader(alarmInfo);
+
+            /*
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                Toast.makeText(this, "버전을 확인해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+             */
+
+
+
         }
     }
-~~~
-입력한 게시물의 내용을 setter를 이용하여 firebase에 저장해준다    
-~~~java
- private void uploader(ReviewPostInfo reviewPostInfo){
-        firebaseFirestore = FirebaseFirestore.getInstance();
 
-        //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환
-        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
-                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
-        //게시물에서 입력한 텍스트들을 받아와서 database의 document부분에 넣어줌.
-        documentReference.set(reviewPostInfo.getPostInfo())
+    //저장 버튼을 누르면 hour,minute,drugtext를 파이어베이스에 넘어감
+    //DB에 업로드 되는 코드
+    private void uploader(final AlarmInfo alarmInfos) {
+
+            firebaseFirestore = FirebaseFirestore.getInstance();
+            final DocumentReference documentReference = modifyAlarm == null ? firebaseFirestore.collection("AlarmDemo").document()
+                    : firebaseFirestore.collection("AlarmDemo").document(modifyAlarm.getId());
+            // final DocumentReference documentReference = firebaseFirestore.collection("AlarmDemo").document(times);
+
+
+            //Log.e("log : ",alarmInfo.getId().toString());
+            documentReference.set(alarmInfos.getAlarmInfo())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {//성공시
-                        Log.d(TAG,"id");
+                    public void onSuccess(Void aVoid) {
+                        Log.e(TAG, "id");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
-                    @Override// 실패 시
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG,"Error",e);
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, "Error", e);
+                }
+            });
+
+
+
+
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseFirestore.collection("AlarmDemo").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if(task.isSuccessful()){
+                            for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                if((alarmInfos.getHour()+alarmInfos.getMinute()).equals(documentSnapshot.getData().get("times"))){
+                                   // cancelId = getIntent().getStringExtra("cancelId");
+                                    if (modifyAlarm != null){
+                                        Log.e("getHour+getMinute ==>",alarmInfos.getHour()+alarmInfos.getMinute());
+                                        Log.e("documentSnapshot",documentSnapshot.getData().get("times").toString());
+
+                                        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+                                        intent.putExtra("drug", documentSnapshot.getData().get("drugtext").toString());
+                                        intent.putExtra("id",alarmInfo2);
+
+
+                                        PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(alarmInfo2),intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        alarmManager.cancel(pIntent);
+                                        pIntent.cancel();
+
+                                        Log.e("수정text : ",documentSnapshot.getData().get("drugtext").toString());
+                                        Log.e("수정 id : ", documentSnapshot.getData().get("hour").toString()+documentSnapshot.getData().get("minute").toString());
+                                        final Calendar calendar = Calendar.getInstance();
+
+                                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(alarmInfos.getHour()));
+                                        Log.e("hourtime : ", documentSnapshot.getData().get("hour").toString());
+                                        calendar.set(Calendar.MINUTE, Integer.parseInt(documentSnapshot.getData().get("minute").toString()));
+                                        Log.e("minutetime : ", documentSnapshot.getData().get("minute").toString());
+                                        calendar.set(Calendar.SECOND, 0);
+
+                                        long intervalTime = 1000 * 24 * 60 * 60;
+                                        long currentTime = System.currentTimeMillis();
+
+                                        if (currentTime > calendar.getTimeInMillis()) {
+                                            //알림설정한 시간이 이미 지나간 시간이라면 하루뒤로 알림설정하도록함.
+                                            calendar.setTimeInMillis(calendar.getTimeInMillis() + intervalTime);
+                                        }
+
+                                        PendingIntent pIntents = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(alarmInfo2), intent, 0);
+                                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntents);
+                                        Toast.makeText(getApplicationContext(), "알림이 수정되었습니다.", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                    else if (cancelId != null){
+                                        Log.e("cancel : ","cancel");
+                                        //alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                                        Intent intents = new Intent(getApplicationContext(), AlarmReceiver.class);
+                                        PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(cancelId),intents, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        alarmManager.cancel(pIntent);
+                                        pIntent.cancel();
+
+                                        Toast.makeText(getApplicationContext(), "알림이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+
+                                        Log.e("ERROR : ","ERROR");
+
+                                    }
+                                    else {
+                                            firedrugtext = documentSnapshot.getData().get("drugtext").toString();
+
+                                            Log.e("확인확인", firedrugtext);
+                                            notificationId = documentSnapshot.getData().get("times").toString();
+                                            Log.e("확인확인", notificationId);
+
+                                            Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+                                            intent.putExtra("drug", firedrugtext);
+                                            intent.putExtra("id", notificationId);
+
+                                            final Calendar calendar = Calendar.getInstance();
+
+                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(documentSnapshot.getData().get("hour").toString()));
+                                            Log.e("hourtime : ", documentSnapshot.getData().get("hour").toString());
+                                            calendar.set(Calendar.MINUTE, Integer.parseInt(documentSnapshot.getData().get("minute").toString()));
+                                            Log.e("minutetime : ", documentSnapshot.getData().get("minute").toString());
+                                            calendar.set(Calendar.SECOND, 0);
+
+                                            long intervalTime = 1000 * 24 * 60 * 60;
+                                            long currentTime = System.currentTimeMillis();
+
+                                            if (currentTime > calendar.getTimeInMillis()) {
+                                                //알림설정한 시간이 이미 지나간 시간이라면 하루뒤로 알림설정하도록함.
+                                                calendar.setTimeInMillis(calendar.getTimeInMillis() + intervalTime);
+                                            }
+
+                                            PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(hourtime+minutetime), intent, 0);
+                                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+                                            Toast.makeText(getApplicationContext(), "알림이 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+
+                        }
+
                     }
+
                 });
     }
 ~~~
 
-##### 3)firebase에 저장된 게시물을 목록으로 보여주기 위해 ReviewMainAdapter.java에 adapter를 정의해준다   
-이 adpater는 recyclerView와 cardView를 이용한다.    
+
+
+7)firebase에 저장된 알림데이터를 가져와서 알림을 저장한다.
+notification을 이용하여 알림을 하기 위해서 pendingIntent를 사용하는데, 여러개의 푸시알림을 위해서 pendingIntent에 들아가는 requestcode값이 각각 달라야한다. 따라서 이것을 구분해주기 위해서 설정한 알림시간의 시값+분값을 requestcode로 설정해주었고, intent를 이용하여 AlarmReceiver.class에 약이름과 requestcode값을 넘겨주었다.
+
+
+
+AlarmReceiver.class
 ~~~java
-//Review페이지의 처음 창을 보여주는 MainAdapter
-public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.MainViewHolder>{
-    private ArrayList<ReviewPostInfo> mDataset;
-    private Activity activity;
-    private String email;
-    TextView textEmail;
-    CardView cardView1;
+public class AlarmReceiver extends BroadcastReceiver {
+    String notificationid;
+    AlarmManager alarmManager;
+    AlarmInfo alarmInfo2;
+    Intent mainIntent;
+    Context contexts;
+    String cancelId;
+    String str;
+    int i = 0;
 
-    //RecyclerView와 cardView를 이용하여 등록된 리뷰를 전체 리스트로 출력할것임. 그것을 위한 정의
-    static class MainViewHolder extends RecyclerView.ViewHolder{
-        CardView cardView;
-        MainViewHolder(Activity activity, CardView v, ReviewPostInfo reviewPostInfo) {
-            super(v);
-            cardView = v;
-        }
-    }
-    //viewType이 계속 0만 주기 때문에 사용하려면 override해야함.
+
+    //받아서 푸쉬알림 해주는 부분.
     @Override
-    public int getItemViewType(int position){
-        return position;
-    }
+    public void onReceive(Context context, Intent intent) {
+        this.contexts = context;
+        notificationid = intent.getStringExtra("id");
+        String text = intent.getStringExtra("drug");
+        str = notificationid.toString();
 
-    //배열로 들어온 데이터들을 불러오는 작업.
-    ReviewMainAdapter(Activity activity, ArrayList<ReviewPostInfo> mDataset) {//생성자. 초기화해줌
-        this.mDataset = mDataset;
-        this.activity = activity;
-    }
 
-    @NonNull
-    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
-    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
-        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
-        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
-        //Log.e("로그: ","로그: "+viewType);
+        Log.e("약번호 넘어오자...", String.valueOf(notificationid));
+        Log.e("약이름 넘어오자...",text);
 
-        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
-            @Override
-            public void onClick(View view) {
-                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
-                Intent intent = new Intent(activity, ReviewActivityPost.class);
-                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
-                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
-                activity.startActivity(intent);
+
+        //푸쉬알람 해주는 부분
+        mainIntent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, Integer.parseInt(notificationid),mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "drugId");
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+
+            Toast.makeText(context, "누가버전", Toast.LENGTH_SHORT).show();
+            builder.setSmallIcon(R.drawable.ic_drug_icon);
+
+            builder.setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setContentTitle("약쏙")
+                    .setContentText(text + "을(를) 복용할시간에요:)")
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
+                    .setContentInfo("INFO")
+                    .setDefaults(Notification.DEFAULT_VIBRATE);
+
+
+            if (notificationManager != null) {
+
+
+                PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag"
+                );
+                wakeLock.acquire(5000);
+                notificationManager.notify(Integer.parseInt(notificationid), builder.build());
+
             }
-        });
-        return mainViewHolder;
-    }
+        }
 
-    @Override
-    public void onBindViewHolder(@NonNull MainViewHolder holder, int position) {
-        //item_post에 실제 db들의 값들을 넣어주는 작업.
 
-        //CardView에 firebase에 저장된 title값 넣어주기
-        CardView cardView = holder.cardView;
-        TextView titleTextView = cardView.findViewById(R.id.titleTextView);
-        titleTextView.setText(mDataset.get(position).getTitle());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-        //게시물을 추가한 날짜 넣어주기
-        TextView createTextView = cardView.findViewById(R.id.createdTextView);
-        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(mDataset.get(position).getCreatedAt()));
+            Toast.makeText(context, "오레오 이상", Toast.LENGTH_SHORT).show();
 
-        //contents값 넣어주기
-        final TextView contentsTextView = cardView.findViewById(R.id.contentsTextView);
-        contentsTextView.setText(mDataset.get(position).getContents());
+            builder.setSmallIcon(R.drawable.ic_drug_icon);
 
-        textEmail = cardView.findViewById(R.id.textView2);
-        textEmail.setText(mDataset.get(position).getEmail());
-    }
+            String channelId = "drug";
+            String chaanelName = "약쏙";
+            String description = "매일 정해진 시간에 알림합니다. ";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
 
-    @Override //자동 override됨. 데이터들의 수를 세줌.
-    public int getItemCount() {
-        return (mDataset != null ? mDataset.size() : 0);
+            NotificationChannel channel = new NotificationChannel(channelId, chaanelName, importance);
+            channel.setDescription(description);
+
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            builder.setSmallIcon(R.drawable.ic_drug_icon);
+
+            builder.setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setContentTitle("약쏙")
+                    .setContentText(text + "을(를) 복용할시간에요:)")
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
+                    .setContentInfo("INFO")
+                    .setDefaults(Notification.DEFAULT_VIBRATE);
+
+
+            //if(notificationManager !=null){
+
+
+            PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag"
+            );
+            wakeLock.acquire(5000);
+            notificationManager.notify(Integer.parseInt(notificationid), builder.build());
+
+            //}
+
+        }
     }
 }
 ~~~
 
-##### 4)ReviewMainActivity.java에서 firebase에 저장된 데이터들을 위에서 정의된 adapter를 이용하여 넣어준다.    
-Review의 목록을 보여줄 java 파일인 ReviewMainActivity.java 파일에 recyclerView를 정의해준다     
-~~~java
-public class ReviewMainActivity extends AppCompatActivity {
-    private  ArrayList<ReviewPostInfo> postList;
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private ReviewMainAdapter mainAdapter;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //이 파일에서는 review_activity_main.xml창을 보여줄것임.
-        setContentView(R.layout.review_activity_main);
-        fragmentMainMenu = new FragmentMainMenu();
-        
-        //recyclerView 초기화
-        recyclerView = findViewById(R.id.recyclerView);//recyclerViewid연결
-        recyclerView.setHasFixedSize(true);//recylerView 기존 성능 강화
-        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ReviewMainActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
-        postUpdate();
-        findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);//게시글 추가 버튼을 클릭 시
-    }
-    //게시글 추가 버튼을 클릭할 때 처리하는 기능
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {//게시글 추가 버튼을 눌렀을 때 ReviewWriteActivity.java로 넘겨줌
-            if (view.getId() == R.id.floatingActionButton) {
-                myStartActivity(ReviewWriteActivity.class);
-            }
-         }
-    };
 
- //실제 게시물을 보여주고 업데이트 해주는 코드
-    public void postUpdate(){
-        firebaseFirestore.collection("posts").orderBy("createdAt", Query.Direction.DESCENDING).get()
+settingAlarm.java에서 넘겨준 약이름을 받아와서 설정한 notification알림에 builder를 이용하여 contentText에 자기가 설정한 약이름을 띄울수있게 했다.
+
+
+
+오레오 이상부터는 channelId를 필수로 써야하기 때문에 오레오 이전버전과, 오레오 이상버전의 notification알림을 if문을 이용해서 각각 설정해 주었다. 
+
+
+8)알림이 설정되면 adapter를 이용해서 알림리스트에 설정한 알림이 뜨도록 한다.
+
+
+alarmUpdate는 firebase에 저장된 알림데이터들을 ArrayList에 저장하여 MyAdapter로 넘겨준다. 
+~~~java
+private void alarmUpdate(){
+        firebaseFirestore.collection("AlarmDemo").orderBy("hour", Query.Direction.ASCENDING).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
-                            postList = new ArrayList<>();//arraylist에 받아온값들을 다 넣어주어 보여줌
-                            postList.clear();
+                            alarmList = new ArrayList<>();
+                            alarmList.clear();
                             for(QueryDocumentSnapshot document : task.getResult()){
-                                Log.d(TAG, document.getId()+" => "+document.getData());
-                                postList.add(new ReviewPostInfo(//데이터를 다 가져와 postList배열에 넣어줌.
-                                        document.getData().get("title").toString(),
-                                        document.getData().get("contents").toString(),
-                                        new Date(document.getDate("createdAt").getTime()),
-                                        document.getId(),
-                                        document.getData().get("user").toString()
-                                        //firebaseFirestore.collection("users").document().getId()//user의 email값을 가져옴.
-                                ));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴
+                                alarmList.add(new AlarmInfo(
+                                        document.getData().get("hour").toString(),
+                                        document.getData().get("minute").toString(),
+                                        document.getData().get("drugtext").toString(),
+                                        document.getData().get("ampm").toString(),
+                                        document.getId()
+                                ));
                             }
-                            //MainAdaper에서 넘겨줌.
-                            mainAdapter = new ReviewMainAdapter(ReviewMainActivity.this, postList);
-                            mainAdapter.setOnPostListener(onPostListener);//onPostListener를 넘겨주면 MainAdapter에서도 쓸수있음.
-                            recyclerView.setAdapter(mainAdapter);
-                            mainAdapter.notifyDataSetChanged();
+                            myAdapter = new MyAdapter(getActivity(), alarmList);
+                            myAdapter.setOnAlarmListener(onAlarmListener);
+                            recyclerView.setAdapter(myAdapter);
+                            myAdapter.notifyDataSetChanged();
                         }else {
                             Log.d(TAG, "Error : ",task.getException());
                         }
-
                     }
                 });
-}
-~~~
- 
-##### 5)게시글 자세히보기 기능    
-등록된 게시물은 다음 코드를 이용하여 내용의 일부만 보여주도록 구현하였다.    
-~~~java
-<TextView
-    android:id="@+id/titleTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:textColor="#000000"
-    android:textSize="15sp"
-    android:textStyle="bold"
-    tools:text="@string/itemPostTitle"
-    android:maxLines="1"
-    android:ellipsize="end"/>
-~~~
-따라서 게시글의 자세히보기 기능을 구현하였다.   
-이는 해당 게시물을 클릭하면 게시글을 전체볼 수 있는 창으로 넘어가도록 구현한 것이다.   
-먼저 adapter에서 해당하는 게시물을 클릭했을 때, intent를 이용하여 값들을 넘겨주었다.   
-~~~java
-@NonNull
-    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
-    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
-        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
-        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
-        //Log.e("로그: ","로그: "+viewType);
-
-        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
-            @Override
-            public void onClick(View view) {
-                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
-                Intent intent = new Intent(activity, ReviewActivityPost.class);
-                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
-                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
-                activity.startActivity(intent);
-            }
-        });
-~~~
-intent를 이용하여 넘겨준 값들을 ReviewActivityPost.java 파일에서 받아서 띄워주는 것이다.
-~~~java
- @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //이 java파일에서는 activity_write_post창을 보여줄것임.
-        setContentView(R.layout.review_activity_post);
-
-        reviewPostInfo = (ReviewPostInfo) getIntent().getSerializableExtra("postInfo");
-        //title 넣어주기
-        TextView titleTextView = findViewById(R.id.titleTextView);
-        titleTextView.setText(reviewPostInfo.getTitle());
-
-        //게시물을 추가한 날짜 넣어주기
-        TextView createTextView = findViewById(R.id.createdTextView);
-        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd",
-                Locale.getDefault()).format(reviewPostInfo.getCreatedAt()));//local시간을 생성하여 넣어줄것임.
-        //contents 넣어주기
-        final TextView contentsTextView = findViewById(R.id.contentsTextView);
-        contentsTextView.setText(reviewPostInfo.getContents());
-        
-        reviewPostAdapter = new ReviewPostAdapter(this);
-        reviewPostAdapter.setOnPostListener(onPostListener);//ReviewPostAdapter에 연결해줌.
     }
 ~~~
-<div>
-<img src="https://user-images.githubusercontent.com/57400849/86554916-e1539f00-bf89-11ea-965e-1b2bd067ae3a.png" width="70%"> 
-<img src="https://user-images.githubusercontent.com/57400849/86554958-01835e00-bf8a-11ea-8329-65fb59a8c7db.png">  
-</div>
 
- 
-
-
-
-
->#### 2-3-3 게시물 수정 및 삭제
-게시글의 수정 및 삭제 기능은 popup메뉴를 이용한 방법과 버튼을 이용한 방법. 이 두가지를 이용하여 기능 이용이 가능하도록 구현하였다.
-게시물의 업데이트를 위해 interface를 이용하는 것이다.
-
-
-#### 1.수정 및 삭제 방법 설명   
-먼저 기능 구현을 설명하기 전, 공통적인 수정 및 삭제 방법을 설명한다.   
-##### 1)수정기능   
-우선 수정버튼을 클릭하면, ReviewWriteActivity.java파일로 넘어가게 된다. 이때, 이 java파일에서는 해당하는 게시물의 저장되어있는 값들을 가져와
-보여주며 원래의 게시글을 수정할 수 있게 도와준다.   
+MyAdapter.java
 ~~~java
- private void postInit (){//수정버튼을 눌렀을 때 그 전의 값들을 넣어주는 역할을 함
-        if(reviewPostInfo2 !=null){
-            titleEditText.setText(reviewPostInfo2.getTitle());
-            contentEditText.setText(reviewPostInfo2.getContents());
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+    private ArrayList<AlarmInfo> mDataset;
+    private Activity activity;
+    private OnAlarmListener onAlarmListener;
+    private Button modifybtn;
+    private Button deletebtn;
+    AlarmManager alarmManager;
+
+
+    static class MyViewHolder extends RecyclerView.ViewHolder {
+        CardView cardView;
+        MyViewHolder(Activity activity, CardView v, AlarmInfo alarmInfo) {
+            super(v);
+            cardView = v;
         }
     }
-~~~
-이 메서드를 이용하여 uploader메서드의 아래의 코드에서 firebase에서의 수정도 가능하게 한다.   
-~~~java
- //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환->수정버튼 이용 시 사용됨
-        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
-                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
-~~~
-<div>
-<img src="https://user-images.githubusercontent.com/57400849/86555488-786d2680-bf8b-11ea-865c-e833ca339498.png" width="70%"> 
-<img src="https://user-images.githubusercontent.com/57400849/86555300-f5e46700-bf8a-11ea-92ee-52cdbd07c024.png" width="20%">
-</div>   
+
+    public int getItemViewType(int position){
+        return position;
+    }
+
+    public void setOnAlarmListener(OnAlarmListener onAlarmListener){
+        this.onAlarmListener = onAlarmListener;
+    }
+    MyAdapter(Activity activity, ArrayList<AlarmInfo> mDataset){
+        this.mDataset = mDataset;
+        this.activity = activity;
+    }
 
 
-##### 2)삭제기능   
-삭제하고싶은 게시물에서 popup메뉴의 삭제버튼이나 게시물의 삭제버튼을 누르게 되면 해당하는 게시물의 position값을 얻어와 해당 게시물을
-firebase와 리뷰 목록에서 삭제 가능하도록 구현하였다.    
-이를 구현하기 위해 OnPostListener.java 파일에 수정 및 삭제 기능의 listener를 이용하였다.   
-수정 및 삭제시, 게시물 업데이트를 위해 interface를 이용하는 것이다. 이 메서드 하나로 수정 및 삭제 기능을 구현가능하도록 한다.    
+    @NonNull
+    @Override
+    public MyAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, final int viewType) {
+
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_alarm, parent, false);
+        final MyViewHolder myViewHolder = new MyViewHolder(activity, cardView, mDataset.get(viewType));
+        modifybtn = cardView.findViewById(R.id.modifybtn);
+        deletebtn = cardView.findViewById(R.id.deletebtn);
+
+        //수정버튼 클릭시
+        modifybtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAlarmListener.onModify(myViewHolder.getAdapterPosition());
+                //myStartActivity(SettingAlarm.class);
+            }
+        });
+
+        //삭제버튼 클릭시
+        deletebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAlarmListener.onDelete(myViewHolder.getAdapterPosition());
+                myStartActivity(MainActivity.class);
+            }
+        });
+
+        return myViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final MyAdapter.MyViewHolder holder, final int position) {
+
+        final CardView cardView = holder.cardView;
+        TextView hourText = cardView.findViewById(R.id.hourText);
+        hourText.setText(mDataset.get(position).getHour());
+        Log.e("확인확인", String.valueOf(mDataset.get(position).getHour()));
+
+        TextView minuteText = cardView.findViewById(R.id.minuteText);
+        minuteText.setText(mDataset.get(position).getMinute());
+        Log.e("getMinute", String.valueOf(mDataset.get(position).getMinute()));
+
+        TextView drugText = cardView.findViewById(R.id.drug_text);
+        drugText.setText(mDataset.get(position).getDrugText());
+        Log.e("getDrugText",mDataset.get(position).getDrugText());
+
+        TextView ampmText = cardView.findViewById(R.id.ampmText);
+        ampmText.setText(mDataset.get(position).getAmpm());
+        Log.e("getAmpm", mDataset.get(position).getAmpm());
+
+        //modifybtn = cardView.findViewById(R.id.modifybtn);
+        //deletebtn = cardView.findViewById(R.id.deletebtn);
+    }
+    private void myStartActivity (Class c, AlarmReceiver alarmReceiver){//intent를 이용하여 id 값을 전달해줄것임.
+        Intent intent = new Intent(activity, c);
+        intent.putExtra("alarmInfo", (Parcelable) alarmReceiver);//앞에는 key값, 뒤에는 실제 값
+        //id값을 보내주면 WritePostActivity에서 받아서 쓸것임
+        activity.startActivity(intent);
+    }
+    private void myStartActivity(Class c) {//화면 전환을 위한 메서드를 함수로 정의함
+        Intent intent = new Intent(activity, c);
+        activity.startActivityForResult(intent, 1);
+    }
+    @Override
+    public int getItemCount() {
+        return (mDataset !=null ? mDataset.size() :0);
+    }
+
+
+}
+~~~
+알림을 설정하면 다음과 같은 알림리스트가 생성된다.
+
+
+
+<img src="https://user-images.githubusercontent.com/62935657/86553245-26c19d80-bf85-11ea-9c49-e0157edfa11b.png" width="30%"></img>
+
+
+>>#### 2-5-2 푸시알림
+AlarmReceiver.java
+
 ~~~java
-public interface OnPostListener {
+NotificationChannel channel = new NotificationChannel(channelId, chaanelName, importance);
+            channel.setDescription(description);
+
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            builder.setSmallIcon(R.drawable.ic_drug_icon);
+
+            builder.setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setContentTitle("약쏙")
+                    .setContentText(text + "을(를) 복용할시간에요:)")
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setContentIntent(contentIntent)
+                    .setContentInfo("INFO")
+                    .setDefaults(Notification.DEFAULT_VIBRATE);
+
+
+            //if(notificationManager !=null){
+
+
+            PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag"
+            );
+            wakeLock.acquire(5000);
+            notificationManager.notify(Integer.parseInt(notificationid), builder.build());
+~~~
+
+
+ic_drug_icon.png
+<img src="https://user-images.githubusercontent.com/62935657/86551712-d9dbc800-bf80-11ea-8deb-d7e3d49fb645.png" width="10%"></img>
+를 넣어 푸시알림이 왔을때 위와 같은 icon이 뜨도록 설정했다.
+
+
+
+setDefaults(Notification.DEFAULT_VIBRATE); 를 이용하여 푸시알림이 왔을때 진동이 울리게 했다.
+setContentTitle로 제목을 설정하고, setContentText로 본문을 설정한다.
+알림을 표시하기 위해서 notify(notificationId, builder.build())를 이용하여 builder에 전달한다. 
+
+
+~~~java
+if (notificationManager != null) {
+
+
+                PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag"
+                );
+                wakeLock.acquire(5000);
+                notificationManager.notify(Integer.parseInt(notificationid), builder.build());
+
+            }
+~~~
+다음과 같은 코드를 이용하여 화면이 꺼져있을때, 화면이 켜지면서 다음과 같은 푸시알림이 보일수 있도록 했다.
+
+
+
+
+<img src="https://user-images.githubusercontent.com/62935657/86553144-dba78a80-bf84-11ea-8c84-abeefc613942.png" width="30%"></img>
+
+
+
+
+>>#### 2-5-3 알림삭제
+
+
+OnAlarmListener.java
+~~~java
+package listener;
+
+public interface OnAlarmListener {
     void onDelete(int position);
     void onModify(int position);
 }
 ~~~
-위의 listener를 정의해주기 위해 ReviewMainActivity.java파일에 추가해준다.   
-~~~java
- OnPostListener onPostListener = new OnPostListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
-        @Override
-        public void onDelete(int position) {//MainAdapter에 넘겨주기 위한 메서드 작성
 
-            String id = postList.get(position).getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
-            firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
+
+
+
+1)alarmlistener 인터페이스를 만들어서 삭제버튼을 눌렀을때, fragmentAlarm.java로 가서, 알림이 삭제가 될수 있도록 한다.
+
+
+알림을 설정할때 지정했던 requestcode값을 arraylist에서 받아와서 pendingIntent로 넣어주면, 삭제해야할 알림이 삭제가 된다.
+
+~~~java
+OnAlarmListener onAlarmListener = new OnAlarmListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
+        @Override
+        public void onDelete(final int position) {//MainAdapter에 넘겨주기 위한 메서드 작성
+
+            id = alarmList.get(position).getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
+            firebaseFirestore.collection("AlarmDemo").document(id).delete()//그 id에 맞는 값들을 지워줌
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {//성공시
-                            startToast("게시글을 삭제하였습니다.");
-                            postUpdate();//새로고침을 위해 이 이벤트를 mainActivity에서 알아야함.->listener를 만들어줘야함
+                            alarmUpdate();
+
+                            Intent intent = new Intent(getActivity(), AlarmReceiver.class);
+                            // intent.putExtra("cancelId", alarmList.get(position).getHour()+alarmList.get(position).getMinute());
+                            //cancelId = intent.getStringExtra("cancelId");
+                            //if (cancelId != null){
+                            Log.e("cancel : ","cancel");
+                            //alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                            // Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+                            PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(),
+                                    Integer.parseInt(alarmList.get(position).getHour()+alarmList.get(position).getMinute()),intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            alarmManager.cancel(pIntent);
+                            pIntent.cancel();
+                            Toast.makeText(getActivity(), "알림이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                            Log.e("ERROR : ","ERROR");
+
+                            Log.e("DB삭제 성공 : ","성공");
+
                         }
                     }).addOnFailureListener(new OnFailureListener(){
                 @Override
@@ -2245,167 +2630,33 @@ public interface OnPostListener {
                 }
             });
         }
-
-        @Override
-        public void onModify(int position) {//여기서 수정하면 writepostActivity를 켜서 수정해주는코드
-            myStartActivity(ReviewWriteActivity.class,postList.get(position));
-        }
-    };
 ~~~
-<img src="https://user-images.githubusercontent.com/57400849/86555531-99ce1280-bf8b-11ea-93a3-742ee9cd725a.png" width="70%">   
-
-##### 2. popup메뉴를 이용하여 수정 및 삭제 기능을 구현하였다.
-##### 1)각각의 adapter에서 구현이 가능하도록 해야하기 때문에 ReviewMainAdapter.java에서 추가적으로 popup메서드를 구현하였다.   
 ~~~java
- //popup메뉴를 만들기 위한 메서드. view로 받아오기 위해 activity사용함. 여기서 popup메뉴는 수정 삭제가 내려오는 메뉴임.
-    public void showPopup(View v, final int position) {//android studio에서 제공하는 팝업 메뉴 표시 기능
-        //db값을 갖고오고, 선택된 post값을 알아오기 위해 사용함. view와 위치값(position)을 갖고와서 사용하기. 하나의 postID를 알아야함.
-        //postID를 알아야 그 post를 삭제할수있음.->postInfo.java수정
-
-        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
-        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
-
-        PopupMenu popup = new PopupMenu(activity,v);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()){
-                    case R.id.modify ://modify버튼을 눌렀을 때
-                        onPostListener.onModify(position);//인터페이스의 onModify를 이용
-                        return true;
-                    case R.id.delete://delete버튼을 눌렀을 때
-                        // 게시글 삭제를 위한 메서드. db에서도 삭제함.
-                        onPostListener.onDelete(position);//인터페이스의 onDelete를 이용
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
-        MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
-        inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
-        popup.show();
-    }
-~~~
-##### 2)이 showPopup() 메서드를 onCreateViewHolder 메서드에 추가적으로 정의해준다.    
-~~~java
-@NonNull
-    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
-    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
-        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
-        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
-        //Log.e("로그: ","로그: "+viewType);
-        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
-            @Override
-            public void onClick(View view) {
-                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
-                Intent intent = new Intent(activity, ReviewActivityPost.class);
-                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
-                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
-                activity.startActivity(intent);
-            }
-        });
-        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
-        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
-        cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopup(view, mainViewHolder.getAdapterPosition());
-            }
-        });
-        return mainViewHolder;
-    }
-~~~
-따라서 각각의 adapter에서 수정 및 삭제 popup 메뉴가 생성되도록 구현하도록 한다.    
-
-<img src="https://user-images.githubusercontent.com/57400849/86555610-ce41ce80-bf8b-11ea-8e6d-b97148d80912.png" width="20%">   
-
-
-##### 3. 게시물을 자세히 보기 클릭시, 그 안에서도 수정 및 삭제 기능이 가능하도록 구현하였다.    
-##### 1)먼저 게시글 삭제 기능을 ReviewPostAdapter.java파일에 따로 구현해주었다. 이는 메서드의 유연한 사용을 위함이다.   
-~~~java
-public void postDelete(ReviewPostInfo reviewPostInfo){
-
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();//FirebaseFirestore 초기화해주는 코드
-        String id = reviewPostInfo.getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
-        firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+ private void alarmUpdate(){
+        firebaseFirestore.collection("AlarmDemo").orderBy("hour", Query.Direction.ASCENDING).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {//성공시
-                        startToast("게시글을 삭제하였습니다.");//삭제시 삭제 토스트를 띄워줌
-                        //끝났는줄 알고 post 업데이트를 해줘야 하니까 리스너 필요
-                        onPostListener.onDelete(1);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            alarmList = new ArrayList<>();
+                            alarmList.clear();
+                            for(QueryDocumentSnapshot document : task.getResult()){
+                                alarmList.add(new AlarmInfo(
+                                        document.getData().get("hour").toString(),
+                                        document.getData().get("minute").toString(),
+                                        document.getData().get("drugtext").toString(),
+                                        document.getData().get("ampm").toString(),
+                                        document.getId()
+                                ));
+                            }
+                            myAdapter = new MyAdapter(getActivity(), alarmList);
+                            myAdapter.setOnAlarmListener(onAlarmListener);
+                            recyclerView.setAdapter(myAdapter);
+                            myAdapter.notifyDataSetChanged();
+                        }else {
+                            Log.d(TAG, "Error : ",task.getException());
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener(){
-            @Override
-            public void onFailure(@NonNull Exception e) {//실패시 실패 토스트를 띄워줌
-                startToast("게시글 삭제에 실패하였습니다."); }
-        });
-    }
-
-    public void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
-        Toast.makeText(activity,msg,Toast.LENGTH_SHORT).show();
-    }
-};
-~~~
-##### 2)ReviewActivityPost,java파일에 추가적으로 정의해준다.   
-이때도 onPostListener의 메서드를 불러온다.
-~~~java
-OnPostListener onPostListener = new OnPostListener() {
-        @Override
-        public void onDelete(int position) {
-            Log.e("로그", "삭제 성공");
-        }
-
-        @Override
-        public void onModify(int position) {
-            Log.e("로그", "수정 성공");
-        }
-    };
-    //수정버튼, 삭제버튼 클릭 시 실행해주는 메서드를 구현함
-    private void buttonClick(){
-        //dialog를 이용해서 삭제를 재 확인 해주는 메서드를 구현함.
-        final AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
-                android.R.style.Theme_DeviceDefault_Light_Dialog);
-        //삭제버튼 클릭 시
-        delete2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                oDialog.setMessage("삭제하시겠습니까?")//Dialog로 듸워줌
-                        .setTitle("알림")
-                        .setPositiveButton("아니오", new DialogInterface.OnClickListener()//아니오 클릭 시
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                Log.i("Dialog", "취소");
-                                Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNeutralButton("예", new DialogInterface.OnClickListener()//예 버튼 클릭 시
-                        {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                //실제 삭제 기능을 수행하는 코드.
-                                reviewPostAdapter.postDelete(reviewPostInfo); //reviewPostInfo의 postDelete메서드를 이용해 삭제시킴
-                                myStartActivity(ReviewMainActivity.class, reviewPostInfo);//intent로 ReviewMainActivity로 넘겨줌
-                                finish();
-                            }
-                        })
-                        .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
-                        .show();
-            }
-        });
-        //수정버튼 클릭 시
-        modify2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                myStartActivity(ReviewWriteActivity.class, reviewPostInfo);//바로 ReviewWriteActivity창으로 넘겨줌. 다시 게시물을 작성할 수 있는 창으로 넘겨주는것임.
-            }
-        });
+                });
     }
 ~~~
-<img src="https://user-images.githubusercontent.com/57400849/86555662-f3364180-bf8b-11ea-938d-246628adb58e.png" width="20%">    
-
-
