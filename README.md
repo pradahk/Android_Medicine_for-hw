@@ -1236,6 +1236,7 @@ public class ModifyPhoneDialog extends DialogFragment {
     }
 ~~~
 <img src="https://user-images.githubusercontent.com/62936197/86555739-2f69a200-bf8c-11ea-8c39-da34b681ac41.png" width="30%">   
+
 *****
 >### 2-3 사용자 후기 게시판
 >#### 2-3-1 firebase 연동
