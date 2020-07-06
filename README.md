@@ -1292,7 +1292,7 @@ public class ReviewPostInfo implements Serializable {
 }
 ~~~
 ##### 2)게시물을 입력할 ReviewWriteActivity.java 파일 생성    
-* 위에서 정의해준 getter와 setter를 이용하여 사용자가 입력한 값을 ReviewPostInfo.java의 setter에 저장해준다.   
+위에서 정의해준 getter와 setter를 이용하여 사용자가 입력한 값을 ReviewPostInfo.java의 setter에 저장해준다.   
 ~~~java
 //text 업데이트를 위한 코드
     private void contentsUpdate() {
@@ -1310,7 +1310,7 @@ public class ReviewPostInfo implements Serializable {
         }
     }
 ~~~
-* 입력한 게시물의 내용을 setter를 이용하여 firebase에 저장해준다    
+입력한 게시물의 내용을 setter를 이용하여 firebase에 저장해준다    
 ~~~java
  private void uploader(ReviewPostInfo reviewPostInfo){
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -1483,7 +1483,7 @@ public class ReviewMainActivity extends AppCompatActivity {
 ~~~
  
 ##### 5)게시글 자세히보기 기능    
-* 등록된 게시물은 다음 코드를 이용하여 내용의 일부만 보여주도록 구현하였다.    
+등록된 게시물은 다음 코드를 이용하여 내용의 일부만 보여주도록 구현하였다.    
 ~~~java
 <TextView
     android:id="@+id/titleTextView"
@@ -1497,7 +1497,7 @@ public class ReviewMainActivity extends AppCompatActivity {
     android:maxLines="1"
     android:ellipsize="end"/>
 ~~~
-* 따라서 게시글의 자세히보기 기능을 구현하였다.   
+따라서 게시글의 자세히보기 기능을 구현하였다.   
 이는 해당 게시물을 클릭하면 게시글을 전체볼 수 있는 창으로 넘어가도록 구현한 것이다.   
 먼저 adapter에서 해당하는 게시물을 클릭했을 때, intent를 이용하여 값들을 넘겨주었다.   
 ~~~java
@@ -1588,7 +1588,7 @@ intent를 이용하여 넘겨준 값들을 ReviewActivityPost.java 파일에서 
 ##### 2)삭제기능   
 삭제하고싶은 게시물에서 popup메뉴의 삭제버튼이나 게시물의 삭제버튼을 누르게 되면 해당하는 게시물의 position값을 얻어와 해당 게시물을
 firebase와 리뷰 목록에서 삭제 가능하도록 구현하였다.    
-* 이를 구현하기 위해 OnPostListener.java 파일에 수정 및 삭제 기능의 listener를 이용하였다.   
+이를 구현하기 위해 OnPostListener.java 파일에 수정 및 삭제 기능의 listener를 이용하였다.   
 수정 및 삭제시, 게시물 업데이트를 위해 interface를 이용하는 것이다. 이 메서드 하나로 수정 및 삭제 기능을 구현가능하도록 한다.    
 ~~~java
 public interface OnPostListener {
@@ -1596,7 +1596,7 @@ public interface OnPostListener {
     void onModify(int position);
 }
 ~~~
-* 위의 listener를 정의해주기 위해 ReviewMainActivity.java파일에 추가해준다.   
+위의 listener를 정의해주기 위해 ReviewMainActivity.java파일에 추가해준다.   
 ~~~java
  OnPostListener onPostListener = new OnPostListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
         @Override
