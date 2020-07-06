@@ -63,14 +63,114 @@ dependencies {
  }
 ~~~
 >#### 2-1-2 회원가입
-아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다.   
+아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다. 
+~~~java
+public class SignupActivity extends AppCompatActivity {
+// 비밀번호 정규식
+private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
+// 이메일 정규식
+public static final Pattern EMAIL_ADDRESS = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+// 전화번호 정규식
+public static final Pattern PHONE_PATTERN = Pattern.compile("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", Pattern.CASE_INSENSITIVE);
+
+// 파이어베이스 인증 객체 생성
+private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+// 파이어스토어 인증 객체 생성
+private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+// 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
+private EditText editTextEmail;
+private EditText editTextPassword;
+
+// 비밀번호 확인에 작성한 값을 저장할 객체 생성
+private EditText editTextPasswordCheck;
+// 작성한 이름 값과 전화번호 값을 저장할 객체 생성
+private EditText editTextName;
+private EditText editTextPhone;
+
+// 회원정보에 저장할 값 객체 생성
+private String email = "";
+private String password = "";
+private String passwordCheck = "";
+private String name = "";
+private String phone = "";
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.activity_signup);
+
+// id가 write_email인 editText에 대한 메서드 저장
+editTextEmail = findViewById(R.id.write_email);
+// id가 signup_password인 editText에 대한 메서드 저장
+editTextPassword = findViewById(R.id.signup_password);
+// id가 check_password인 editText에 대한 메서드 저장
+editTextPasswordCheck = findViewById(R.id.check_password);
+// id가 write_name인 editText에 대한 메서드 저장
+editTextName = findViewById(R.id.write_name);
+// id가 write_phone인 editText에 대한 메서드 저장
+editTextPhone = findViewById(R.id.write_phone);
+}
+
+    // onClick signup
+    public void singUp(View view) {
+        // editText에 작성한 내용을 String으로 변환하여 객체에 저장
+        email = editTextEmail.getText().toString();
+        password = editTextPassword.getText().toString();
+        passwordCheck = editTextPasswordCheck.getText().toString();
+        name = editTextName.getText().toString();
+        phone = editTextPhone.getText().toString();
+
+        // 유효성 검사 후 회원가입 실행
+        if (isValidEmail() && isValidPasswd() && isValidPasswdcheck() && isValidName() && isValidPhone()) {
+            firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // 입력한 email, password, name, phone 값을 파이어스토어에 저장
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("email", email);
+                                user.put("password", password);
+                                user.put("name", name);
+                                user.put("phone", phone);
+                                firebaseFirestore.collection("users").document(email)
+                                        .set(user)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // 정보 저장이 성공적으로 이루어지면 이메일 인증 메일 발송
+                                                sendEmailVerification();
+                                                //  이메일 인증 다이얼로그 보여줌
+                                                authemailDialog.show();
+
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                // 회원가입에 실패하면 "회원가입 실패" 토스트를 보여줌
+                                                Toast.makeText(SignupActivity.this, R.string.failed_signup, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                            } else {
+                                Toast.makeText(SignupActivity.this, R.string.alreadyemail, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
+~~~
 <img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">      
 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
 전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.   
 <img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="70%>   
 >#### 2-1-3 로그인
-회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.     
+회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.   
+                                                                                                                       
+<img src="https://user-images.githubusercontent.com/62936197/86550056-5324ec00-bf7c-11ea-86d6-bfb4b3b7c1d1.png" width="70%>    
 Firebase의 Auth에 저장된 값과 비교하여 입력한 값이 일치하면 로그인이 성공되고 메뉴 화면으로 전환된다.   
 
 ~~~java                                                                                                                      
@@ -151,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 ~~~   
-유효성 검사 메서드   
+이메일 및 비밀번호 유효성 검사 메서드   
 ~~~java
  // 이메일 유효성 검사
     private boolean isValidEmail() {
@@ -180,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
     }
 ~~~   
 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.      
-<img src="https://user-images.githubusercontent.com/62936197/86550056-5324ec00-bf7c-11ea-86d6-bfb4b3b7c1d1.png" width="70%>   
+ 
 >#### 2-1-4 아이디 찾기 및 비밀번호 재설정
 사용자가 자신의 아이디를 잊었다면 회원가입 시 사용한 이름과 전화번호를 통해 사용자의 아이디를 찾을 수 있게 한다.   
 회원가입으로 인해 Firebase에 저장된 사용자의 이름, 전화번호 데이터와 아이디를 찾기 위해 Edittext에 입력한 이름, 전화번호 값이 모두 일치해야 사용자에게 이메일을 보여준다.   
