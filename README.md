@@ -1235,4 +1235,548 @@ public class ModifyPhoneDialog extends DialogFragment {
     }
     }
 ~~~
-<img src="https://user-images.githubusercontent.com/62936197/86555739-2f69a200-bf8c-11ea-8c39-da34b681ac41.png" width="30%">     
+<img src="https://user-images.githubusercontent.com/62936197/86555739-2f69a200-bf8c-11ea-8c39-da34b681ac41.png" width="30%">   
+*****
+>### 2-3 사용자 후기 게시판
+>#### 2-3-1 firebase 연동
+firebase와 연동하는 방법은 회원가입 부분에서 설명한 방법과 동일하다.      
+>#### 2-3-2 게시물 등록    
+recyclerView와 cardView를 이용하여 목록에서 firebase에 저장된 데이터들을 보여줄 것이다.    
+##### 1)getter와 setter를 정의해주는 ReviewPostInfo.java 파일 생성하기    
+외부에서 접근할 때 객체의 무결성을 보장하기 위해 getter와 setter를 정의하였다  
+게시글을 입력했을 때, 게시글의 제목과 내용, 등록한 날짜를 정의해준다.   
+~~~java
+import java.io.Serializable;
+import java.util.Date;
+//getter와 setter를 정의해주는 코드
+public class ReviewPostInfo implements Serializable {
+    //intent에서 putExtra로 보내주기 위해 implements Serializable가 사용됨.
+    private String title;
+    private String contents;
+    private Date createdAt;
+    private String id;
+   public ReviewPostInfo(String title, String Contents, Date createdAt) {
+        this.title = title;
+        this.contents = Contents;
+        this.createdAt = createdAt;
+    }
+    //get set 메서드 이용
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getContents() {
+        return contents;
+    }
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+~~~
+##### 2)게시물을 입력할 ReviewWriteActivity.java 파일 생성    
+* 위에서 정의해준 getter와 setter를 이용하여 사용자가 입력한 값을 ReviewPostInfo.java의 setter에 저장해준다.   
+~~~java
+//text 업데이트를 위한 코드
+    private void contentsUpdate() {
+        //titleEditText과 contentEditText의 값을 받아서 string값으로 받아옴
+        final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
+        final String contents = ((EditText) findViewById(R.id.contentEditText)).getText().toString();
+        final Date date = reviewPostInfo2 ==null? new Date() : reviewPostInfo2.getCreatedAt();//날짜가 존재하지 않으면 현재 날짜를 불러오고, 수정 시 날짜가 존재하니까 그때는 그 날짜 그대로 유지시켜줌
+        //제목과 글이 둘 다 입력 되었을 때 실행됨
+        if(title.length() > 0 && contents.length()>0){
+            loadrLayout.setVisibility(View.VISIBLE);
+            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date);
+            uploader(reviewPostInfo);//값들이 postinfo로 들어와 uploader 메서드로 들어감
+        }else {//그렇지 않으면 게시글을 입력해달라는 toast가 띄워짐
+            startToast("게시글을 입력해주세요");
+        }
+    }
+~~~
+* 입력한 게시물의 내용을 setter를 이용하여 firebase에 저장해준다    
+~~~java
+ private void uploader(ReviewPostInfo reviewPostInfo){
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환
+        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
+                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
+        //게시물에서 입력한 텍스트들을 받아와서 database의 document부분에 넣어줌.
+        documentReference.set(reviewPostInfo.getPostInfo())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {//성공시
+                        Log.d(TAG,"id");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override// 실패 시
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG,"Error",e);
+                    }
+                });
+    }
+~~~
+
+##### 3)firebase에 저장된 게시물을 목록으로 보여주기 위해 ReviewMainAdapter.java에 adapter를 정의해준다   
+이 adpater는 recyclerView와 cardView를 이용한다.    
+~~~java
+//Review페이지의 처음 창을 보여주는 MainAdapter
+public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.MainViewHolder>{
+    private ArrayList<ReviewPostInfo> mDataset;
+    private Activity activity;
+    private String email;
+    TextView textEmail;
+    CardView cardView1;
+
+    //RecyclerView와 cardView를 이용하여 등록된 리뷰를 전체 리스트로 출력할것임. 그것을 위한 정의
+    static class MainViewHolder extends RecyclerView.ViewHolder{
+        CardView cardView;
+        MainViewHolder(Activity activity, CardView v, ReviewPostInfo reviewPostInfo) {
+            super(v);
+            cardView = v;
+        }
+    }
+    //viewType이 계속 0만 주기 때문에 사용하려면 override해야함.
+    @Override
+    public int getItemViewType(int position){
+        return position;
+    }
+
+    //배열로 들어온 데이터들을 불러오는 작업.
+    ReviewMainAdapter(Activity activity, ArrayList<ReviewPostInfo> mDataset) {//생성자. 초기화해줌
+        this.mDataset = mDataset;
+        this.activity = activity;
+    }
+
+    @NonNull
+    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        //Log.e("로그: ","로그: "+viewType);
+
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+        return mainViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MainViewHolder holder, int position) {
+        //item_post에 실제 db들의 값들을 넣어주는 작업.
+
+        //CardView에 firebase에 저장된 title값 넣어주기
+        CardView cardView = holder.cardView;
+        TextView titleTextView = cardView.findViewById(R.id.titleTextView);
+        titleTextView.setText(mDataset.get(position).getTitle());
+
+        //게시물을 추가한 날짜 넣어주기
+        TextView createTextView = cardView.findViewById(R.id.createdTextView);
+        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(mDataset.get(position).getCreatedAt()));
+
+        //contents값 넣어주기
+        final TextView contentsTextView = cardView.findViewById(R.id.contentsTextView);
+        contentsTextView.setText(mDataset.get(position).getContents());
+
+        textEmail = cardView.findViewById(R.id.textView2);
+        textEmail.setText(mDataset.get(position).getEmail());
+    }
+
+    @Override //자동 override됨. 데이터들의 수를 세줌.
+    public int getItemCount() {
+        return (mDataset != null ? mDataset.size() : 0);
+    }
+}
+~~~
+
+##### 4)ReviewMainActivity.java에서 firebase에 저장된 데이터들을 위에서 정의된 adapter를 이용하여 넣어준다.    
+Review의 목록을 보여줄 java 파일인 ReviewMainActivity.java 파일에 recyclerView를 정의해준다     
+~~~java
+public class ReviewMainActivity extends AppCompatActivity {
+    private  ArrayList<ReviewPostInfo> postList;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private ReviewMainAdapter mainAdapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //이 파일에서는 review_activity_main.xml창을 보여줄것임.
+        setContentView(R.layout.review_activity_main);
+        fragmentMainMenu = new FragmentMainMenu();
+        
+        //recyclerView 초기화
+        recyclerView = findViewById(R.id.recyclerView);//recyclerViewid연결
+        recyclerView.setHasFixedSize(true);//recylerView 기존 성능 강화
+        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ReviewMainActivity.this);
+        recyclerView.setLayoutManager(layoutManager);
+        postUpdate();
+        findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);//게시글 추가 버튼을 클릭 시
+    }
+    //게시글 추가 버튼을 클릭할 때 처리하는 기능
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {//게시글 추가 버튼을 눌렀을 때 ReviewWriteActivity.java로 넘겨줌
+            if (view.getId() == R.id.floatingActionButton) {
+                myStartActivity(ReviewWriteActivity.class);
+            }
+         }
+    };
+
+ //실제 게시물을 보여주고 업데이트 해주는 코드
+    public void postUpdate(){
+        firebaseFirestore.collection("posts").orderBy("createdAt", Query.Direction.DESCENDING).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            postList = new ArrayList<>();//arraylist에 받아온값들을 다 넣어주어 보여줌
+                            postList.clear();
+                            for(QueryDocumentSnapshot document : task.getResult()){
+                                Log.d(TAG, document.getId()+" => "+document.getData());
+                                postList.add(new ReviewPostInfo(//데이터를 다 가져와 postList배열에 넣어줌.
+                                        document.getData().get("title").toString(),
+                                        document.getData().get("contents").toString(),
+                                        new Date(document.getDate("createdAt").getTime()),
+                                        document.getId(),
+                                        document.getData().get("user").toString()
+                                        //firebaseFirestore.collection("users").document().getId()//user의 email값을 가져옴.
+                                ));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴
+                            }
+                            //MainAdaper에서 넘겨줌.
+                            mainAdapter = new ReviewMainAdapter(ReviewMainActivity.this, postList);
+                            mainAdapter.setOnPostListener(onPostListener);//onPostListener를 넘겨주면 MainAdapter에서도 쓸수있음.
+                            recyclerView.setAdapter(mainAdapter);
+                            mainAdapter.notifyDataSetChanged();
+                        }else {
+                            Log.d(TAG, "Error : ",task.getException());
+                        }
+
+                    }
+                });
+}
+~~~
+ 
+##### 5)게시글 자세히보기 기능    
+* 등록된 게시물은 다음 코드를 이용하여 내용의 일부만 보여주도록 구현하였다.    
+~~~java
+<TextView
+    android:id="@+id/titleTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:textColor="#000000"
+    android:textSize="15sp"
+    android:textStyle="bold"
+    tools:text="@string/itemPostTitle"
+    android:maxLines="1"
+    android:ellipsize="end"/>
+~~~
+* 따라서 게시글의 자세히보기 기능을 구현하였다.   
+이는 해당 게시물을 클릭하면 게시글을 전체볼 수 있는 창으로 넘어가도록 구현한 것이다.   
+먼저 adapter에서 해당하는 게시물을 클릭했을 때, intent를 이용하여 값들을 넘겨주었다.   
+~~~java
+@NonNull
+    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        //Log.e("로그: ","로그: "+viewType);
+
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+~~~
+intent를 이용하여 넘겨준 값들을 ReviewActivityPost.java 파일에서 받아서 띄워주는 것이다.
+~~~java
+ @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //이 java파일에서는 activity_write_post창을 보여줄것임.
+        setContentView(R.layout.review_activity_post);
+
+        reviewPostInfo = (ReviewPostInfo) getIntent().getSerializableExtra("postInfo");
+        //title 넣어주기
+        TextView titleTextView = findViewById(R.id.titleTextView);
+        titleTextView.setText(reviewPostInfo.getTitle());
+
+        //게시물을 추가한 날짜 넣어주기
+        TextView createTextView = findViewById(R.id.createdTextView);
+        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd",
+                Locale.getDefault()).format(reviewPostInfo.getCreatedAt()));//local시간을 생성하여 넣어줄것임.
+        //contents 넣어주기
+        final TextView contentsTextView = findViewById(R.id.contentsTextView);
+        contentsTextView.setText(reviewPostInfo.getContents());
+        
+        reviewPostAdapter = new ReviewPostAdapter(this);
+        reviewPostAdapter.setOnPostListener(onPostListener);//ReviewPostAdapter에 연결해줌.
+    }
+~~~
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86554916-e1539f00-bf89-11ea-965e-1b2bd067ae3a.png" width="70%"> 
+<img src="https://user-images.githubusercontent.com/57400849/86554958-01835e00-bf8a-11ea-8329-65fb59a8c7db.png">  
+</div>
+
+ 
+
+
+
+
+>#### 2-3-3 게시물 수정 및 삭제
+게시글의 수정 및 삭제 기능은 popup메뉴를 이용한 방법과 버튼을 이용한 방법. 이 두가지를 이용하여 기능 이용이 가능하도록 구현하였다.
+게시물의 업데이트를 위해 interface를 이용하는 것이다.
+
+
+#### 1.수정 및 삭제 방법 설명   
+먼저 기능 구현을 설명하기 전, 공통적인 수정 및 삭제 방법을 설명한다.   
+##### 1)수정기능   
+우선 수정버튼을 클릭하면, ReviewWriteActivity.java파일로 넘어가게 된다. 이때, 이 java파일에서는 해당하는 게시물의 저장되어있는 값들을 가져와
+보여주며 원래의 게시글을 수정할 수 있게 도와준다.   
+~~~java
+ private void postInit (){//수정버튼을 눌렀을 때 그 전의 값들을 넣어주는 역할을 함
+        if(reviewPostInfo2 !=null){
+            titleEditText.setText(reviewPostInfo2.getTitle());
+            contentEditText.setText(reviewPostInfo2.getContents());
+        }
+    }
+~~~
+이 메서드를 이용하여 uploader메서드의 아래의 코드에서 firebase에서의 수정도 가능하게 한다.   
+~~~java
+ //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환->수정버튼 이용 시 사용됨
+        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
+                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
+~~~
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86555488-786d2680-bf8b-11ea-865c-e833ca339498.png" width="70%"> 
+<img src="https://user-images.githubusercontent.com/57400849/86555300-f5e46700-bf8a-11ea-92ee-52cdbd07c024.png" width="20%">
+</div>   
+
+
+##### 2)삭제기능   
+삭제하고싶은 게시물에서 popup메뉴의 삭제버튼이나 게시물의 삭제버튼을 누르게 되면 해당하는 게시물의 position값을 얻어와 해당 게시물을
+firebase와 리뷰 목록에서 삭제 가능하도록 구현하였다.    
+* 이를 구현하기 위해 OnPostListener.java 파일에 수정 및 삭제 기능의 listener를 이용하였다.   
+수정 및 삭제시, 게시물 업데이트를 위해 interface를 이용하는 것이다. 이 메서드 하나로 수정 및 삭제 기능을 구현가능하도록 한다.    
+~~~java
+public interface OnPostListener {
+    void onDelete(int position);
+    void onModify(int position);
+}
+~~~
+* 위의 listener를 정의해주기 위해 ReviewMainActivity.java파일에 추가해준다.   
+~~~java
+ OnPostListener onPostListener = new OnPostListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
+        @Override
+        public void onDelete(int position) {//MainAdapter에 넘겨주기 위한 메서드 작성
+
+            String id = postList.get(position).getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
+            firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {//성공시
+                            startToast("게시글을 삭제하였습니다.");
+                            postUpdate();//새로고침을 위해 이 이벤트를 mainActivity에서 알아야함.->listener를 만들어줘야함
+                        }
+                    }).addOnFailureListener(new OnFailureListener(){
+                @Override
+                public void onFailure(@NonNull Exception e) {//실패시
+                    startToast("게시글 삭제에 실패하였습니다.");
+                }
+            });
+        }
+
+        @Override
+        public void onModify(int position) {//여기서 수정하면 writepostActivity를 켜서 수정해주는코드
+            myStartActivity(ReviewWriteActivity.class,postList.get(position));
+        }
+    };
+~~~
+<img src="https://user-images.githubusercontent.com/57400849/86555531-99ce1280-bf8b-11ea-93a3-742ee9cd725a.png" width="70%">   
+
+##### 2. popup메뉴를 이용하여 수정 및 삭제 기능을 구현하였다.
+##### 1)각각의 adapter에서 구현이 가능하도록 해야하기 때문에 ReviewMainAdapter.java에서 추가적으로 popup메서드를 구현하였다.   
+
+~~~java
+ //popup메뉴를 만들기 위한 메서드. view로 받아오기 위해 activity사용함. 여기서 popup메뉴는 수정 삭제가 내려오는 메뉴임.
+    public void showPopup(View v, final int position) {//android studio에서 제공하는 팝업 메뉴 표시 기능
+        //db값을 갖고오고, 선택된 post값을 알아오기 위해 사용함. view와 위치값(position)을 갖고와서 사용하기. 하나의 postID를 알아야함.
+        //postID를 알아야 그 post를 삭제할수있음.->postInfo.java수정
+
+        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
+        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+
+        PopupMenu popup = new PopupMenu(activity,v);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.modify ://modify버튼을 눌렀을 때
+                        onPostListener.onModify(position);//인터페이스의 onModify를 이용
+                        return true;
+                    case R.id.delete://delete버튼을 눌렀을 때
+                        // 게시글 삭제를 위한 메서드. db에서도 삭제함.
+                        onPostListener.onDelete(position);//인터페이스의 onDelete를 이용
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
+        inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
+        popup.show();
+    }
+~~~
+##### 2)이 showPopup() 메서드를 onCreateViewHolder 메서드에 추가적으로 정의해준다.    
+~~~java
+@NonNull
+    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        //Log.e("로그: ","로그: "+viewType);
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
+        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+        cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopup(view, mainViewHolder.getAdapterPosition());
+            }
+        });
+        return mainViewHolder;
+    }
+~~~
+따라서 각각의 adapter에서 수정 및 삭제 popup 메뉴가 생성되도록 구현하도록 한다.    
+
+<img src="https://user-images.githubusercontent.com/57400849/86555610-ce41ce80-bf8b-11ea-8e6d-b97148d80912.png" width="20%">   
+
+
+##### 3. 게시물을 자세히 보기 클릭시, 그 안에서도 수정 및 삭제 기능이 가능하도록 구현하였다.    
+##### 1)먼저 게시글 삭제 기능을 ReviewPostAdapter.java파일에 따로 구현해주었다. 이는 메서드의 유연한 사용을 위함이다.   
+~~~java
+public void postDelete(ReviewPostInfo reviewPostInfo){
+
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();//FirebaseFirestore 초기화해주는 코드
+        String id = reviewPostInfo.getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
+        firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {//성공시
+                        startToast("게시글을 삭제하였습니다.");//삭제시 삭제 토스트를 띄워줌
+                        //끝났는줄 알고 post 업데이트를 해줘야 하니까 리스너 필요
+                        onPostListener.onDelete(1);
+                    }
+                }).addOnFailureListener(new OnFailureListener(){
+            @Override
+            public void onFailure(@NonNull Exception e) {//실패시 실패 토스트를 띄워줌
+                startToast("게시글 삭제에 실패하였습니다."); }
+        });
+    }
+
+    public void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
+        Toast.makeText(activity,msg,Toast.LENGTH_SHORT).show();
+    }
+};
+~~~
+##### 2)ReviewActivityPost,java파일에 추가적으로 정의해준다.   
+이때도 onPostListener의 메서드를 불러온다.
+~~~java
+OnPostListener onPostListener = new OnPostListener() {
+        @Override
+        public void onDelete(int position) {
+            Log.e("로그", "삭제 성공");
+        }
+
+        @Override
+        public void onModify(int position) {
+            Log.e("로그", "수정 성공");
+        }
+    };
+    //수정버튼, 삭제버튼 클릭 시 실행해주는 메서드를 구현함
+    private void buttonClick(){
+        //dialog를 이용해서 삭제를 재 확인 해주는 메서드를 구현함.
+        final AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
+                android.R.style.Theme_DeviceDefault_Light_Dialog);
+        //삭제버튼 클릭 시
+        delete2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oDialog.setMessage("삭제하시겠습니까?")//Dialog로 듸워줌
+                        .setTitle("알림")
+                        .setPositiveButton("아니오", new DialogInterface.OnClickListener()//아니오 클릭 시
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                Log.i("Dialog", "취소");
+                                Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setNeutralButton("예", new DialogInterface.OnClickListener()//예 버튼 클릭 시
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //실제 삭제 기능을 수행하는 코드.
+                                reviewPostAdapter.postDelete(reviewPostInfo); //reviewPostInfo의 postDelete메서드를 이용해 삭제시킴
+                                myStartActivity(ReviewMainActivity.class, reviewPostInfo);//intent로 ReviewMainActivity로 넘겨줌
+                                finish();
+                            }
+                        })
+                        .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
+                        .show();
+            }
+        });
+        //수정버튼 클릭 시
+        modify2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myStartActivity(ReviewWriteActivity.class, reviewPostInfo);//바로 ReviewWriteActivity창으로 넘겨줌. 다시 게시물을 작성할 수 있는 창으로 넘겨주는것임.
+            }
+        });
+    }
+~~~
+<img src="https://user-images.githubusercontent.com/57400849/86555662-f3364180-bf8b-11ea-938d-246628adb58e.png" width="20%">    
+
+
+
+
