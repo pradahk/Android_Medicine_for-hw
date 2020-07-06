@@ -63,8 +63,17 @@ dependencies {
  }
 ~~~
 >#### 2-1-2 회원가입
-아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다.
-~~~java
+아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다.   
+
+<img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
+<img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">   
+회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
+전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.      
+<img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="70%>   
+>#### 2-1-3 로그인
+회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.     
+Firebase의 Auth에 저장된 값과 비교하여 입력한 값이 일치하면 로그인이 성공되고 메뉴 화면으로 전환된다.   
+                                                                                                                       ~~~java
 public class MainActivity extends AppCompatActivity {
     // 비밀번호 정규식
     Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
@@ -141,14 +150,34 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 ~~~   
-<img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
-<img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">   
-회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
-전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.      
-<img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="70%>   
->#### 2-1-3 로그인
-회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.     
-Firebase의 Auth에 저장된 값과 비교하여 입력한 값이 일치하면 로그인이 성공되고 메뉴 화면으로 전환된다.   
+유효성 검사 메서드   
+~~~java
+ // 이메일 유효성 검사
+    private boolean isValidEmail() {
+        if (email.isEmpty()) {
+            // 이메일 칸이 공백이면 false
+            return false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            // 이메일 형식이 불일치하면 false
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // 비밀번호 유효성 검사
+    private boolean isValidPasswd() {
+        if (password.isEmpty()) {
+            // 비밀번호 칸이 공백이면 fasle
+            return false;
+        } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            // 비밀번호 형식이 불일치하면 false
+            return false;
+        } else {
+            return true;
+        }
+    }
+~~~   
 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.   
 <img src="https://user-images.githubusercontent.com/62936197/86550056-5324ec00-bf7c-11ea-86d6-bfb4b3b7c1d1.png" width="70%>   
 >#### 2-1-4 아이디 찾기 및 비밀번호 재설정
