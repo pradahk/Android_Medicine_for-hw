@@ -1866,12 +1866,13 @@ public void mOnClick(View v){
 <div>
 <img src="https://user-images.githubusercontent.com/57400913/86556685-fe3ea100-bf8e-11ea-97dc-850dda76d829.png" width="30%">
 <img src="https://user-images.githubusercontent.com/57400913/86557019-eae00580-bf8f-11ea-8d11-b519cdf41e36.png" width="30%">       
-</div>
+</div>   
+
 *****
 >### 2-3 사용자 후기 게시판
->#### 2-3-1 firebase 연동
+>>#### 2-3-1 firebase 연동
 firebase와 연동하는 방법은 회원가입 부분에서 설명한 방법과 동일하다.      
->#### 2-3-2 게시물 등록    
+>>#### 2-3-2 게시물 등록    
 recyclerView와 cardView를 이용하여 목록에서 firebase에 저장된 데이터들을 보여줄 것이다.    
 ##### 1)getter와 setter를 정의해주는 ReviewPostInfo.java 파일 생성하기    
 외부에서 접근할 때 객체의 무결성을 보장하기 위해 getter와 setter를 정의하였다  
