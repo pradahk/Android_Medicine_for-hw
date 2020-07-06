@@ -566,7 +566,7 @@ public class FindpwActivity extends AppCompatActivity {
     }
 }
 ~~~  
-<img src="https://user-images.githubusercontent.com/62936197/86553133-d0ecf580-bf84-11ea-9ae4-599829bcb9cc.png" width="40%">     
+<img src="https://user-images.githubusercontent.com/62936197/86553548-1100a800-bf86-11ea-9f8a-858e6a56c99e.png" width="70%">     
 7) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
-<img src="https://user-images.githubusercontent.com/62936197/86552930-53c18080-bf84-11ea-8ad4-5673ab09e8b2.png" width="40%">   
+<img src="https://user-images.githubusercontent.com/62936197/86553483-ced76680-bf85-11ea-86a1-750e9f48279a.png" width="40%">   
 
