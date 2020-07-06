@@ -48,3 +48,21 @@ dependencies {
 }
 </code>
 </pre>
+모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 다음 줄을 파일 하단에 추가한다.
+<pre>
+<code>
+apply plugin: 'com.android.application'
+
+android {
+  // ...
+}
+apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
+</pre>
+모듈(앱 수준) Gradle 파일(일반적으로 app/build.gradle)에서 핵심 Firebase SDK의 종속 항목을 추가한다.
+<pre>
+<code>
+dependencies {
+ implementation 'com.google.firebase:firebase-core:17.0.0'
+ }
+</code>
+</pre>
