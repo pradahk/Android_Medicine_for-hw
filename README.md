@@ -290,7 +290,7 @@ public class AuthemailDialog extends Dialog {
         authemailDialog = new AuthemailDialog(this, positiveListener);
         }
 ~~~   
-6) 이메일 인증 다이얼로그의 확인버튼 클릭시   
+#####  이메일 인증 다이얼로그의 확인버튼 클릭시   
 ~~~java
     private View.OnClickListener positiveListener = new View.OnClickListener() {
         public void onClick(View v) {
@@ -391,6 +391,34 @@ public class MainActivity extends AppCompatActivity {
 >#### 2-1-4 Google 로그인
 계정 생성을 통한 로그인 외에 구글 아이디를 이용한 로그인 방법을 추가하였다.   
 사용자는 자신의 Google 아이디를 이용하여 어플에 로그인을 진행할 수 있으며 Google 로그인을 성공적으로 진행한 사용자는 게시판 이용 또한 가능해진다.
+~~~java
+public class MainActivity extends AppCompatActivity {
+    // 구글 로그인 객체 생성
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+         // 구글 로그인
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // 구글 로그인 버튼  onClicklistener 생성
+        signInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Log.e("구글 로그인","버튼 클릭");
+                // 클릭시 구글 로그인 메서드 실행
+                signIn();
+            }
+        });
+        }
+~~~
 #####  Google 로그인 메서드
 ~~~java
     private void signIn() {
@@ -627,7 +655,7 @@ public class FindpwActivity extends AppCompatActivity {
     }
 }
 ~~~  
-<img src="https://user-images.githubusercontent.com/62936197/86553548-1100a800-bf86-11ea-9f8a-858e6a56c99e.png" width="60%">     
+<img src="https://user-images.githubusercontent.com/62936197/86553548-1100a800-bf86-11ea-9f8a-858e6a56c99e.png" width="50%">     
 3) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
 <img src="https://user-images.githubusercontent.com/62936197/86553483-ced76680-bf85-11ea-86a1-750e9f48279a.png" width="30%">   
 
