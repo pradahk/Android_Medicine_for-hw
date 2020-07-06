@@ -659,9 +659,11 @@ public class FindpwActivity extends AppCompatActivity {
 3) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
 <img src="https://user-images.githubusercontent.com/62936197/86553483-ced76680-bf85-11ea-86a1-750e9f48279a.png" width="30%">   
 >#### 2-1-6 회원정보 수정
-계정을 생성하여 어플에 성공적으로 로그인을 한 사용자는 ‘마이페이지’탭에서 회원정보를 수정할 수 있다. 회원정보를 열람할 수 있는 탭은 Fragment로 구성하였다.      
+계정을 생성하여 어플에 성공적으로 로그인을 한 사용자는 ‘마이페이지’탭에서 회원정보를 수정할 수 있다. 회원정보를 열람할 수 있는 탭은 Fragment로 구성하였다.   
+
 1) 탭에 방문할 때에는 이메일을 한 번 더 입력해야 하며 입력한 값이 현재 로그인 중인 사용자의 이메일 값과 일치할 경우 회원정보 및 정보 수정을 위한 버튼을 보여준다.   
-이메일 값이 일치하지 않을 경우 회원정보가 보여 지지 않으며 로그인을 하지 않은 사용자가 이 탭에 방문할 때는 ‘로그인 후 이용해주세요.’라는 Text를 보여준다.
+
+이메일 값이 일치하지 않을 경우 회원정보가 보여 지지 않으며 로그인을 하지 않은 사용자가 이 탭에 방문할 때는 ‘로그인 후 이용해주세요.’라는 Text를 보여준다.   
 
 ~~~java
 public class FragmentInfo extends Fragment {
@@ -820,6 +822,7 @@ public class FragmentInfo extends Fragment {
     }
 ~~~
 ##### 정보 수정 후 새로고침 버튼 클릭시 화면이 갱신되어 수정된 정보로 보여주는 refresh 메서드
+
 ~~~java
     // fragment 화면 갱신 메서드
     private void refresh(){
@@ -828,6 +831,7 @@ public class FragmentInfo extends Fragment {
     }
 ~~~
 ##### 회원정보 열람 화면 호출할 이메일 입력 다이얼로그
+
 ~~~java
     private void showDialog(){
         // 입력하는 이메일 값을 저장할 변수
@@ -874,7 +878,9 @@ public class FragmentInfo extends Fragment {
     }
 ~~~
 <img src="https://user-images.githubusercontent.com/62936197/86555561-af433c80-bf8b-11ea-942f-00ecb48f5b0c.png" width="50%">      
+
 ##### 이메일 인증 다이얼로그로 인증이 완료된 후 새로고침을 했을 때 다이얼로그 없이 보여주기 위해 회원정보가 저장된 텍스트를 바로 띄워주기 위한 showInfo 메서드 
+
 ~~~java
     private void showInfo(){
         // 현재 로그인이 되어있는 사용자를 가져옴
@@ -950,7 +956,9 @@ public class FragmentInfo extends Fragment {
 <img src="https://user-images.githubusercontent.com/62936197/86555628-dc8fea80-bf8b-11ea-93d5-ce0479983e5b.png" width="30%">     
 2) 회원정보는 Firestore에 저장된 이메일, 이름, 전화번호, 비밀번호를 보여주되, 이메일은 수정이 불가하며 그 외의 항목 옆에 있는 수정버튼 클릭 시 Dialog로 수정할 값을 입력할 수 있다.   
 수정할 값들 또한 회원가입 시와 동일하게 유효성 검사를 진행하고, 입력한 값들이 모두 유효하면 Firebase의 Auth와 Firestore에 변경한 값으로 데이터를 업데이트 해준다.   
+
 ##### 이름 수정 다이얼로그
+
 ~~~java
 public class ModifyNameDialog extends DialogFragment {
     private Fragment fragment;
@@ -1036,6 +1044,7 @@ public class ModifyNameDialog extends DialogFragment {
 }
 ~~~
 ##### 비밀번호 수정 다이얼로그
+
 ~~~java
 public class ModifyDialog extends DialogFragment {
     private Fragment fragment;
@@ -1135,8 +1144,8 @@ public class ModifyDialog extends DialogFragment {
 }
 ~~~
 ##### 전화번호 수정 다이얼로그
-~~~java
 
+~~~java
 public class ModifyPhoneDialog extends DialogFragment {
     private Fragment fragment;
 
