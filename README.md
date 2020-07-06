@@ -66,52 +66,55 @@ dependencies {
 아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다. 
 ~~~java
 public class SignupActivity extends AppCompatActivity {
-// 비밀번호 정규식
-private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
-// 이메일 정규식
-public static final Pattern EMAIL_ADDRESS = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-// 전화번호 정규식
-public static final Pattern PHONE_PATTERN = Pattern.compile("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", Pattern.CASE_INSENSITIVE);
+  // 비밀번호 정규식
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
+    // 이메일 정규식
+    public static final Pattern EMAIL_ADDRESS = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    // 전화번호 정규식
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", Pattern.CASE_INSENSITIVE);
+    // 파이어베이스 인증 객체 생성
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-// 파이어베이스 인증 객체 생성
-private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-// 파이어스토어 인증 객체 생성
-private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    // 파이어스토어 인증 객체 생성
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-// 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
-private EditText editTextEmail;
-private EditText editTextPassword;
+    // 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
+    private EditText editTextEmail;
+    private EditText editTextPassword;
 
-// 비밀번호 확인에 작성한 값을 저장할 객체 생성
-private EditText editTextPasswordCheck;
-// 작성한 이름 값과 전화번호 값을 저장할 객체 생성
-private EditText editTextName;
-private EditText editTextPhone;
+    // 비밀번호 확인에 작성한 값을 저장할 객체 생성
+    private EditText editTextPasswordCheck;
 
-// 회원정보에 저장할 값 객체 생성
-private String email = "";
-private String password = "";
-private String passwordCheck = "";
-private String name = "";
-private String phone = "";
+    // 작성한 이름 값과 전화번호 값을 저장할 객체 생성
+    private EditText editTextName;
+    private EditText editTextPhone;
 
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_signup);
+    // 회원정보에 저장할 값 객체 생성
+    private String email = "";
+    private String password = "";
+    private String passwordCheck = "";
+    private String name = "";
+    private String phone = "";
 
-// id가 write_email인 editText에 대한 메서드 저장
-editTextEmail = findViewById(R.id.write_email);
-// id가 signup_password인 editText에 대한 메서드 저장
-editTextPassword = findViewById(R.id.signup_password);
-// id가 check_password인 editText에 대한 메서드 저장
-editTextPasswordCheck = findViewById(R.id.check_password);
-// id가 write_name인 editText에 대한 메서드 저장
-editTextName = findViewById(R.id.write_name);
-// id가 write_phone인 editText에 대한 메서드 저장
-editTextPhone = findViewById(R.id.write_phone);
-}
-
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_signup);
+       
+       // id가 write_email인 editText에 대한 메서드 저장
+       editTextEmail = findViewById(R.id.write_email);
+       // id가 signup_password인 editText에 대한 메서드 저장
+       editTextPassword = findViewById(R.id.signup_password);
+       // id가 check_password인 editText에 대한 메서드 저장
+       editTextPasswordCheck = findViewById(R.id.check_password);
+       // id가 write_name인 editText에 대한 메서드 저장
+       editTextName = findViewById(R.id.write_name);
+       // id가 write_phone인 editText에 대한 메서드 저장
+       editTextPhone = findViewById(R.id.write_phone);
+       }
+~~~   
+회원가입 버튼 클릭시
+~~~java
     // onClick signup
     public void singUp(View view) {
         // editText에 작성한 내용을 String으로 변환하여 객체에 저장
@@ -162,11 +165,107 @@ editTextPhone = findViewById(R.id.write_phone);
         }
     }
 ~~~
+유효성 검사
+~~~java
+   // 이메일 유효성 검사
+    private boolean isValidEmail() {
+        if (email.isEmpty()) {
+            // 이메일 칸이 공백이면 false
+            Toast.makeText(SignupActivity.this, R.string.writeemail, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!EMAIL_ADDRESS.matcher(email).matches()) {
+            // 이메일 형식이 불일치하면 false
+            Toast.makeText(SignupActivity.this, R.string.notvaildemail, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    // 비밀번호 유효성 검사
+    private boolean isValidPasswd() {
+        if (password.isEmpty()) {
+            // 비밀번호 칸이 공백이면 false
+            Toast.makeText(SignupActivity.this, R.string.writepassword, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            // 비밀번호 형식이 불일치하면 false
+            Toast.makeText(SignupActivity.this, R.string.notvalidpassword, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // 비밀번호 체크 유효성 검사
+    private boolean isValidPasswdcheck() {
+        if (passwordCheck.isEmpty()) {
+            // 비밀번호 칸이 공백이면 false
+            Toast.makeText(SignupActivity.this, R.string.writecheckpassword, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!password.equals(passwordCheck)) {
+            // 비밀번호와 비밀번호 확인에 입력한 값이 불일치하면 false
+            Toast.makeText(SignupActivity.this, R.string.notmatchpass, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // 이름 유효성 검사
+    private boolean isValidName() {
+        if (name.isEmpty()) {
+            // 이름 칸이 공백이면 false
+            Toast.makeText(SignupActivity.this, R.string.writename, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // 전화번호 유효성 검사
+    private boolean isValidPhone() {
+        if (phone.isEmpty()) {
+            // 전화번호 칸이 공백이면 false
+            Toast.makeText(SignupActivity.this, R.string.writephone, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PHONE_PATTERN.matcher(phone).matches()) {
+            Toast.makeText(SignupActivity.this, R.string.notvalidphone, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+~~~
 <img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">      
 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
 전송된 메일을 통해 이메일 인증을 완료하지 않으면 이메일과 비밀번호 값이 일치해도 로그인에 성공할 수 없으며 이메일 인증이 완료되어야 로그인에 성공할 수 있다.   
-<img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="70%>   
+~~~java
+ // 이메일 인증 다이얼로그 객체 생성
+ private AuthemailDialog authemailDialog;
+  @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signup);
+          // 다이얼로그의 리스너 등록
+        authemailDialog = new AuthemailDialog(this, positiveListener);
+        }
+~~~
+이메일 인증 다이얼로그의 확인버튼 클릭시
+~~~java
+    private View.OnClickListener positiveListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            // 다이얼로그 종료
+            authemailDialog.dismiss();
+            // 로그인 화면으로 이동
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        }
+    };
+~~~
+<img src="https://user-images.githubusercontent.com/62936197/86549388-79e22300-bf7a-11ea-8504-d6576d6257b2.png" width="40%>   
 >#### 2-1-3 로그인
 회원가입 시에 입력한 이메일과 비밀번호를 입력하여 로그인을 진행한다.   
                                                                                                                        
