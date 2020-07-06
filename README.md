@@ -1818,8 +1818,115 @@ radius의 값으로 반경 2500m로 설정해주었기 때문에 현재 위치�
    
 
 >>#### 2-2-4 약국 파싱
-1) 
-)공공데이터로 XML형태로 제공하는 전국 약국 정보를 파싱하기 위한 PharmParser.java 파일 만들기
+1)공공데이터로 XML형태로 제공하는 전국 약국 정보를 파싱하기 위한 PharmParser.java 파일 만들기
+
+##### 공공데이터 키 값 받기
+<img src="https://user-images.githubusercontent.com/62935657/86558576-bcb0f480-bf94-11ea-88e1-6cdb04e78f6a.png" width="70%"></img>
+
+활용신청을 눌러서 키값을 받는다.
+
+<img src="https://user-images.githubusercontent.com/62935657/86558760-3812a600-bf95-11ea-8bb7-430bcc89fa83.png" width="70%"></img>
+
+
+##### 공공데이터 파싱
+
+2)인증키값을 queryURL를 만들어서 약국을 파싱해 올 수 있도록 한다. 
+~~~java
+XmlPullParser xpp;
+    String key = "공공데이터 약국 키값 받기"; //약국 공공데이터 서비스키
+
+    public String getXmlData() {
+        StringBuffer buffer = new StringBuffer();
+
+        String str = edit.getText().toString();//EditText에 작성된 Text얻어오기
+        String location = null;
+        try {
+            location = URLEncoder.encode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String queryUrl = "http://apis.data.go.kr/B551182/pharmacyInfoService/getParmacyBasisList?serviceKey="//요청 URL
+                + key +"&numOfRows=100" + "&emdongNm=" + location; //동 이름으로 검색
+~~~
+str변수에 edittext에 입력된 text를 얻어와서 encode한 후 location에 저장해준다.
+요청변수+키값+페이지+동 태그+location한 Url을 만들어서, 동이름으로 약국을 파싱해올 수 있게한다. 
+
+3)파싱해온 약국의 정보를 태그값에 따라서 주소, 약국, 전화번호를 가져오고 stringbuffer를 이용해서 저장해준다. 
+~~~java
+XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            xpp = factory.newPullParser();
+            xpp.setInput(new InputStreamReader(is, "UTF-8")); //inputstream 으로부터 xml 입력받기
+
+            String tag;
+
+            xpp.next();
+            int eventType = xpp.getEventType();
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_DOCUMENT:
+                        buffer.append("파싱 시작...\n\n");
+                        break;
+
+                    case XmlPullParser.START_TAG:
+                        tag = xpp.getName();//테그 이름 얻어오기
+
+                        if (tag.equals("item")) ;// 첫번째 태그값이랑 비교
+
+                        else if (tag.equals("addr")) {
+                            buffer.append("주소 : ");
+                            xpp.next();
+                            buffer.append(xpp.getText());//title 요소의 TEXT 읽어오기
+                            buffer.append("\n"); //줄바꿈
+                        } else if (tag.equals("yadmNm")) {
+                            buffer.append("약국명 :");
+                            xpp.next();
+                            buffer.append(xpp.getText());
+                            buffer.append("\n");
+                        } else if (tag.equals("telno")) {
+                            buffer.append("전화번호 :");
+                            xpp.next();
+                            buffer.append(xpp.getText());
+                            buffer.append("\n");
+                        }
+                        break;
+
+                    case XmlPullParser.TEXT:
+                        break;
+
+                    case XmlPullParser.END_TAG:
+                        tag = xpp.getName(); //테그 이름 얻어오기
+
+                        if (tag.equals("item"))
+                            buffer.append("\n");// 첫번째 검색결과종료 후 줄바꿈
+                        break;
+                }
+                break;
+
+                    case XmlPullParser.TEXT:
+                        break;
+
+                    case XmlPullParser.END_TAG:
+                        tag = xpp.getName(); //테그 이름 얻어오기
+
+                        if (tag.equals("item"))
+                            buffer.append("\n");// 첫번째 검색결과종료 후 줄바꿈
+                        break;
+                }
+
+                eventType = xpp.next();
+            }
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch blocke.printStackTrace();
+        }
+~~~
+
+4)stringbuffer를 이용해서 문자열 객체를 반환한다.
+~~~java
+return buffer.toString();//StringBuffer 문자열 객체 반환
+~~~
 
 
 
@@ -1869,7 +1976,2048 @@ public void mOnClick(View v){
 <img src="https://user-images.githubusercontent.com/57400913/86557019-eae00580-bf8f-11ea-8d11-b519cdf41e36.png" width="30%">       
 </div>   
 
-*****   
+
+*****    
+>### 2-3 사용자 후기 게시판
+>>#### 2-3-1 firebase 연동   
+firebase와 연동하는 방법은 회원가입 부분에서 설명한 방법과 동일하다.      
+>>#### 2-3-2 게시물 등록     
+recyclerView와 cardView를 이용하여 목록에서 firebase에 저장된 데이터들을 보여줄 것이다.    
+    
+1)getter와 setter를 정의해주는 ReviewPostInfo.java 파일 생성하기    
+    
+외부에서 접근할 때 객체의 무결성을 보장하기 위해 getter와 setter를 정의하였다  
+게시글을 입력했을 때, 게시글의 제목과 내용, 등록한 날짜를 정의해준다.   
+
+##### getter,setter 정의   
+~~~java
+import java.io.Serializable;
+import java.util.Date;
+//getter와 setter를 정의해주는 코드
+public class ReviewPostInfo implements Serializable {
+    //intent에서 putExtra로 보내주기 위해 implements Serializable가 사용됨.
+    private String title;
+    private String contents;
+    private Date createdAt;
+    private String id;
+    
+   public ReviewPostInfo(String title, String Contents, Date createdAt) {
+        this.title = title;
+        this.contents = Contents;
+        this.createdAt = createdAt;
+    }
+    //id값을 불러올 때 사용되는 생성자함수
+    public ReviewPostInfo(String title, String Contents, Date createdAt, String id) {
+        this.title = title;
+        this.contents = Contents;
+        this.createdAt = createdAt;
+        this.id = id;
+    }
+    //get set 메서드 이용
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getContents() { 
+        return contents;
+    }
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public Map<String,Object> getPostInfo(){
+        Map<String,Object> docData = new HashMap<>();
+        docData.put("title",title);
+        docData.put("contents",contents);
+        docData.put("createdAt",createdAt);
+        return docData;
+    }
+}
+~~~
+2)게시물을 입력할 ReviewWriteActivity.java 파일 생성    
+위에서 정의해준 getter와 setter를 이용하여 사용자가 입력한 값을 ReviewPostInfo.java의 setter에 저장해준다.   
+##### 게시물 입력시 setter에 저장     
+~~~java
+//text 업데이트를 위한 코드
+    private void contentsUpdate() {
+        //titleEditText과 contentEditText의 값을 받아서 string값으로 받아옴
+        final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
+        final String contents = ((EditText) findViewById(R.id.contentEditText)).getText().toString();
+        final Date date = reviewPostInfo2 ==null? new Date() : reviewPostInfo2.getCreatedAt();//날짜가 존재하지 않으면 현재 날짜를 불러오고, 수정 시 날짜가 존재하니까 그때는 그 날짜 그대로 유지시켜줌
+        //제목과 글이 둘 다 입력 되었을 때 실행됨
+        if(title.length() > 0 && contents.length()>0){
+            loadrLayout.setVisibility(View.VISIBLE);
+            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date);
+            uploader(reviewPostInfo);//값들이 postinfo로 들어와 uploader 메서드로 들어감
+        }else {//그렇지 않으면 게시글을 입력해달라는 toast가 띄워짐
+            startToast("게시글을 입력해주세요");
+        }
+    }
+~~~
+입력한 게시물의 내용을 setter를 이용하여 firebase에 저장해준다 
+##### firebase에 저장해주는 코드   
+
+~~~java
+ private void uploader(ReviewPostInfo reviewPostInfo){
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환
+        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
+                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
+        //게시물에서 입력한 텍스트들을 받아와서 database의 document부분에 넣어줌.
+        documentReference.set(reviewPostInfo.getPostInfo())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {//성공시
+                        Log.d(TAG,"id");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override// 실패 시
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG,"Error",e);
+                    }
+                });
+    }
+~~~
+
+3)firebase에 저장된 게시물을 목록으로 보여주기 위해 ReviewMainAdapter.java에 adapter를 정의해준다   
+이 adpater는 recyclerView와 cardView를 이용한다.    
+   
+##### RecyclerView와 cardView를 이용하여 등록된 리뷰를 전체 리스트로 출력할것임. 그것을 위한 정의
+~~~java
+
+    static class MainViewHolder extends RecyclerView.ViewHolder{
+        CardView cardView;
+        MainViewHolder(Activity activity, CardView v, ReviewPostInfo reviewPostInfo) {
+            super(v);
+            cardView = v;
+        }
+    }
+~~~
+
+##### 배열로 들어온 데이터들을 불러오는 작업.   
+~~~java
+ReviewMainAdapter(Activity activity, ArrayList<ReviewPostInfo> mDataset) {//생성자. 초기화해줌
+    this.mDataset = mDataset;
+    this.activity = activity;
+}
+~~~
+
+##### RecyclerView와 cardView를 만들어주는 작업.    
+보이는 부분만 load함.   
+~~~java
+    @NonNull
+    @Override//
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+        return mainViewHolder;
+    }
+~~~
+
+##### 실제 db들의 값들을 넣어주는 작업.   
+~~~java
+    @Override
+    public void onBindViewHolder(@NonNull MainViewHolder holder, int position) {
+        
+
+        //CardView에 firebase에 저장된 title값 넣어주기
+        CardView cardView = holder.cardView;
+        TextView titleTextView = cardView.findViewById(R.id.titleTextView);
+        titleTextView.setText(mDataset.get(position).getTitle());
+
+        //게시물을 추가한 날짜 넣어주기
+        TextView createTextView = cardView.findViewById(R.id.createdTextView);
+        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(mDataset.get(position).getCreatedAt()));
+
+        //contents값 넣어주기
+        final TextView contentsTextView = cardView.findViewById(R.id.contentsTextView);
+        contentsTextView.setText(mDataset.get(position).getContents());
+
+        textEmail = cardView.findViewById(R.id.textView2);
+        textEmail.setText(mDataset.get(position).getEmail());
+    }
+
+    @Override //자동 override됨. 데이터들의 수를 세줌.
+    public int getItemCount() {
+        return (mDataset != null ? mDataset.size() : 0);
+    }
+}
+~~~
+
+4)ReviewMainActivity.java에서 firebase에 저장된 데이터들을 위에서 정의된 adapter를 이용하여 넣어준다.    
+Review의 목록을 보여줄 java 파일인 ReviewMainActivity.java 파일에 recyclerView를 정의해준다     
+##### adapter에 데이터들을 넣어주는 코드    
+~~~java
+public class ReviewMainActivity extends AppCompatActivity {
+    private  ArrayList<ReviewPostInfo> postList;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private ReviewMainAdapter mainAdapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //이 파일에서는 review_activity_main.xml창을 보여줄것임.
+        setContentView(R.layout.review_activity_main);
+        fragmentMainMenu = new FragmentMainMenu();
+        
+        //recyclerView 초기화
+        recyclerView = findViewById(R.id.recyclerView);//recyclerViewid연결
+        recyclerView.setHasFixedSize(true);//recylerView 기존 성능 강화
+        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ReviewMainActivity.this);
+        recyclerView.setLayoutManager(layoutManager);
+        postUpdate();
+        findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);//게시글 추가 버튼을 클릭 시
+    }
+    //게시글 추가 버튼을 클릭할 때 처리하는 기능
+    View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {//게시글 추가 버튼을 눌렀을 때 ReviewWriteActivity.java로 넘겨줌
+            if (view.getId() == R.id.floatingActionButton) {
+                myStartActivity(ReviewWriteActivity.class);
+            }
+         }
+    };
+
+ //실제 게시물을 보여주고 업데이트 해주는 코드
+    public void postUpdate(){
+        firebaseFirestore.collection("posts").orderBy("createdAt", Query.Direction.DESCENDING).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            postList = new ArrayList<>();//arraylist에 받아온값들을 다 넣어주어 보여줌
+                            postList.clear();
+                            for(QueryDocumentSnapshot document : task.getResult()){
+                                Log.d(TAG, document.getId()+" => "+document.getData());
+                                postList.add(new ReviewPostInfo(//데이터를 다 가져와 postList배열에 넣어줌.
+                                        document.getData().get("title").toString(),
+                                        document.getData().get("contents").toString(),
+                                        new Date(document.getDate("createdAt").getTime()),
+                                        document.getId()
+                                ));//각 post들을 구분할 수 있게 하기 위해 post의id값을 얻어옴
+                            }
+                            //MainAdaper에서 넘겨줌.
+                            mainAdapter = new ReviewMainAdapter(ReviewMainActivity.this, postList);
+                            mainAdapter.setOnPostListener(onPostListener);//onPostListener를 넘겨주면 MainAdapter에서도 쓸수있음.
+                            recyclerView.setAdapter(mainAdapter);
+                            mainAdapter.notifyDataSetChanged();
+                        }else {
+                            Log.d(TAG, "Error : ",task.getException());
+                        }
+
+                    }
+                });
+}
+~~~
+ 
+5)게시글 자세히보기 기능    
+##### 등록된 게시물은 다음 코드를 이용하여 내용의 일부만 보여주도록 구현함   
+
+~~~java
+<TextView
+    android:id="@+id/titleTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:textColor="#000000"
+    android:textSize="15sp"
+    android:textStyle="bold"
+    tools:text="@string/itemPostTitle"
+    android:maxLines="1"
+    android:ellipsize="end"/>
+~~~
+##### 이에 따라 게시글의 자세히보기 기능을 구현함.   
+이는 해당 게시물을 클릭하면 게시글을 전체볼 수 있는 창으로 넘어가도록 구현한 것이다.   
+먼저 adapter에서 해당하는 게시물을 클릭했을 때, intent를 이용하여 값들을 넘겨주었다.   
+~~~java
+@NonNull
+    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        //Log.e("로그: ","로그: "+viewType);
+
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+~~~
+##### intent를 이용하여 넘겨준 값들을 ReviewActivityPost.java 파일에서 받아서 띄워줌     
+
+~~~java
+ @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //이 java파일에서는 activity_write_post창을 보여줄것임.
+        setContentView(R.layout.review_activity_post);
+
+        reviewPostInfo = (ReviewPostInfo) getIntent().getSerializableExtra("postInfo");
+        //title 넣어주기
+        TextView titleTextView = findViewById(R.id.titleTextView);
+        titleTextView.setText(reviewPostInfo.getTitle());
+
+        //게시물을 추가한 날짜 넣어주기
+        TextView createTextView = findViewById(R.id.createdTextView);
+        createTextView.setText(new SimpleDateFormat("yyyy-MM-dd",
+                Locale.getDefault()).format(reviewPostInfo.getCreatedAt()));//local시간을 생성하여 넣어줄것임.
+        //contents 넣어주기
+        final TextView contentsTextView = findViewById(R.id.contentsTextView);
+        contentsTextView.setText(reviewPostInfo.getContents());
+        
+        reviewPostAdapter = new ReviewPostAdapter(this);
+        reviewPostAdapter.setOnPostListener(onPostListener);//ReviewPostAdapter에 연결해줌.
+    }
+~~~
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86554916-e1539f00-bf89-11ea-965e-1b2bd067ae3a.png" width="70%"> 
+<img src="https://user-images.githubusercontent.com/57400849/86554958-01835e00-bf8a-11ea-8329-65fb59a8c7db.png">  
+</div>
+
+ 
+
+
+
+
+>>#### 2-3-3 게시물 수정 및 삭제   
+게시글의 수정 및 삭제 기능은 popup메뉴를 이용한 방법과 버튼을 이용한 방법. 이 두가지를 이용하여 기능 이용이 가능하도록 구현하였다.
+게시물의 업데이트를 위해 interface를 이용하는 것이다.   
+
+
+1.수정 및 삭제 방법 설명   
+먼저 기능 구현을 설명하기 전, 공통적인 수정 및 삭제 방법을 설명한다.   
+1)수정기능   
+우선 수정버튼을 클릭하면, ReviewWriteActivity.java파일로 넘어가게 된다. 이때, 이 java파일에서는 해당하는 게시물의 저장되어있는 값들을 가져와
+보여주며 원래의 게시글을 수정할 수 있게 도와준다.   
+##### 수정버튼을 눌렀을 때 그 전의 값들을 넣어줌   
+~~~java
+ private void postInit (){
+        if(reviewPostInfo2 !=null){
+            titleEditText.setText(reviewPostInfo2.getTitle());
+            contentEditText.setText(reviewPostInfo2.getContents());
+        }
+    }
+~~~
+##### 이 메서드를 이용하여 uploader메서드의 아래의 코드에서 firebase에서의 수정도 가능하게 한다.   
+~~~java
+ //값이 null이면 앞에것을 반환.->게시물 등록 시 사용됨. null이 아니면 뒤에것을 반환->수정버튼 이용 시 사용됨
+        final DocumentReference documentReference = reviewPostInfo2 ==null? firebaseFirestore.collection("posts").document()
+                :firebaseFirestore.collection("posts").document(reviewPostInfo2.getId());
+~~~
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86555488-786d2680-bf8b-11ea-865c-e833ca339498.png" width="70%"> 
+<img src="https://user-images.githubusercontent.com/57400849/86555300-f5e46700-bf8a-11ea-92ee-52cdbd07c024.png" width="20%">
+</div>   
+
+
+2)삭제기능   
+삭제하고싶은 게시물에서 popup메뉴의 삭제버튼이나 게시물의 삭제버튼을 누르게 되면 해당하는 게시물의 position값을 얻어와 해당 게시물을
+firebase와 리뷰 목록에서 삭제 가능하도록 구현하였다.    
+이를 구현하기 위해 OnPostListener.java 파일에 수정 및 삭제 기능의 listener를 이용하였다.   
+수정 및 삭제시, 게시물 업데이트를 위해 interface를 이용하는 것이다. 이 메서드 하나로 수정 및 삭제 기능을 구현가능하도록 한다.    
+##### listener 메서드 구현     
+~~~java
+public interface OnPostListener {
+    void onDelete(int position);
+    void onModify(int position);
+}
+~~~
+##### ReviewMainActivity.java파일에서 정의함     
+~~~java
+ OnPostListener onPostListener = new OnPostListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
+        @Override
+        public void onDelete(int position) {//MainAdapter에 넘겨주기 위한 메서드 작성
+
+            String id = postList.get(position).getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
+            firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {//성공시
+                            startToast("게시글을 삭제하였습니다.");
+                            postUpdate();//새로고침을 위해 이 이벤트를 mainActivity에서 알아야함.->listener를 만들어줘야함
+                        }
+                    }).addOnFailureListener(new OnFailureListener(){
+                @Override
+                public void onFailure(@NonNull Exception e) {//실패시
+                    startToast("게시글 삭제에 실패하였습니다.");
+                }
+            });
+        }
+
+        @Override
+        public void onModify(int position) {//여기서 수정하면 writepostActivity를 켜서 수정해주는코드
+            myStartActivity(ReviewWriteActivity.class,postList.get(position));
+        }
+    };
+~~~
+<img src="https://user-images.githubusercontent.com/57400849/86555531-99ce1280-bf8b-11ea-93a3-742ee9cd725a.png" width="70%">   
+
+2. popup메뉴를 이용하여 수정 및 삭제 기능을 구현하였다.
+1)각각의 adapter에서 구현이 가능하도록 해야하기 때문에 ReviewMainAdapter.java에서 추가적으로 popup메서드를 구현하였다.   
+
+##### popup메서드 구현     
+~~~java
+ //popup메뉴를 만들기 위한 메서드. view로 받아오기 위해 activity사용함. 여기서 popup메뉴는 수정 삭제가 내려오는 메뉴임.
+    public void showPopup(View v, final int position) {//android studio에서 제공하는 팝업 메뉴 표시 기능
+        //db값을 갖고오고, 선택된 post값을 알아오기 위해 사용함. view와 위치값(position)을 갖고와서 사용하기. 하나의 postID를 알아야함.
+        //postID를 알아야 그 post를 삭제할수있음.->postInfo.java수정
+
+        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
+        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+
+        PopupMenu popup = new PopupMenu(activity,v);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override//popup메뉴 내의 삭제버튼, 수정버튼을 눌렀을 때 삭제,수정기능 구현
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.modify ://modify버튼을 눌렀을 때
+                        onPostListener.onModify(position);//인터페이스의 onModify를 이용
+                        return true;
+                    case R.id.delete://delete버튼을 눌렀을 때
+                        // 게시글 삭제를 위한 메서드. db에서도 삭제함.
+                        onPostListener.onDelete(position);//인터페이스의 onDelete를 이용
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        MenuInflater inflater = popup.getMenuInflater();//inflater를 이용하여 view화 시킴
+        inflater.inflate(R.menu.post, popup.getMenu());//popup메뉴를 보여줌.
+        popup.show();
+    }
+~~~
+2)이 showPopup() 메서드를 onCreateViewHolder 메서드에 추가적으로 정의해준다.    
+~~~java
+@NonNull
+    @Override//RecyclerView와 cardView를 만들어주는 작업. 보이는 부분만 load함.
+    public ReviewMainAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //layout을 view객체로 만들기 위해 layoutInflater를 이용한다.
+        final CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item_post, parent, false);
+        final MainViewHolder mainViewHolder = new MainViewHolder(activity, cardView, mDataset.get(viewType));//cardview가 하나하나 돌때, position값을 알기위해 viewType을 넣어 만듬.
+        //Log.e("로그: ","로그: "+viewType);
+        cardView.setOnClickListener(new View.OnClickListener() {//하나의 카드뷰를 클릭 시 intent로 해당하는 값을 ReviewActivityPost로넘겨줌.
+            @Override
+            public void onClick(View view) {
+                //postInfo 데이터를 보내줘야 데이터를 가지고 레이아웃에 그려줌.
+                Intent intent = new Intent(activity, ReviewActivityPost.class);
+                intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));//앞에는 key값, 뒤에는 실제 값
+                //postInfo의 이름으로 intent를 보내 PostActivity에서 받아서 쓸수있게함
+                activity.startActivity(intent);
+            }
+        });
+        //수정,삭제의 popup메뉴를 보여주는 버튼을 cardview로 정의함.
+        // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
+        cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopup(view, mainViewHolder.getAdapterPosition());
+            }
+        });
+        return mainViewHolder;
+    }
+~~~
+따라서 각각의 adapter에서 수정 및 삭제 popup 메뉴가 생성되도록 구현하도록 한다.    
+
+<img src="https://user-images.githubusercontent.com/57400849/86555610-ce41ce80-bf8b-11ea-8e6d-b97148d80912.png" width="20%">   
+
+
+3. 게시물을 자세히 보기 클릭시, 그 안에서도 수정 및 삭제 기능이 가능하도록 구현하였다.    
+1)먼저 게시글 삭제 기능을 ReviewPostAdapter.java파일에 따로 구현해주었다. 이는 메서드의 유연한 사용을 위함이다.   
+
+~~~java
+public void postDelete(ReviewPostInfo reviewPostInfo){
+
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();//FirebaseFirestore 초기화해주는 코드
+        String id = reviewPostInfo.getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
+        firebaseFirestore.collection("posts").document(id).delete()//그 id에 맞는 값들을 지워줌
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {//성공시
+                        startToast("게시글을 삭제하였습니다.");//삭제시 삭제 토스트를 띄워줌
+                        //끝났는줄 알고 post 업데이트를 해줘야 하니까 리스너 필요
+                        onPostListener.onDelete(1);
+                    }
+                }).addOnFailureListener(new OnFailureListener(){
+            @Override
+            public void onFailure(@NonNull Exception e) {//실패시 실패 토스트를 띄워줌
+                startToast("게시글 삭제에 실패하였습니다."); }
+        });
+    }
+
+    public void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
+        Toast.makeText(activity,msg,Toast.LENGTH_SHORT).show();
+    }
+};
+~~~
+2)ReviewActivityPost,java파일에 추가적으로 정의해준다.   
+이때도 onPostListener의 메서드를 불러온다.
+~~~java
+OnPostListener onPostListener = new OnPostListener() {
+        @Override
+        public void onDelete(int position) {
+            Log.e("로그", "삭제 성공");
+        }
+
+        @Override
+        public void onModify(int position) {
+            Log.e("로그", "수정 성공");
+        }
+    };
+    //수정버튼, 삭제버튼 클릭 시 실행해주는 메서드를 구현함
+    private void buttonClick(){
+        //dialog를 이용해서 삭제를 재 확인 해주는 메서드를 구현함.
+        final AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
+                android.R.style.Theme_DeviceDefault_Light_Dialog);
+        //삭제버튼 클릭 시
+        delete2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oDialog.setMessage("삭제하시겠습니까?")//Dialog로 듸워줌
+                        .setTitle("알림")
+                        .setPositiveButton("아니오", new DialogInterface.OnClickListener()//아니오 클릭 시
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                Log.i("Dialog", "취소");
+                                Toast.makeText(getApplicationContext(), "취소", Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setNeutralButton("예", new DialogInterface.OnClickListener()//예 버튼 클릭 시
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                //실제 삭제 기능을 수행하는 코드.
+                                reviewPostAdapter.postDelete(reviewPostInfo); //reviewPostInfo의 postDelete메서드를 이용해 삭제시킴
+                                myStartActivity(ReviewMainActivity.class, reviewPostInfo);//intent로 ReviewMainActivity로 넘겨줌
+                                finish();
+                            }
+                        })
+                        .setCancelable(false) // 백버튼으로 팝업창이 닫히지 않도록 한다.
+                        .show();
+            }
+        });
+        //수정버튼 클릭 시
+        modify2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myStartActivity(ReviewWriteActivity.class, reviewPostInfo);//바로 ReviewWriteActivity창으로 넘겨줌. 다시 게시물을 작성할 수 있는 창으로 넘겨주는것임.
+            }
+        });
+    }
+~~~
+<img src="https://user-images.githubusercontent.com/57400849/86555662-f3364180-bf8b-11ea-938d-246628adb58e.png" width="20%">    
+
+
+>>#### 2-3-4 사용자 정보 연동   
+1)로그인을 하지 않은 사용자는 사용자 후기 게시판에 접근할 수 없도록함. 로그인이 됐다면, 사용자 후기 게시판에 접근할 수 있음.  
+ReviewMainActivity.java에 메서드를 추가한다.
+##### 파이어베이스에 로그인 중인지 판단   
+~~~java
+ @Override public void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(firebaseAuthListener);
+    }
+~~~
+
+##### 로그인 중인 사용자가 있는 지 판단   
+~~~java
+  @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.review_activity_main);
+        fragmentMainMenu = new FragmentMainMenu();
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                user = firebaseAuth.getCurrentUser();
+                // 로그인한 사용자가 있는 경우
+                if (user != null) {
+                    Log.e("로그","리뷰게시판입니다.");
+                }
+                // 로그인한 사용자가 없는 경우
+                else {
+                    login();
+                }
+            }
+        };
+~~~   
+##### 로그인을 확인하는 메서드   
+~~~java   
+private void login() {
+AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+if((!this.isFinishing())){
+    dialog.setMessage("로그인 후 이용해주세요.")
+            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    dialog.cancel();
+                    Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            })
+            .setCancelable(false)
+            .show();
+}
+~~~   
+<img src="https://user-images.githubusercontent.com/57400849/86573689-b4b27e00-bfaf-11ea-80d3-eb20b85fca59.png" width="70%">
+
+2)게시물을 등록할 때, 회원가입 시 등록한 이메일 정보를 통해 게시글 작성자를 구분하도록 함.   
+##### ReviewPostInfo.java 파일에 email에 대한 getter와 setter를 정의함. 이에 따라 생성자 함수에도 추가해줌   
+~~~java
+ public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public ReviewPostInfo(String title, String Contents, Date createdAt, String id,String email) {
+        this.title = title;
+        this.contents = Contents;
+        this.createdAt = createdAt;
+        this.id = id;
+        this.email = email;
+    }
+   public ReviewPostInfo(String title, String Contents, Date createdAt, String email) {
+        this.title = title;
+        this.contents = Contents;
+        this.createdAt = createdAt;
+        this.email = email;
+    }
+    public Map<String,Object> getPostInfo(){
+        Map<String,Object> docData = new HashMap<>();
+        docData.put("title",title);
+        docData.put("contents",contents);
+        docData.put("createdAt",createdAt);
+        docData.put("user",email);
+        return docData;
+    }
+~~~
+
+##### 이에 따라 ReviewWriteActivity.java 파일의 contentsUpdate()메서드도 아래와 같이 수정해준다.   
+~~~java
+ //text 업데이트를 위한 코드
+    private void contentsUpdate() {
+        //titleEditText과 contentEditText의 값을 받아서 string값으로 받아옴
+        final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
+        final String contents = ((EditText) findViewById(R.id.contentEditText)).getText().toString();
+        final Date date = reviewPostInfo2 ==null? new Date() : reviewPostInfo2.getCreatedAt();//날짜가 존재하지 않으면 현재 날짜를 불러오고, 수정 시 날짜가 존재하니까 그때는 그 날짜 그대로 유지시켜줌
+        //제목과 글이 둘 다 입력 되었을 때 실행됨
+        if(title.length() > 0 && contents.length()>0){
+            loadrLayout.setVisibility(View.VISIBLE);
+            user = firebaseAuth.getCurrentUser();
+            assert user != null;
+            ReviewPostInfo reviewPostInfo = new ReviewPostInfo(title, contents, date, user.getEmail());
+            uploader(reviewPostInfo);//값들이 postinfo로 들어와 uploader 메서드로 들어감
+        }else {//그렇지 않으면 게시글을 입력해달라는 toast가 띄워짐
+            startToast("게시글을 입력해주세요");
+        }
+    }
+~~~   
+
+##### ReviewMainActivity.java파일에서 adapter로 넘기는 부분도 아래와 같이 수정해준다.   
+~~~java
+ //실제 게시물을 보여주고 업데이트 해주는 코드
+public void postUpdate(){
+    firebaseFirestore.collection("posts").orderBy("createdAt", Query.Direction.DESCENDING).get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()){
+                        postList = new ArrayList<>();//arraylist에 받아온값들을 다 넣어주어 보여줌
+                        postList.clear();
+                        for(QueryDocumentSnapshot document : task.getResult()){
+                            Log.d(TAG, document.getId()+" => "+document.getData());
+                            postList.add(new ReviewPostInfo(//데이터를 다 가져와 postList배열에 넣어줌.
+                                    document.getData().get("title").toString(),
+                                    document.getData().get("contents").toString(),
+                                    new Date(document.getDate("createdAt").getTime()),
+                                    document.getId(),
+                                    document.getData().get("user").toString()
+                            ));
+                        }
+                        mainAdapter = new ReviewMainAdapter(ReviewMainActivity.this, postList);
+                        mainAdapter.setOnPostListener(onPostListener);//onPostListener를 넘겨주면 MainAdapter에서도 쓸수있음.
+                        recyclerView.setAdapter(mainAdapter);
+                        mainAdapter.notifyDataSetChanged();
+                    }else {
+                        Log.d(TAG, "Error : ",task.getException());
+                    }
+
+                }
+            });
+~~~
+
+3)사용자 본인이 작성한 게시물만 삭제 및 수정이 가능하며, 자신의 게시물에만 popup메뉴 및 수정 삭제 버튼이 보이게 함.   
+   
+popup메뉴에서의 수정 삭제를 위한 사용자 확인 메서드를 ReviewMainAdapter.java파일에서 수정.   
+##### 게시글을 등록한 사용자와 현재 로그인한 사용자가 일치하면 해당 사용자가 등록한 게시글의 수정 삭제 popup메뉴를 보여줌.   
+~~~java
+ final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
+        assert user != null;
+        if(user != null)  {
+            email = user.getEmail();
+            cardView1= cardView.findViewById(R.id.menu);
+            if (email.equals(mDataset.get(viewType).getEmail())) {
+                cardView1.setVisibility(View.VISIBLE);
+            } else {
+                cardView1.setVisibility(View.GONE);
+            }
+        }
+        else {
+            Log.e("error : ", "error");
+        }
+~~~
+
+
+게시글 자세히 보기에서의 수정 삭제 버튼에 대한 사용자 확인 메서드를 ReviewActivityPost.java파일에서 수정.
+##### 로그인중인 사용자와 게시글 등록 시 저장된 사용자가 동일하면 수정 및 삭제 버튼을 보여줌.   
+~~~java   
+private void userCheck(){
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
+    assert user != null;
+    email = user.getEmail();
+    firebaseFirestore =  FirebaseFirestore.getInstance();
+    if (email.equals(reviewPostInfo.getEmail())) {
+        //Log.e("log : ",document.getData().get("user").toString());
+        Log.e("log : ",reviewPostInfo.getEmail());
+        modify2.setVisibility(View.VISIBLE);
+        delete2.setVisibility(View.VISIBLE);
+        buttonClick();
+    }
+    // 입력한 정보와 파이어베이스에 저장된 정보가 다르면 일치하는 회원정보가 없다는 텍스트를 보여줌
+    else {
+        //Log.e("log : ",document.getData().get("user").toString());
+        Log.e("log : ",reviewPostInfo.getEmail());
+        modify2.setVisibility(View.GONE);
+        delete2.setVisibility(View.GONE);
+    }
+}
+~~~   
+
+<img src="https://user-images.githubusercontent.com/57400849/86564192-bde81e80-bfa0-11ea-92b1-44a9210ed929.png" width="50%">
+
+
+
+*****    
+>### 2-4 약검색
+>>#### 2-4-1 약 이름으로 검색   
+검색창에 알고싶은 약의 이름을 검색하면 해당 약에 대한 검색 결과를 보여주게 한다.   
+   
+1)공공데이터 허가받기   
+
+공공데이터 포털에서 XML형식으로 제공하는 '식품 의약품 안전처' 에서 제공하는 '의약품 낱알식별정보(DB) 서비스'와 '식품 의약품 안전처, 식품의약품안전평가원'에서 제공하는 '의약품 제품 허가정보 서비스' 공공데이터를 이용하여 의약품의 정보를 얻어왔다.   
+
+##### 의약품 낱알식별정보(DB) 서비스   
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86556026-12819e80-bf8d-11ea-82d0-5abb55d3f596.png" width="50%" >
+<img src="https://user-images.githubusercontent.com/57400849/86556401-31ccfb80-bf8e-11ea-9bd8-0415836e0e39.png" width="40%" hight="50%">
+</div>   
+    
+##### 의약품 제품 허가정보 서비스   
+<div>
+<img src="https://user-images.githubusercontent.com/57400849/86556081-393fd500-bf8d-11ea-828c-40812dc3f1f1.png" width="50%">
+<img src="https://user-images.githubusercontent.com/57400849/86556542-9a1bdd00-bf8e-11ea-802d-2e8251cd2502.png" width="40%" hight="50%">
+</div>    
+    
+
+    
+2)먼저 의약품의 기본 정보를 불러오기 위해 getter와 setter를 NameDrug.java 파일에 정의한다.   
+이는 검색한 의약품에 해당하는 품목명, 업소명, 이미지, 분류명, 전문/일반 구분을 사용자에게 제공하기 위해서 getter, setter로 받아오고 불러오기 위함이다.  
+
+##### getter, setter 정의   
+~~~java
+public class NameDrug {
+    private Bitmap image;//image는 Bitmap값을 이용해야한다.
+    private String drugName;
+    private String company;
+    private String className;
+    private String etcOtcName;
+
+    public String getClassName() {
+        return className;
+    }
+    public void setClassName(String className) {
+        this.className = className;
+    }
+    public String getEtcOtcName() {
+        return etcOtcName;
+    }
+    public void setEtcOtcName(String etcOtcName) {
+        this.etcOtcName = etcOtcName;
+    }
+    public Bitmap getImage() {
+        return image;
+    }
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+    public String getDrugName() {
+        return drugName;
+    }
+    public void setDrugName(String drugName) {
+        this.drugName = drugName;
+    }
+    public String getCompany() {
+        return company;
+    }
+    public void setCompany(String company) {
+        this.company = company;
+    }
+}
+~~~   
+   
+3)사용자가 검색버튼을 누를 때 Thread 실행    
+  
+우선, 의약품에 대한 간단한 정보를 불러오기 위하여 '의약품 낱알식별정보(DB) 서비스'를 이용한다.   
+데이터가 많을 때 별도로 스레드를 만들어 사용하면 빠르게 실행된다.   
+안드로이드는 싱글 쓰레드 체제이며, 오직 메인 쓰레드(UI 쓰레드)만이 뷰의 값을 바꿀 수 있는 권한을 갖고 있다.   
+그래서 뷰의 값에 간섭하는 작업을 하는 쓰레드만을 만들고 뷰에 접근하려 시도하면, 안드로이드 자체적으로 앱을 죽여버린다.   
+이 경우를 막기 위해 안드로이드 개발자들은 핸들러라는 것을 만들어서 쓰는 것이다.   
+
+##### 검색버튼 클릭   
+~~~java
+public void mOnClick(final View view) { //검색 버튼을 클릭 시
+        
+        getedit = edit.getText().toString();
+        if(getedit.getBytes().length <= 0)
+        {
+            Toast.makeText(getApplicationContext(),"검색어를 입력해주세요.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //검색 결과가 다 뜰때까지 로딩중을 띄워줌 -> 공공데이터 파싱을 이용하기 때문에 오래 걸리기 때문이다.
+            progressDialog.setMessage("로딩중입니다.");
+            progressDialog.show();
+            if (view.getId() == R.id.buttonNameSearch) {//버튼을 클릭 시 Thread 발생, 공공데이터를 search하여 불러오는 메서드 실행
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        //아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
+                        runOnUiThread(new Runnable() { //스레드 사용 시 Ui를 이용하기 때문에 runOnUiThread가 필요하다.
+                            //지금 작업을 수행하는 쓰레드가 메인 쓰레드라면 즉시 작업을 시작하고
+                            //메인 쓰레드가 아니라면 쓰레드 이벤트 큐에 쌓아두는 기능을 하는 게 runOnUiThread다.
+                            //Runnable : 특정 동작을 UI 스레드에서 동작하도록 합니다. 만약 현재 스레드가 UI 스레드이면 그 동작은 즉시 수행됨
+                            //Thread에서 UI에 접근하여 변경할 때 필요한것이다.
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                MyAsyncTask myAsyncTask = new MyAsyncTask();
+                                myAsyncTask.execute();
+                            }
+                        });
+                    }
+                }).start();
+            }
+        }
+    }
+~~~
+   
+4)MyAsyncTask메서드 생성   
+   
+검색버튼을 누를 시 실행되는 MyAsyncTask 메서드는 사용자가 EditText창에 입력한 검색어가 포함된 의약품들의 정보를 파싱하는 메서드이다.   
+검색을 실행할 때는 스마트폰이 인터넷과 연결되어 있어야 한다는 주의사항이 존재한다.   
+파싱을 위해서는 우선 사용자가 검색한 내용을 UTF-8로 인코딩 하는 과정이 필요하다.
+
+##### 인코딩   
+~~~java
+String str = edit.getText().toString();//EditText에 작성된 Text얻어오기
+   String drugSearch = null;//약 이름으로 검색하기 위해 null로 초기화해줌
+   try {//인코딩을 위한 try catch문
+       drugSearch = URLEncoder.encode(str, "UTF-8");//Edit창에 적은 String값을 인코딩 해줌
+   } catch (UnsupportedEncodingException e) {
+       e.printStackTrace();
+   }
+~~~
+   
+인코딩해서 얻어온 값을 파싱할 주소에 넣은 후, 파싱을 시작하여 파싱한 결과를 저장한다.
+
+##### 공공데이터 파싱   
+~~~java
+ //공공데이터 파싱을 위한 주소
+requestDrugUrl = "http://apis.data.go.kr/1470000/MdcinGrnIdntfcInfoService/getMdcinGrnIdntfcInfoList?ServiceKey="//요청 URL
+      + key  + "&numOfRows=100&item_name=" + drugSearch; //약 이름으로 검색 하기.
+
+//실질적으로 파싱해서 inputstream해주는 코드
+URL url = new URL(requestDrugUrl); //공공데이터 파싱 주소를 url에 넣음음
+InputStream is = url.openStream(); //Stream파일로 읽어들이기 위해 가져온 url을 연결함.
+XmlPullParserFactory factory = XmlPullParserFactory.newInstance();//Tag 및 데이터를 가지고 올 때 필요함.
+parser = factory.newPullParser();//string을 xml로 바꾸어 넣을 곳
+parser.setInput(new InputStreamReader(is, "UTF-8"));//string을 xml로.
+eventType = parser.getEventType();//파싱해온 주소의 eventType을 가져옴. 이것을 이용하여 파싱의 시작과 끝을 구분해줌
+
+~~~
+
+##### 파싱한 내용 중 원하는 내용만 TAG 값으로 구분하여 가져옴   
+TAG값을 구분하여 원하는 데이터들만 가져온다. 가져온 데이터들을 setter를 이용하여 저장한다. 이렇게 저장한 데이터들을 베열을 선언하여 배열에 저장해준다.
+~~~java
+ //eventType이 END_DOCUMENT이 아닐때까지 while문이 돌아감
+       while (eventType != XmlPullParser.END_DOCUMENT) {
+           switch (eventType) {
+               case XmlPullParser.START_DOCUMENT://eventType이 START_DOCUMENT일 경우
+                   list = new ArrayList<>();//배열을 선언해줌
+                   break;
+               case XmlPullParser.END_TAG://eventType이 END_TAG일 경우, 태그가 끝나는 부분
+                   if (parser.getName().equals("item") && nameDrug != null) {//Tag 이름이 item일경우
+                       list.add(nameDrug);//배열에 Drug.java에 들어간 인자들을 넣어주고 끝냄
+                   }
+                   break;
+               case XmlPullParser.START_TAG://eventType이 START_TAG일 경우, 태그가 시작되는 부분. parser가 시작 태그를 만나면 실행
+                   if (parser.getName().equals("item")) {//TAG명이 item일 때 Drug를 초기화 해줌
+                       nameDrug = new NameDrug();
+                   }
+                   //Tag가 시작될 때 다 true로 변경함
+
+                   if (parser.getName().equals("ITEM_NAME")) drugName = true;
+                   if (parser.getName().equals("ENTP_NAME")) company = true;
+                   if (parser.getName().equals("ITEM_IMAGE")) image = true;
+                   if (parser.getName().equals("CLASS_NAME")) class_name = true;
+                   if (parser.getName().equals("ETC_OTC_NAME")) etc_otc_name = true;
+
+                   break;
+               case XmlPullParser.TEXT://eventType이 TEXT일 경우. parser가 내용에 접근했을때
+
+                   if (drugName) {//drugName이 true일때 태그의 내용을 저장함.
+                       nameDrug.setDrugName(parser.getText());//drug에 약 이름을 set해줌
+                       drugName = false;//마지막에 false로 돌려 초기화해줌
+                   } else if (company) {//company이 true일때 태그의 내용을 저장함.
+                       nameDrug.setCompany(parser.getText());//drug에
+                       company = false;
+                   } else if (class_name) {//class_name이 true일때 태그의 내용을 저장함.
+                       nameDrug.setClassName(parser.getText());//drug에 약 이름을 set해줌
+                       class_name = false;//마지막에 false로 돌려 초기화해줌
+                   } else if (etc_otc_name) {//etc_otc_name이 true일때 태그의 내용을 저장함.
+                       nameDrug.setEtcOtcName(parser.getText());//drug에
+                       etc_otc_name = false;
+                   } else if (image) {//이미지 parser하는 방법은 조금 다름
+                       imag = parser.getText();//가져온 결과는 URL링크형식임
+                       try {
+                           //img는 따로 buffer를 이용하여 가져온 후 뿌려줘야함.
+                           URL url1 = new URL(imag);//URL링크 형식으로 받아온 결과를 집어넣음
+                           URLConnection conn = url1.openConnection();// URL을 연결한 객체 생성.
+                           conn.connect();
+                           BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
+                           Bitmap bm = BitmapFactory.decodeStream(bis);
+                           bis.close();
+                           nameDrug.setImage(bm);//Bitmap형식으로된 이미지를 저장해줌
+                           image = false;
+                       } catch (Exception ignored) {
+                       }
+                   }
+                   break;
+           }
+
+           eventType = parser.next();//다음 parser를 찾아옴
+           //detailEventType = detailParser.next();
+       }
+
+   } catch(Exception e){
+       e.printStackTrace();
+   }
+
+   return null;
+}
+~~~
+
+이미지 파일인 경우 Bitmap을 이용하여 이와 같이 따로 얻어온다.
+
+##### url형태의 이미지 공공데이터 파싱    
+~~~java
+else if (image) {//이미지 parser하는 방법은 조금 다름
+  imag = parser.getText();//가져온 결과는 URL링크형식임
+  try {
+      //img는 따로 buffer를 이용하여 가져온 후 뿌려줘야함.
+      URL url1 = new URL(imag);//URL링크 형식으로 받아온 결과를 집어넣음
+      URLConnection conn = url1.openConnection();// URL을 연결한 객체 생성.
+      conn.connect();
+      BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
+      Bitmap bm = BitmapFactory.decodeStream(bis);
+      bis.close();
+      nameDrug.setImage(bm);//Bitmap형식으로된 이미지를 저장해줌
+      image = false;
+  } catch (Exception ignored) {
+  }
+}
+~~~
+
+5)이렇게 파싱해온 데이터들을 adapter로 넘겨준다. 이는 검색 결과를 목록으로 보여주기 위해서이다.   
+
+##### adapter 연결   
+데이터들이 저장된 배열을 adapter로 넘겨준다.
+~~~java
+@Override
+  protected void onPostExecute (String s){//adapter를 연결해주는 부분. 이 코드를 이용해 AsyncTask를 실행한다.
+      //결과 파라미터를 리턴하면서 그 리턴값을 통해 스레드 작업이 끝났을 때의 동작을 구현함.
+      super.onPostExecute(s);
+      //검색 결과가 다 뜨면 progressDialog를 없앰
+      progressDialog.dismiss();
+      //어답터 연결.
+      adapter = new NameMyAdapter(getApplicationContext(), list);//앞의 인자는 application context를 제공하며, 뒤에 인자는 위에서 값을 넣어준 list.
+      recyclerView.setAdapter(adapter);
+      adapter.notifyDataSetChanged();//어댑터에 연결된 항목들을 갱신함.
+  }
+~~~
+   
+검색 결과들을 목록으로 띄워주기 위해 recyclerView를 이용한 adapter를 NameMyAdapter.java 파일에 정의   
+
+##### 생성자를 context와 배열로 초기화   
+~~~java
+NameMyAdapter(Context context, ArrayList<NameDrug> mList) {
+     this.mList = mList;
+     this.mInflate = LayoutInflater.from(context);
+     this.mContext = context;
+ }
+~~~
+##### view holder를 생성하고 View를 붙여준다.   
+~~~java
+ @NonNull
+    @Override
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //최초 view에 대한 list item에 대한 view를 생성함.
+        //onBindViewHolder한테 실질적으로 매칭해주는 역할을 함.
+        View view = mInflate.inflate(R.layout.list_item, parent, false);
+        final MyViewHolder viewHolder = new MyViewHolder(view);
+        return viewHolder;
+    }
+~~~   
+   
+##### view에 내용을 넣어준다.   
+~~~java
+ @Override//재활용 되는 뷰가 호출하여 실행되는 메서드. 뷰 홀더를 전달하고 어댑터는 postion의 데이터를 결합시킴
+ public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+     //각 item에 대한 매칭을함.
+     //arrayList가 NameDrug에 연결해놓았음. NameMainactivity에서 파싱한 데이터를 받아옴.NameMainactivity에서 NameDrug객체가 있는 arrayList에 담아서 adapter쪽으로 쏨
+     //그러면 onBindViewHolder여기서 그것을 받아 glide로 load하게됨
+
+
+     //Glide를 이용해서 이미지 view 안에 서버로부터 이미지를 받아와 BindViewHolder될 때 넣어줄것임.삽입될것임
+     Glide.with(holder.itemView).load(mList.get(position).getImage()).into(holder.list_image);
+
+     //position : 현재 position에 있는것을 가져와서 그대로 입력해줌.
+     //NameMainactivity에서 파싱한 데이터들을 실질적으로 넣어줌.
+     holder.tv_name.setText(mList.get(position).getDrugName());
+     holder.tv_company.setText(mList.get(position).getCompany());
+     holder.tv_className.setText(mList.get(position).getClassName());
+     holder.tv_etcOtcName.setText(mList.get(position).getEtcOtcName());
+ }
+~~~   
+   
+<img src="https://user-images.githubusercontent.com/57400849/86573235-0c041e80-bfaf-11ea-9875-7fab1dabe5e3.png" width="30%">
+
+6)출력된 리스트 중에 상세보기를 원하는 의약품을 클릭했을 시 보여지는 페이지는 2-4-3 약 상세보기 기능에서 설명한다.   
+
+   
+>>#### 2-4-2 모양으로 약 검색   
+1)'의약품안전나라'사이트에서 csv형식으로 제공하는 '의약품 낱알식별' 파일을 다운로드 받는다.
+<img src="https://user-images.githubusercontent.com/57400913/86558535-9c813580-bf94-11ea-8dac-a6032270ccf8.png" width="70%">   
+
+2)csv형식을 안드로이드 스튜디오에서 사용하기 좋게 json형식으로 변환한다.     
+<div>
+<img src="https://user-images.githubusercontent.com/57400913/86558548-a2771680-bf94-11ea-9fb8-a8ce03f54e16.png" width="40%">
+<img src="https://user-images.githubusercontent.com/57400913/86558552-a4d97080-bf94-11ea-89b7-8f1752c71524.png" width="40%">
+</div>
+   
+3)app폴더 아래에 assets폴더를 생성한 후에 json으로 변환한 파일을 넣어준다.
+<img src="https://user-images.githubusercontent.com/57400913/86558778-4234a480-bf95-11ea-82fb-facc8f9ec789.png" width="70%">
+
+4)사용자가 검색한 의약품의 정보들을 저장하기 위한 FormDrug.java 폴더를 생성한다.   
+검색한 의약품에 해당하는 품목명, 업소명, 이미지, 분류명, 전문/일반 구분을 사용자에게 제공하기 위해서 getter, setter로 받아오고 불러오기 위함이다.  
+~~~java
+public class FormDrug {
+    //리스트에 띄울 목록
+    private String drugName; //품목명
+    private String company; // 업소명
+    private String image;//이미지 주소
+    private String className; //분류명
+    private String etcOtcName; // 전문일반구분
+
+    //검색할때 사용, 리스트에 띄우지 않음
+    private String shape; //모양
+    private String color; //색상
+    private String type; //제형
+    private String markfront; // 식별 표시 앞
+    private String markback; // 식별 표시 뒤
+
+    public String getDrugName() {
+        return drugName;
+    }
+
+    public void setDrugName(String drugName) {
+        this.drugName = drugName;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getEtcOtcName() {
+        return etcOtcName;
+    }
+
+    public void setEtcOtcName(String etcOtcName) {
+        this.etcOtcName = etcOtcName;
+    }
+
+
+
+    //////////////모양 검색할때 사용//////////////
+
+    public String getShape() {
+        return shape;
+    }
+
+    public void setShape(String shape) {
+        this.shape = shape;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getMarkfront() {
+        return markfront;
+    }
+
+    public void setMarkfront(String markfront) {
+        this.markfront = markfront;
+    }
+
+    public String getMarkback() {
+        return markback;
+    }
+
+    public void setMarkback(String markback) {
+        this.markback = markback;
+    }
+
+}
+~~~    
+
+5)FormMainActivity.java 폴더를 생성한다.   
+색상, 모양, 제형 카테고리에서 사용자가 선택한 것을 처리한다.     
+식별자로 검색할 때, 사용자가 검색하기 위해 Edittext에 입력한 값을 처리한다.      
+##### 색상, 모양, 제형 버튼을 클릭하기 위한 버튼들 배열로 생성, 초기화
+~~~java
+public class FormMainActivity extends AppCompatActivity {
+    private static final String TAG = "Ma";
+
+    // 각각의 카테고리에서 최종적으로 선택한 것 저장
+    private String choosecolor = null; // 선택한 색상 저장
+    private String chooseshape = null; // 선택한 모양 저장
+    private String choosetype = null; // 선택한 제형 저장
+    private String searchmarkfront = null; // 식별자 검색 저장(앞)
+    private String searchmarkback = null; // 식별자 검색 저장(뒤)
+
+    //색상 버튼과 관련
+    Button[] colorBtn = new Button[16]; //색상 버튼 배열
+    Button result_colorbtn; //버튼의 id값 저장
+    private String colorbtn_id; //버튼의 id값
+    private String thiscolor; // 비교할 색상 값
+
+    //모양 버튼과 관련
+    Button[] shapeBtn = new Button[11]; //모양 버튼 배열
+    Button result_shapebtn; //버튼의 id값 저장
+    private String shapebtn_id; //버튼의 id값
+    private String thisshape; // 비교할 색상 값
+
+    //제형 버튼과 관련
+    Button[] typeBtn = new Button[4]; //모양 버튼 배열
+    Button result_typebtn; //버튼의 id값 저장
+    private String typebtn_id; //버튼의 id값
+    private String thistype; // 비교할 색상 값
+~~~
+    
+##### 색상 버튼 이벤트
+choosecolor는 사용자가 선택한 버튼에 맞는 검색 결과를 보여주기 위한 값을 저장하는 변수이며, thiscolor는 사용자가 누른 버튼의 배경색만 변경해주기 위한 값을 저장하는 변수이다.   
+
+1)사용자가 누른 버튼의 배경색을 하양색으로 변경하고 choosecolor와 thiscolor에 버튼의 text값을 저장한다.   
+2)사용자가 버튼을 누를때마다 choosecolor와 thiscolor의 값이 바뀐다.   
+3)사용자가 누른 버튼의 색만 변경해주기 위해서 버튼을 누를 때마다 반복문을 이용해서 버튼의 수만큼 각 버튼의 text값과 현재 선택한 값이    choosecolor를 비교해서 값이 다르다면 원래의 색으로 변경해준다.    
+4)또, 바로 이 전에 누른 버튼의 text값과 thiscolr의 값을 비교해주어 같다면 배경색을 원래의 색으로 변경해준다.   
+~~~java
+public void settingColorbtn(){
+        for(int i=0; i <colorBtn.length; i++){
+            colorbtn_id = "color_btn" + (i+1); //버튼 아이디값 저장
+            colorBtn[i] = findViewById(getResources().getIdentifier(colorbtn_id, "id",getPackageName())); //버튼 초기화
+
+        }
+
+        for(Button buttonId : colorBtn){
+            buttonId.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    result_colorbtn = findViewById(v.getId());
+                    result_colorbtn.setBackgroundResource(R.drawable.choose_btton); //해당아이디 버튼의 배경색을 바꿈
+                    result_colorbtn.setTextColor(Color.WHITE);
+                    choosecolor = result_colorbtn.getText().toString(); //선택 색상을 저장
+
+                    //////여기서 for문으로 thiscolor랑 result.getText.toString()비교해서 배경색 다시 바꿔주기
+                    Log.e("다음 클릭 후 : ", thiscolor);
+
+                    for(int j=0; j<colorBtn.length; j++){
+                        if(!colorBtn[j].getText().toString().equals(choosecolor)) {
+                            colorBtn[j].setBackgroundResource(R.drawable.basic_button);
+                            colorBtn[j].setTextColor(Color.BLACK);
+                        }if(colorBtn[j].getText().toString().equals(thiscolor)){
+                            colorBtn[j].setBackgroundResource(R.drawable.basic_button);
+                            colorBtn[j].setTextColor(Color.BLACK);
+                        }
+                    }
+
+                    thiscolor = textcolor.getText().toString();
+
+                }
+            });
+        }
+
+    }
+~~~    
+##### 모양 버튼 이벤트   
+색상 버튼 이벤트와 동일한 방식으로 버튼의 배경색 처리를 한다.   
+~~~java
+public void settingShapebtn(){
+        for(int i=0; i <shapeBtn.length; i++){
+            shapebtn_id = "shape_btn" + (i+1); //버튼 아이디값 저장
+            shapeBtn[i] = findViewById(getResources().getIdentifier(shapebtn_id, "id",getPackageName()));
+        }
+
+        for(Button buttonId : shapeBtn){
+            buttonId.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    result_shapebtn = findViewById(v.getId());
+                    result_shapebtn.setBackgroundResource(R.drawable.choose_btton); //해당아이디 버튼의 배경색을 하양으로 바꿈
+                    result_shapebtn.setTextColor(Color.WHITE);
+                    chooseshape = result_shapebtn.getText().toString();
+
+
+                    Log.e("다음 클릭 후 : ", thisshape);
+
+                    for(int j=0; j<shapeBtn.length; j++){
+                        if(!shapeBtn[j].getText().toString().equals(chooseshape)) {
+                            shapeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                            shapeBtn[j].setTextColor(Color.BLACK);
+                        }if(shapeBtn[j].getText().toString().equals(thisshape)){
+                            shapeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                            shapeBtn[j].setTextColor(Color.BLACK);
+                        }
+                    }
+
+                    //  textcolor.setText(result.getText()); // 선택 색상을 보여줄 textview
+
+                    thisshape = textshape.getText().toString();
+                }
+            });
+        }
+    }
+~~~   
+##### 제형 버튼 이벤트
+색상과 모양 버튼의 버튼의 text값과 동일하기 때문에 클릭한 버튼의 text값을 바로 변수에 저장해주었지만   
+제형 버튼은 공공데이터에서 제공하는 파일의 형식이 맞추려면 과정이 복잡해진다.    
+(ex.정제류 - 나정, 필름코팅정, 서방정, 저작정, 추어블정(저작정), 구강붕해정, 서방성필름코팅정, 장용성필름코팅정, 다층정, 분산정(현탁정))     
+1)제형 버튼 중 클릭한 버튼의 text값을 choosetype에 저장한다.   
+2)버튼의 text값과 json파일에 저장되어있는 제형의 종류를 공통으로 포함된 문자열을 비교한 후에 다시 choosetype에 모든 종류를 저장한다.   
+3)이후에 사용자가 선택한 버튼의 배경색만 변경하는 부분은 위의 색상 이벤트에서 설명한것과 동일하다.   
+~~~java
+public void settingTypebtn(){
+        for(int i=0; i <typeBtn.length; i++){
+            typebtn_id = "type_btn" + (i+1); //버튼 아이디값 저장
+            typeBtn[i] = findViewById(getResources().getIdentifier(typebtn_id, "id",getPackageName())); //초기화
+        }
+
+        for(Button buttonId : typeBtn){
+            buttonId.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    result_typebtn = findViewById(v.getId());
+                    result_typebtn.setBackgroundResource(R.drawable.choose_btton); //해당아이디 버튼의 배경색을 하양으로 바꿈
+                    result_typebtn.setTextColor(Color.WHITE);
+                    choosetype = result_typebtn.getText().toString();
+
+                    if(choosetype.contains("정")){
+                        choosetype = "나정, 필름코팅정, 서방정, 저작정, 추어블정(저작정), 구강붕해정, 서방성필름코팅정, 장용성필름코팅정, 다층정, 분산정(현탁정), 정제";
+                    }else if(choosetype.contains("경질")){
+                        choosetype = "경질캡슐제|산제, 경질캡슐제|과립제, 경질캡슐제|장용성과립제, 스팬슐, 서방성캡슐제|펠렛";
+                    }else if(choosetype.contains("연질")){
+                        choosetype ="연질캡슐제|현탁상, 연질캡슐제|액상";
+                    } else if(choosetype.contains("기타")){
+                        choosetype = "껌제, 트로키제";
+                    }
+
+                    //texttype.setText(choosetype);
+
+                    Log.e("choosetype ?????", choosetype);
+                    Log.e("다음 클릭 후 : ", thistype);
+
+                    for(int j=0; j<typeBtn.length; j++){
+
+                        if(typeBtn[j].getText().toString().contains("정")){
+                            if(!choosetype.contains("정")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                            if(thisshape.contains("정")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                        }else if(typeBtn[j].getText().toString().contains("경질")){
+                            if(!choosetype.contains("경질")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                            if(thisshape.contains("경질")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                        }else if(typeBtn[j].getText().toString().contains("연질")){
+                            if(!choosetype.contains("연질")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                            if(thisshape.contains("연질")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                        }else {
+                            if(!choosetype.contains("껌제")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                            if(thisshape.contains("제")) {
+                                typeBtn[j].setBackgroundResource(R.drawable.basic_button);
+                                typeBtn[j].setTextColor(Color.BLACK);
+                            }
+                        }
+
+                    }
+
+                    //  textcolor.setText(result.getText()); // 선택 색상을 보여줄 textview
+
+                    thistype = texttype.getText().toString();
+                }
+            });
+        }
+    }
+~~~      
+
+##### 색상, 모양, 제형 버튼 선택 초기화
+1)사용자가 선택한 버튼을 초기화하기 위해서 클릭하면 choosecolor, chooseshape, choosetype에 모두 null값이 저장된다.   
+2)사용자가 선택해서 하양색으로 변한 배경색 또한 원래의 배경색으로 돌아온다.   
+3)초기화 되었다는 Toast가 뜬다.   
+~~~java
+//초기화 버튼
+    public void click_research(View view) {
+        choosecolor = null;
+        chooseshape = null;
+        choosetype = null;
+
+        Toast myToast = Toast.makeText(this.getApplicationContext(),"선택이 초기화 되었습니다.", Toast.LENGTH_SHORT);
+        myToast.show();
+
+        for(int i=0; i <colorBtn.length; i++){
+            colorBtn[i].setBackgroundColor(Color.WHITE);
+            colorBtn[i].setBackgroundResource(R.drawable.basic_button);
+            colorBtn[i].setTextColor(Color.BLACK);
+        }
+        for(int i=0; i <shapeBtn.length; i++){
+            shapeBtn[i].setBackgroundColor(Color.WHITE);
+            shapeBtn[i].setBackgroundResource(R.drawable.basic_button);
+            shapeBtn[i].setTextColor(Color.BLACK);
+        }
+        for(int i=0; i <typeBtn.length; i++){
+            typeBtn[i].setBackgroundColor(Color.WHITE);
+            typeBtn[i].setBackgroundResource(R.drawable.basic_button);
+            typeBtn[i].setTextColor(Color.BLACK);
+        }
+
+    }
+}
+~~~     
+<img src="https://user-images.githubusercontent.com/57400913/86567020-a3647400-bfa5-11ea-8dee-0fdac8278d3d.png" width="40%">   
+
+##### 의약품의 앞, 뒤에 쓰여있는 식별 표시로 검색하기    
+1)공공데이터로 제공한 파일에서 식별 표시에 없는 의약품의 경우에는 '-'로 저장되어있다.   
+2)사용자가 앞이나 뒤 한 곳만 입력했을때도 올바른 결과를 나오게 하기 위해서 입력된 값의 길이를 체크한 후에 공백이면 searchamarkfront와 serachmarkback에 '-'를 저장해준다.   
+
+~~~java
+//식별자 앞 edittext값 초기화, 저장
+    public void takeMarkfront(){
+        EditText markfront = (EditText) findViewById(R.id.mark_front);
+        searchmarkfront = markfront.getText().toString();
+        if(searchmarkfront.length() == 0){
+            searchmarkfront = null; // 입력된 값이 없을때 '-'로 저장
+        }else {
+            searchmarkfront=this.searchmarkfront;
+        }
+    }
+
+    //식별자 뒤 edittext값 초기화, 저장
+    public void takeMarkBack(){
+        EditText markback = (EditText) findViewById(R.id.mark_Back);
+        searchmarkback = markback.getText().toString();
+        if(searchmarkback.length() == 0){
+            searchmarkback = null;
+        }else{
+            searchmarkback = this.searchmarkback;
+        }
+    }
+~~~
+
+##### 사용자가 선택 또는 입력한 값을 Intent로 넘겨주기
+1)최종적으로 choosecolor, chooseshape, choosetype과 searchmarkfront, searchmarkback에 저장된 값을 FormSearchActivity.java폴더에 Intent로 넘겨준다.    
+~~~java
+//검색 결과 버튼
+    public void click_result(View view) {
+
+        Intent intent = new Intent(getApplicationContext(), FormSearchActivity.class);
+
+        intent.putExtra("choosecolor",choosecolor);
+        intent.putExtra("chooseshape",chooseshape);
+        intent.putExtra("choosetype",choosetype);
+
+
+        startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    //식별자 검색 결과 버튼
+    public void click_markresult(View view) {
+
+        takeMarkfront(); // 식별자 앞 edit에 입력한 텍스트값 가져오기
+        takeMarkBack();
+
+        Intent intent = new Intent(getApplicationContext(), FormSearchActivity.class);
+        intent.putExtra("searchmarkfront",searchmarkfront);
+        intent.putExtra("searchmarkback", searchmarkback);
+
+
+        startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+    }
+~~~
+2)FormMainActivity.java 폴더에서 Intent로 넘어온 값과 일치하는 조건들을 Json파일에서 찾아 배열로 저장한 후에 어댑터로 결과를 넘겨주는 과정을 처리할 FormSearchActivity.java 폴더를 생성한다.   
+##### 색상, 모양, 제형 버튼으로 검색한 것인지, 식별 표시로 검색한 것인지 구분
+구분하여 서로 다른 메서드를 실행해준다.   
+~~~java
+        if (choosecolor == null && chooseshape == null && choosetype ==null) {
+            marksearchJson();
+            Log.e("dg","식별자");
+        }
+        else {
+            searchJson();
+            Log.e("dg","컬러");
+        }
+        recyclerView = (RecyclerView)findViewById(R.id.rv_recyclerview);//리사이클러뷰 초기화
+        recyclerView.setHasFixedSize(true);//리사이클러뷰 기존 성능 강화
+
+        //리니어레이아웃을 사용하여 리사이클러뷰에 넣어줄것임
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        mAdapter = new FormMyAdapter(getApplicationContext(), list);
+        recyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+~~~
+##### 색상, 모양, 제형 버튼으로 검색한 경우
+1)세 개의 카테고리 중 한 카테고리에서만 선택해도 올바른 검색 결과를 나오게 하기 위해서 총 7가지 경우로 나누었다.   
+2)json파일은 key와 value로 구성되어있는데 사용자가 선택한 값과 일치하는 value값을 찾아 품목명, 제품 이미지, 업소명, 분류명, 전문일반구문 key에 해당하는 value값을 사용자에게 보여주기 위해서 setter에 저장한다.   
+ ~~~java
+ //json에서 조건에 맞는 것 검색(색상, 모양, 제형) 7가지.
+    public void searchJson(){
+        try{
+            InputStream is = getAssets().open("druglist.json"); //assests파일에 저장된 druglist_final.json 파일 열기
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+            is.close();
+            String json = new String(buffer, "UTF-8");
+
+            JSONObject jsonObject = new JSONObject(json);
+            JSONArray jsonArray = jsonObject.getJSONArray("druglist"); //json파일에서 의약품리스트의 배열명, jsonArray로 저장
+
+            list = new ArrayList<>();
+
+            for(int i=0; i<jsonArray.length(); i++){
+                jsonObject = jsonArray.getJSONObject(i);
+
+                //'색상, 모양, 제형' 선택하고 검색하기(3개의 카테고리 중 하나만 선택 하고 검색 가능)
+                //1. 색상만 선택된 경우
+                if(choosecolor != null && chooseshape == null && choosetype == null){
+                    if ((jsonObject.getString("색상앞").contains(choosecolor))) {
+                        FormDrug formDrug = new FormDrug();
+                        Log.e("1번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형"));
+
+                        formDrug.setImage(jsonObject.getString("큰제품이미지"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
+
+                        list.add(formDrug);
+                    }
+                }
+                //2. 색상 & 모양
+                else if(choosecolor != null && chooseshape != null && choosetype == null){
+                    if ((jsonObject.getString("색상앞").contains(choosecolor)) && (jsonObject.getString("의약품제형").equals(chooseshape))) {
+                        FormDrug formDrug = new FormDrug();
+                        Log.e("2번 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
+
+                        formDrug.setImage(jsonObject.getString("큰제품이미지"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
+                        list.add(formDrug);
+                    }
+                } ...
+ ~~~   
+ <div>
+<img src="https://user-images.githubusercontent.com/57400913/86566889-64362300-bfa5-11ea-887c-20be6eb94caf.png" width="40%">
+<img src="https://user-images.githubusercontent.com/57400913/86567239-fb02df80-bfa5-11ea-8ea5-f20b52c8ff2b.png" width="40%">
+</div>    
+
+ ##### 식별 표시로 검색한 경우
+ 1)식별 표시 앞, 뒤 중 하나만 입력해도 올바른 검색 결과를 나오게 하기 위해서 3가지 경우로 나누었다.   
+ 2)해당하는 의약품의 정보를 보여주기 위한 json파싱 방법은 위와 동일하다.   
+ ~~~java
+ //json에서 조건에 맞는 것 검색(식별자) 3가지.
+    public void marksearchJson(){
+        try{
+            InputStream is = getAssets().open("druglist.json"); //assests파일에 저장된 druglist_final.json 파일 열기
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+            is.close();
+            String json = new String(buffer, "UTF-8");
+
+            JSONObject jsonObject = new JSONObject(json);
+            JSONArray jsonArray = jsonObject.getJSONArray("druglist"); //json파일에서 의약품리스트의 배열명, jsonArray로 저장
+
+            list = new ArrayList<>();
+
+            for(int i=0; i<jsonArray.length(); i++){
+                jsonObject = jsonArray.getJSONObject(i);
+
+                //8. 표시앞만
+                if(searchmarkfront != null && searchmarkback == null) { //식별자 앞이 입력됐을 경우
+                    if (searchmarkfront.equals(jsonObject.getString("표시앞")))
+                    {
+                        FormDrug formDrug = new FormDrug();
+                        Log.e("8번째 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
+                        formDrug.setImage(jsonObject.getString("큰제품이미지"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
+                        list.add(formDrug);
+                    }
+
+                } //9. 표시 앞 뒤 둘 다 입력
+                else if(searchmarkfront != null){ //두개 다 입력
+                    if (searchmarkfront.equals(jsonObject.getString("표시앞")) && searchmarkback.equals(jsonObject.getString("표시뒤")))
+                    {
+                        FormDrug formDrug = new FormDrug();
+                        Log.e("9번째 : ", jsonObject.getString("품목명") + jsonObject.getString("색상앞") + jsonObject.getString("의약품제형") + jsonObject.getString("제형코드명") + jsonObject.getString("표시앞") + jsonObject.getString("표시뒤"));
+                        formDrug.setImage(jsonObject.getString("큰제품이미지"));
+                        formDrug.setDrugName(jsonObject.getString("품목명"));
+                        formDrug.setCompany(jsonObject.getString("업소명"));
+                        formDrug.setClassName(jsonObject.getString("분류명"));
+                        formDrug.setEtcOtcName(jsonObject.getString("전문일반구분"));
+                        list.add(formDrug);
+                    }
+                }//10. 표시뒤만
+~~~
+ 3)list에 배열로 결과를 저장하고 FormMyAdapter.java 폴더를 생성한 후에 넘겨준다.   
+ <div>
+<img src="https://user-images.githubusercontent.com/57400913/86567351-33a2b900-bfa6-11ea-83b4-d91234e0b060.png" width="40%">
+<img src="https://user-images.githubusercontent.com/57400913/86567379-3e5d4e00-bfa6-11ea-95b0-eda7e9152b70.png" width="40%">  
+ </div>   
+ <div>
+<img src="https://user-images.githubusercontent.com/57400913/86567395-43220200-bfa6-11ea-8364-33dfff8e0fdf.png" width="40%">
+<img src="https://user-images.githubusercontent.com/57400913/86567408-46b58900-bfa6-11ea-8548-b4da6b0c02c3.png" width="40%">  
+</div>   
+
+ ##### 검색 결과 Recyclerview로 띄어주기
+ 1)비트맵 방식으로 이미지를 띄워주었던 2-4-1 약 이름으로 검색 기능의 4)와 다르게 Glide로 이미지를 변환한다. 다른 부분만 다르고 동일하다.     
+ 2)출력된 리스트 중에 상세보기를 원하는 의약품을 클릭했을 시 보여지는 페이지는 2-4-3 약 상세보기 기능에서 설명한다.   
+~~~java
+public class FormMyAdapter extends RecyclerView.Adapter<FormMyAdapter.MyViewHolder>{
+    private static final String sort = "form";
+
+    private String drugString;
+    private ArrayList<FormDrug> mList;
+    private LayoutInflater mInflate;
+    private Context mContext;
+    private String data = null;
+    private Intent intent;
+    private String searchString;
+
+    FormMyAdapter(Context context, ArrayList<FormDrug> mList) {//생성자를 context와 배열로 초기화해줌
+        this.mList = mList;
+        this.mInflate = LayoutInflater.from(context);
+        this.mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflate.inflate(R.layout.list_item, parent, false);
+        final MyViewHolder viewHolder = new MyViewHolder(view);
+
+        //최초 view에 대한 list item에 대한 view를 생성함.
+        //이 onBindViewHolder친구한테 실질적으로 매칭해주는 역할을 함.
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+        Glide.with(holder.itemView)
+                .load(mList.get(position).getImage())
+                .into(holder.list_image);
+
+        holder.tv_name.setText(mList.get(position).getDrugName());
+        holder.tv_company.setText(mList.get(position).getCompany());
+        holder.tv_className.setText(mList.get(position).getClassName());
+        holder.tv_etcOtcName.setText(mList.get(position).getEtcOtcName());
+    }
+
+    @Override
+    public int getItemCount() {
+        return (mList != null ? mList.size() : 0);
+    }
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+
+        public ImageView list_image;
+        public TextView tv_name;
+        public TextView tv_company;
+        public TextView tv_etcOtcName;
+        public TextView tv_className;
+        public View mView;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mView = itemView;
+            list_image = itemView.findViewById(R.id.list_image);
+            tv_name = itemView.findViewById(R.id.tv_name);
+            tv_company = itemView.findViewById(R.id.tv_company);
+            tv_etcOtcName = itemView.findViewById(R.id.tv_etcOtcName);
+            tv_className = itemView.findViewById(R.id.tv_className);
+        }
+    }
+~~~
+  
+    
+>>#### 2-4-3 상세보기 페이지   
+
+1)검색한 의약품에 대한 목록 중 원하는 의약품을 클릭했을 시, adapter에서 공공데이터를 파싱한다.      
+
+해당 약에 대한 상세 정보를 얻기 위하여 공공데이터의 '의약품 제품 허가정보 서비스'를 이용한다.   
+사용자가 상세 정보를 얻고 싶어하는 의약품을 선택하면, 해당 이름을 파싱 주소로 넘겨주어 새롭게 파싱한다.   
+2-4-1의 4)와 동일하게 TAG값을 얻어 사용자에게 보여주고 싶은 데이터들만 뽑아냈다.   
+이렇게 파싱한 데이터들을 buffer에 저장한다.
+
+~~~java
+String getXmlData(String string){
+
+        StringBuffer buffer = new StringBuffer();
+
+        try {//인코딩을 위한 try catch문
+            searchString = URLEncoder.encode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        //공공데이터 파싱을 위한 주소
+        //약국 공공데이터 서비스키
+        String key = "gyhnkvw8BuHNtPGQzXT5Nluh3Ri3hGlcpEnheMdjI1gjDbZhPSEpy05ofIMaFu2a96c%2FUX%2FzOVblYrTa%2B%2Fu%2Bjg%3D%3D";
+        String requestUrl = "http://apis.data.go.kr/1471057/MdcinPrductPrmisnInfoService/getMdcinPrductItem?ServiceKey="//요청 URL
+                + key + "&item_name=" + searchString; //약 이름으로 검색
+        Log.e("drugSearch : ", requestUrl);
+
+        try {
+            //일단 false로 선언해준 후 파싱해온 tag이름과 같으면 true로 바꾸어 배열에 넣어줄것임
+            boolean Nb_doc_data = false;
+            boolean doc = false;
+            boolean ee_doc_data = false;
+            boolean paragraph = false;
+            boolean ud_doc_data = false;
+            boolean article = false;
+            boolean articleEnd = false;
+            String tagName = null;
+
+            //실질적으로 파싱해서 inputstream해주는 코드
+            URL url = new URL(requestUrl);
+            InputStream is = url.openStream();
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = factory.newPullParser();
+            parser.setInput(new InputStreamReader(is, "UTF-8"));
+
+            //파싱해온 주소의 eventType을 가져옴. 이것을 이용하여 파싱의 시작과 끝을 구분해좀
+            int eventType = parser.getEventType();
+
+            parser.next();
+            //eventType이 END_DOCUMENT이 아닐때까지 while문이 돌아감
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_DOCUMENT://eventType이 START_DOCUMENT일 경우
+                        break;
+                    case XmlPullParser.END_TAG://eventType이 END_TAG일 경우, 태그가 끝나는 부분
+                        if (parser.getName().equals("item")) {//Tag 이름이 item일경우
+                            Log.e("END_TAG : ", "END");
+                        }
+                        if (parser.getName().equals("DOC")) {
+                            articleEnd = true;
+                        }
+                        if(parser.getName().equals("body")){
+                            buffer.append("\n");
+                            buffer.append("※ 허가 취소된 의약품이거나 상세정보를 제공하지 않는 의약품입니다. ※");
+                        }
+                        break;
+                    case XmlPullParser.START_TAG://eventType이 START_TAG일 경우, 태그가 시작되는 부분
+                        if (parser.getName().equals("item")) {
+                            buffer.append("\n");
+                        }
+                        //Tag가 시작될 때 다 true로 변경함
+
+                        //xml파일은 Doc안에 Article안에 paragraph내에 text가 있는 구조임. 그래서 그 안의 구조를 가져오기 위해 이렇게 선언함.
+                        if (parser.getName().equals("DOC")) {
+
+                            //xml파일에서 Tag의 title에 적힌 값을 읽어오기 위한 코드.
+                            String arti = parser.getAttributeValue(null, "title");
+                            buffer.append("\n\n");
+                            buffer.append("< ").append(arti).append(" >");
+                            articleEnd = false;//article의 End부분은 false로 선언해줌. 이것을 이용하여 문서의 끝을 알림.
+                            doc = true;
+                        }
+                        if (parser.getName().equals("ARTICLE")) {
+                            //xml파일에서 Tag의 title에 적힌 값을 읽어오기 위한 코드.
+                            String arti = parser.getAttributeValue(null, "title");
+                            buffer.append(arti);
+                            article = true;
+                        }
+                        if (parser.getName().equals("PARAGRAPH")) {
+                            paragraph = true;
+                        }
+                        if (parser.getName().equals("EE_DOC_DATA")) ee_doc_data = true;//효능효과
+                        if (parser.getName().equals("UD_DOC_DATA")) {//용법용량
+                            ud_doc_data = true;
+                        }
+                        if (parser.getName().equals("NB_DOC_DATA")) {//사용상의주의사항
+                            Nb_doc_data = true;
+                        }
+                        break;
+
+                    case XmlPullParser.TEXT://eventType이 TEXT일 경우
+                        if (ee_doc_data) {//효능효과부분을 가져오는 코드
+                            if (doc) {//doc 데이터 안에
+                                if (!articleEnd) {//article부분이 끝날때까지 돌리기 위해 사용됨
+                                    if (article) {//article 부분에
+                                        if (paragraph) {//paragraph부분. 이곳에 text가 있음.
+                                            //parsing부분
+                                            String ee_text = parser.getText();//text를 가져옴
+                                            //Log.e("GBN_NAME : ", ee_text);
+                                            buffer.append(ee_text);//요소의 TEXT 읽어와서 문자열버퍼에 추가
+                                        }
+                                    }
+                                    buffer.append("\n"); //꼭필요
+                                    break;
+                                }
+                            }
+                            ee_doc_data = false;
+                        } else if (ud_doc_data) {//용법용량부분을 가져오는 코드
+                            if (doc) {
+                                if (!articleEnd) {
+                                    if (article) {
+                                        if (paragraph) {
+                                            String ud_text = parser.getText();
+                                            if (ud_text.contains("<") || ud_text.contains("&")) {//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
+                                                buffer.append(Html.fromHtml(ud_text));
+
+                                            } else {//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
+                                                buffer.append(ud_text);
+                                            }
+                                        }
+                                    }
+                                    buffer.append("\n");
+                                    break;
+                                }
+                            }
+                            ud_doc_data = false;
+                        } else if (Nb_doc_data) {//사용상의주의사항부분
+                            if (doc) {
+
+                                if (!articleEnd) {
+                                    if (article) {
+                                        if (paragraph) {
+                                            String nb_doc_data = parser.getText();
+                                            //Log.e("GBN_NAME : ", nb_doc_data);
+                                            if (nb_doc_data.contains("<") || nb_doc_data.contains("&")) {//table형태 등 html문서로된 부분이 있으면 변환하여 buffer에 추가해줌
+                                                buffer.append(Html.fromHtml(nb_doc_data));
+                                            } else {//html요소가 포함되어있지 않으면 그냥 buffer에 추가해줌
+                                                buffer.append(nb_doc_data);
+                                            }
+                                        }
+                                        buffer.append("\n");
+                                    }
+                                    break;
+                                }
+                            }
+                            ud_doc_data = false;//다시 false로 돌리는 초기화함
+                        }
+                }
+                eventType = parser.next();//다음 parser를 찾아옴
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return buffer.toString();//buffer를 String형식으로 return해줌
+    }
+
+~~~
+
+2)파싱한 결과를 상세정보 페이지인 LookupActivity.java파일로 intent를 통해 넘긴다.   
+
+상세정보 페이지인 LookupActivity.java파일로 이동할 때, 파싱한 결과를 저장한 buffer를 intent를 이용하여 전달한다.   
+이 때, adapter에서 이미지를 변환 후 넘기는 방식에서 이름으로 검색할 때와 약 모양으로 검색할 때의 차이가 존재한다.   
+따라서 intent할 때 동일한 key에 대한 value값에 구분을 두어 상세정보 페이지에서 구분하여 받을 수 있게 한다.   
+   
+##### 이름으로 검색    
+이미지를 Bitmap으로 변환 후 넘겨준다. 이는 이미지 데이터를 파싱을 통해 가져오기 때문이다.   
+~~~java
+private static final String sort = "name";
+
+//해당하는 holder를 눌렀을 때 intent를 이용해서 상세정보 페이지로 넘겨줌
+holder.itemView.setOnClickListener(new View.OnClickListener() {
+   @Override
+   public void onClick(View view) {
+       new Thread(new Runnable() { //파싱을 이용했기 때문에 스레드가 필요하다. 오래 걸리기 때문에 background에서 처리해줘야함
+           @Override
+           public void run() {
+               // TODO Auto-generated method stub
+               //알고싶은 약의 상세정보를 누르면 그 약의 이름을 받아와 다시 파싱을 시작함
+               //그렇기 때문에 약의 이름을 drugString에 저장해준 후 그 이름을 getXmlData()의 메서드로 넘겨줌
+               drugString = mList.get(position).getDrugName();
+               data = getXmlData(drugString);//drugString에 해당하는 데이터를 string형식으로 가져와 data변수에 저장해줌
+
+               intent = new Intent(mContext, LookupActivity.class);//intent를 초기화해주는 코드
+               //앞에는 key값, 뒤에는 실제 값
+               intent.putExtra("Drug", mList.get(position).getDrugName());//drug의 이름을 넘겨줌
+               intent.putExtra("data", data);//파싱한 데이터들을 "data"의 키로 넘겨줌
+
+               //이미지의 용량을 작게 해주는 코드
+               //-> intent로 이미지를 넘길 떼 이미지의 용량이  100kb로 제한되어있기 때문에 그 사이즈에 맞춰서 넘겨줘야함
+               //이미지의 용량을 임의로 지정하여 intent로 넘겨주는 코드
+               Bitmap bitmap = mList.get(position).getImage();
+               ByteArrayOutputStream stream = new ByteArrayOutputStream();
+               bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+               byte[] b = stream.toByteArray();
+               intent.putExtra("image", b); //image의 크기를 낮춰준 후 intent로 넘겨줌
+               intent.putExtra("sort",sort);
+
+               //전체의 intent를 실제로 넘겨주는 코드.
+               mContext.startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+           }
+       }).start();
+   }
+
+});
+~~~
+
+##### 모양으로 검색    
+이미지를 그대로 넘겨준다. 이는 이미지 data를 json에서 가져오기 때문이다.   
+~~~java
+
+private static final String sort = "form";
+
+holder.itemView.setOnClickListener(new View.OnClickListener() {
+@Override
+public void onClick(View view) {
+    new Thread(new Runnable() { //파싱을 이용했기 때문에 스레드가 필요하다. 오래 걸리기 때문에 background에서 처리해줘야함
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            //알고싶은 약의 상세정보를 누르면 그 약의 이름을 받아와 다시 파싱을 시작함
+            //그렇기 때문에 약의 이름을 drugString에 저장해준 후 그 이름을 getXmlData()의 메서드로 넘겨줌
+            drugString = mList.get(position).getDrugName();
+            data = getXmlData(drugString);//drugString에 해당하는 데이터를 string형식으로 가져와 data변수에 저장해줌
+            intent = new Intent(mContext, LookupActivity.class);//intent를 초기화해주는 코드
+            //앞에는 key값, 뒤에는 실제 값
+            intent.putExtra("Drug", drugString);//drug의 이름을 넘겨줌
+            intent.putExtra("data", data);//파싱한 데이터들을 "data"의 키로 넘겨줌
+            intent.putExtra("image", mList.get(position).getImage());
+            intent.putExtra("sort", sort);
+            //전체의 intent를 실제로 넘겨주는 코드.
+            mContext.startActivity(intent.addFlags(FLAG_ACTIVITY_NEW_TASK));
+        }
+    }).start();
+}
+
+});
+
+~~~
+
+3)LookupActivity.java 파일에서 파싱된 정보를 key값을 통해서 받는다.   
+ 
+adapter에서 넘겨준 image의 형식이 다르기 때문에 adpater에서 구분하여 넘겨준 key에 대한 value값을 구분하여 이미지를 각각의 방식에 맞게 변환한다.   
+
+##### 이름으로 검색   
+
+~~~java
+if(sort.equals("name")){
+   byte[] b = getIntent().getByteArrayExtra("image");
+   Bitmap bitmap = BitmapFactory.decodeByteArray(b,0,b.length);
+
+   //textView와 imageView에 받아온 값들을각각 저장해줌.
+   textView.setText(drugString);
+   detailStr.setText(str_detailStr);
+   imageView.setImageBitmap(bitmap);
+
+}
+~~~
+
+
+##### 모양으로 검색   
+
+~~~java
+else if(sort.equals("form")){
+   image = getIntent().getStringExtra("image");
+   //Bitmap bitmap = BitmapFactory.decodeByteArray(b,0,b.length);
+
+   Glide.with(this)
+           .load(image)
+           .into(imageView);
+
+   //textView와 imageView에 받아온 값들을각각 저장해줌.
+   textView.setText(drugString);
+   detailStr.setText(str_detailStr);
+}
+~~~   
+##### 약 상세정보 페이지   
+이미지를 제외한 나머지 부분은 동일하다. 파싱해서 넘겨받은 데이터들을 의약품의 이미지와 함께 보여준다.   
+~~~java
+public class LookupActivity extends NameMainActivity {
+    TextView textView;
+    TextView detailStr;
+    ImageView imageView;
+    String drugString;
+    String str_detailStr;
+    String image; //form 에서 넘어온 어댑터에서 이미지 넣어줄때 사용
+    String sort = null; // form, name 중 어느 어댑터에서 넘어온 건지 구분하기 위함
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_lookup);
+        textView = findViewById(R.id.textView);
+        detailStr = findViewById(R.id.detailStr);
+        imageView = findViewById(R.id.image);
+        //Drug라는 key값으로 NameMyAdapter에서 intent해줄때 넘겨준 값을 가져옴.
+        drugString = getIntent().getStringExtra("Drug");//String값으로 받아옴. 이것은 약의 이름을 받아오는것.
+        str_detailStr = getIntent().getStringExtra("data");
+        //NameMyAdapter.java파일에서 intent로 넘겨준 image를 받아와 byte배열에 저장 후 decode하여 imageview에 보여줌.
+        sort = getIntent().getStringExtra("sort");
+        Log.e("form/sort??",sort);
+        // 이미지 넘겨주는 형식이 다르게 때문에 bitmap, string 구분하기 위해 if문 사용
+        if(sort.equals("name")){
+            byte[] b = getIntent().getByteArrayExtra("image");
+            Bitmap bitmap = BitmapFactory.decodeByteArray(b,0,b.length);
+
+            //textView와 imageView에 받아온 값들을각각 저장해줌.
+            textView.setText(drugString);
+            detailStr.setText(str_detailStr);
+            imageView.setImageBitmap(bitmap);
+        }
+        else if(sort.equals("form")){
+            image = getIntent().getStringExtra("image");
+            //Bitmap bitmap = BitmapFactory.decodeByteArray(b,0,b.length);
+
+            Glide.with(this)
+                    .load(image)
+                    .into(imageView);
+
+            //textView와 imageView에 받아온 값들을각각 저장해줌.
+            textView.setText(drugString);
+            detailStr.setText(str_detailStr);
+        }
+    }
+}
+~~~
+
+<img src="https://user-images.githubusercontent.com/57400849/86573277-1faf8500-bfaf-11ea-9bdd-6c64c76cd2d7.png" width="30%">
+
+
+
+
+*****    
 
 >### 2-5 복용시간 알림
 1)알림을 설정했을 때 firebase에 데이터를 저장을 하기 위해서 firebase와 연동을 해야한다. 
