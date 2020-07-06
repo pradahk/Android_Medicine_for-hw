@@ -520,7 +520,9 @@ public class FindpwActivity extends AppCompatActivity {
         // progressDialog 객체 선언
         progressDialog = new ProgressDialog(this);
     }
-
+~~~
+5) 비밀번호 재전송 버튼 클릭시
+~~~java
     public void findPw(View view)
     {
         // editText에 작성한 내용을 String으로 변환하여 객체에 저장
@@ -531,8 +533,9 @@ public class FindpwActivity extends AppCompatActivity {
             findpw(sendemail);
         }
     }
-
-    // 비밀번호를 찾기 위한 findpw 메서드
+~~~
+6) findpw 메서드
+~~~java
     private void findpw(String sendemail) {
         // 프로그래스 다이얼로그 생성하여 보여줌
         progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
@@ -562,8 +565,8 @@ public class FindpwActivity extends AppCompatActivity {
                 });
     }
 }
-~~~   
+~~~  
 <img src="https://user-images.githubusercontent.com/62936197/86553133-d0ecf580-bf84-11ea-9ae4-599829bcb9cc.png" width="40%">     
-사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
+7) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
 <img src="https://user-images.githubusercontent.com/62936197/86552930-53c18080-bf84-11ea-8ad4-5673ab09e8b2.png" width="40%">   
 
