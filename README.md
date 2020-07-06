@@ -2384,7 +2384,7 @@ public interface OnPostListener {
 ~~~
 <img src="https://user-images.githubusercontent.com/57400849/86555531-99ce1280-bf8b-11ea-93a3-742ee9cd725a.png" width="70%">   
 
-2. popup메뉴를 이용하여 수정 및 삭제 기능을 구현하였다.
+2. popup메뉴를 이용하여 수정 및 삭제 기능을 구현하였다.   
 1)각각의 adapter에서 구현이 가능하도록 해야하기 때문에 ReviewMainAdapter.java에서 추가적으로 popup메서드를 구현하였다.   
 
 ##### popup메서드 구현     
