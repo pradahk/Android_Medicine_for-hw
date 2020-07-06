@@ -658,5 +658,570 @@ public class FindpwActivity extends AppCompatActivity {
 <img src="https://user-images.githubusercontent.com/62936197/86553548-1100a800-bf86-11ea-9f8a-858e6a56c99e.png" width="50%">     
 3) 사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
 <img src="https://user-images.githubusercontent.com/62936197/86553483-ced76680-bf85-11ea-86a1-750e9f48279a.png" width="30%">   
+>#### 2-1-6 회원정보 수정
+계정을 생성하여 어플에 성공적으로 로그인을 한 사용자는 ‘마이페이지’탭에서 회원정보를 수정할 수 있다. 회원정보를 열람할 수 있는 탭은 Fragment로 구성하였다.      
+1) 탭에 방문할 때에는 이메일을 한 번 더 입력해야 하며 입력한 값이 현재 로그인 중인 사용자의 이메일 값과 일치할 경우 회원정보 및 정보 수정을 위한 버튼을 보여준다. 이메일 값이 일치하지 않을 경우 회원정보가 보여 지지 않으며 로그인을 하지 않은 사용자가 이 탭에 방문할 때는 ‘로그인 후 이용해주세요.’라는 Text를 보여준다.
+~~~java
+public class FragmentInfo extends Fragment {
+    // 파이어베이스 사용자 객체 생성
+    private FirebaseUser user;
 
+    // 파이어베이스 인증 객체 생성
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
+    // 파이어스토어 인증 객체 생성
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    // 작성한 이메일 값과 비밀번호 값을 저장할 객체 생성
+    private TextView editTextEmail;
+    private TextView editTextPassword;
+
+    // 작성한 이름 값과 전화번호 값을 저장할 객체 생성
+    private TextView editTextName;
+    private TextView editTextPhone;
+
+    // 로그인이 되어있지 않을 경우 보여주는 텍스트뷰 객체 생성
+    private TextView tv_beforelogin;
+
+    // 수정 버튼 객체 생성
+    private ImageButton btn_modifypw;
+    private ImageButton btn_modifypn;
+    private ImageButton btn_modifyname;
+    // 새로고침 버튼 객체 생성
+    private ImageButton btn_refresh;
+
+    // 새로고침 버튼 클릭시 이메일 입력 다이얼로그가 재생성되는 것을 방지하기 위하여 count라는 변수 생성하여 0을 기본값으로 설정함
+    private int count=0;
+
+    public FragmentInfo() {
+    }
+
+    // 로그인 소식을 듣고 다음단계로 넘겨주는 역할인 firebaseAuthListener을 선언을 onStart에 넣어줌
+    @Override public void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(firebaseAuthListener);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // firebaseAuthListener
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // 현재 로그인 중인 사용자를 가져옴
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                // 로그인한 사용자가 있는 경우
+                if (user != null) {
+                    tv_beforelogin.setText("");
+                    // 기본값인 count=0일 경우 이메일 입력 다이얼로그를 보여주고 count값을 1로 바꿔줌
+                    if(count==0){
+                        showDialog();
+                        count =1;
+                    }
+                    else{
+                        // 다이얼로그 인증을 끝낸 후 새로고침을 했을 경우 다이얼로그 없이 바로 수정된 회원정보를 보여줌
+                        showInfo();
+                    }
+                }
+                // 로그인한 사용자가 없는 경우
+                else {
+                    tv_beforelogin.setText("로그인 후 이용해주세요.");
+                }
+            }
+        };
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //return super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_info, container, false);
+
+        // id가 write_email인 editText에 대한 메서드 저장
+        editTextEmail = view.findViewById(R.id.write_email);
+        // id가 signup_password인 editText에 대한 메서드 저장
+        editTextPassword = view.findViewById(R.id.signup_password);
+        // id가 write_name인 editText에 대한 메서드 저장
+        editTextName = view.findViewById(R.id.write_name);
+        // id가 write_phone인 editText에 대한 메서드 저장
+        editTextPhone = view.findViewById(R.id.write_phone);
+        // id가 tv_beforeLogin인 textview에 대한 메서드 저장
+        tv_beforelogin = view.findViewById(R.id.tv_beforelogin);
+
+        // id가 modifybutton인 버튼에 대한 메서드 저장
+        btn_modifypw = view.findViewById(R.id.modifybutton);
+        btn_modifypn = view.findViewById(R.id.modifybutton2);
+        btn_modifyname = view.findViewById(R.id.modifybutton3);
+
+        // id가 refreshButton인 버튼에 대한 메서드 저장
+        btn_refresh = view.findViewById(R.id.refreshButton);
+
+        // 이메일 일치여부가 성공하기 전에 회원 정보를 보여줄 editText를 모두 빈칸 처리해줌
+        editTextEmail.setText("");
+        editTextName.setText("");
+        editTextPhone.setText("");
+        editTextPassword.setText("");
+        tv_beforelogin.setText("로그인 후 이용해주세요.");
+
+        // 수정 이미지 버튼과 새로고침 버튼을 GONE하여 버튼과 그 공간까지 보이지 않게 처리
+        // 이메일 일치여부가 성공하여 수정할 수 있는 조건이 되면 VIDIBLE하여 보여줄 예정
+        btn_modifypw.setVisibility(View.GONE);
+        btn_modifypn.setVisibility(View.GONE);
+        btn_modifyname.setVisibility(View.GONE);
+        btn_refresh.setVisibility(View.GONE);
+
+        // 비밀번호 수정 이미지 버튼 클릭 시
+        btn_modifypw.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                // modifyDialog 호출
+                ModifyDialog modifyDialog = new ModifyDialog();
+                modifyDialog.show(requireActivity().getSupportFragmentManager(), "tag");
+            }
+        });
+
+        // 전화번호 수정 이미지 버튼 클릭 시
+        btn_modifypn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                // modifyPhoneDialog 호출
+                ModifyPhoneDialog modifyPhoneDialog = new ModifyPhoneDialog();
+                modifyPhoneDialog.show(requireActivity().getSupportFragmentManager(), "tag");
+            }
+        });
+
+        // 이름 수정 이미지 버튼 클릭 시
+        btn_modifyname.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                // modifyNameDialog 호출
+                ModifyNameDialog modifyNameDialog = new ModifyNameDialog();
+                modifyNameDialog.show(requireActivity().getSupportFragmentManager(), "tag");
+            }
+        });
+
+        // 새로고침 이미지 버튼 클릭 시
+        btn_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // refresh 메서드 실행
+                refresh();
+            }
+        });
+
+        return view;
+    }
+~~~
+##### 정보 수정 후 새로고침 버튼 클릭시 화면이 갱신되어 수정된 정보로 보여주는 refresh 메서드
+~~~java
+    // fragment 화면 갱신 메서드
+    private void refresh(){
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.detach(this).attach(this).commit();
+    }
+~~~
+##### 회원정보 열람 화면 호출할 이메일 입력 다이얼로그
+~~~java
+    private void showDialog(){
+        // 입력하는 이메일 값을 저장할 변수
+        final EditText edittext = new EditText(getActivity());
+        // 다이얼로그 호출
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog.setTitle("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
+                .setMessage("(구글 로그인 회원은 회원정보를 제공하지 않습니다.)")
+                .setView(edittext)  // 이메일을 입력하기 위한 edittext
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // 로그인 중인 사용자를 불러옴
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        // 다이얼로그에 입력한 이메일 값
+                        final String email = edittext.getText().toString();
+                        // 로그인 중인 사용자의 이메일 값을 checkmail이라는 string 변수값에 넣어줌
+                        assert user != null;
+                        String checkmail = user.getEmail();
+                        // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값 비교
+                        // 같을 때
+                        if(email.equals(checkmail)){
+                            Toast.makeText(getActivity(),"이메일 확인 성공", Toast.LENGTH_SHORT).show();
+                            // "확인" 버튼 클릭시 info 메서드 호출
+                            // 입력한 이메일 값을 파이어스토어의 이메일 값과 비교해야하기 때문에 info메서드에 email값을 넣어줌
+                            info(email);
+                        }
+                        // 입력한 값이 없이 '확인'버튼을 누를 경우
+                        else if(email.getBytes().length<1){
+                            Toast.makeText(getActivity(),"이메일을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                        }
+                        // 다이얼로그에 입력한 이메일 값과 로그인 중인 사용자의 이메일 값이 다를 때
+                        else{
+                            Toast.makeText(getActivity(),"이메일이 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
+~~~
+<img src="https://user-images.githubusercontent.com/62936197/86555561-af433c80-bf8b-11ea-942f-00ecb48f5b0c.png" width="50%">     
+##### 이메일 인증 다이얼로그로 인증이 완료된 후 새로고침을 했을 때 다이얼로그 없이 보여주기 위해 회원정보가 저장된 텍스트를 바로 띄워주기 위한 showInfo 메서드 
+~~~java
+    private void showInfo(){
+        // 현재 로그인이 되어있는 사용자를 가져옴
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // firestore의 collection 경로를  "users"로 설정
+        firebaseFirestore.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult())
+                            {
+                                assert user != null;
+                                // 로그인 중인 사용자의 이메일과 파이어베이스의 이메일이 같을 때
+                                if(user.getEmail().equals(document.getData().get("email"))) {
+                                    // editText에 파이어스토에 저장된 값을 setText해줌
+                                    editTextEmail.setText(document.getData().get("email").toString());
+                                    editTextName.setText(document.getData().get("name").toString());
+                                    editTextPhone.setText(document.getData().get("phone").toString());
+                                    editTextPassword.setText(document.getData().get("password").toString());
+                                    tv_beforelogin.setText("");
+                                    // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
+                                    btn_modifypw.setVisibility(View.VISIBLE);
+                                    btn_modifypn.setVisibility(View.VISIBLE);
+                                    btn_modifyname.setVisibility(View.VISIBLE);
+                                    btn_refresh.setVisibility(View.VISIBLE);
+
+                                }
+
+                            }
+                        }
+                    }
+                });
+    }
+~~~
+##### 회원정보를 보여줄 info 메서드 
+~~~java
+    private void info(final String string){
+        // firestore의 collection 경로를  "users"로 설정
+        firebaseFirestore.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // 파이어스토어에서 데이터를 가져오는 것을 성공했을 때
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult())
+                            {
+                                assert user != null;
+                                // 입력한 string값과 파이어베이스의 이메일 비교하여 같을 때 처리
+                                if(string.equals(document.getData().get("email"))) {
+                                    // editText에 파이어스토에 저장된 값을 setText해줌
+                                    editTextEmail.setText(document.getData().get("email").toString());
+                                    editTextName.setText(document.getData().get("name").toString());
+                                    editTextPhone.setText(document.getData().get("phone").toString());
+                                    editTextPassword.setText(document.getData().get("password").toString());
+                                    tv_beforelogin.setText("");
+                                    // 수정버튼과 새로고침 버튼 VISIBLE 처리하여 보여줌
+                                    btn_modifypw.setVisibility(View.VISIBLE);
+                                    btn_modifypn.setVisibility(View.VISIBLE);
+                                    btn_modifyname.setVisibility(View.VISIBLE);
+                                    btn_refresh.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+}
+~~~
+<img src="https://user-images.githubusercontent.com/62936197/86555628-dc8fea80-bf8b-11ea-93d5-ce0479983e5b.png" width="50%">     
+2) 회원정보는 Firestore에 저장된 이메일, 이름, 전화번호, 비밀번호를 보여주되, 이메일은 수정이 불가하며 그 외의 항목 옆에 있는 수정버튼 클릭 시 Dialog로 수정할 값을 입력할 수 있다. 수정할 값들 또한 회원가입 시와 동일하게 유효성 검사를 진행하고, 입력한 값들이 모두 유효하면 Firebase의 Auth와 Firestore에 변경한 값으로 데이터를 업데이트 해준다.
+##### 이름 수정 다이얼로그
+~~~java
+public class ModifyNameDialog extends DialogFragment {
+    private Fragment fragment;
+
+    // 파이어스토어에 저장된 "name"이라는 이름의 값을 pass_key라는 문자에 저장
+    private static final String pass_key = "name";
+
+    // 파이어스토어 인증 객체 생성
+    private FirebaseUser user;
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
+    private Button positivebutton;
+    private Button negativebutton;
+
+    // 다이얼로그에 입력하는 name 객체 생성
+    private EditText name;
+
+    // 새롭게 저장할 name 값 객체 생성
+    String newName ="";
+
+    public ModifyNameDialog(){
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.modify3_dialog, container, false);
+
+        // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
+        positivebutton = view.findViewById(R.id.positivebutton);
+        negativebutton = view.findViewById(R.id.negativebutton);
+
+        // 다이얼로그에 작성하는 name값 저장
+        name = view.findViewById(R.id.write_name);
+
+        // 취소 버튼 클릭시
+        negativebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 다이얼로그 사라짐
+                getDialog().dismiss();
+            }
+        });
+
+        // 확인 버튼 클릭시
+        positivebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 로그인 중인 사용자 가져오기기
+               final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // 로그인 상태일 경우
+                if(user != null) {
+                    // 다이얼로그에 작성한 name값을 string으로 처리하여 샤로운 name값인 newName에 저장
+                    newName = name.getText().toString();
+                    if (isValidName()) {
+                        // 파이어스토어 collection 경로를 "uesrs"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
+                        DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
+                        // 새로운 name값으로 업데이트
+                        contact.update(pass_key, newName)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        // 업데이트 성공시 다이얼로그 사라짐
+                                        getDialog().dismiss();
+                                    }
+                                });
+                    }
+                }
+            }
+
+        });
+        return view;
+    }
+    // 이름 유효성 검사
+    private boolean isValidName() {
+        if (newName.isEmpty()) {
+            // 이름 칸이 공백이면 false
+            Toast.makeText(getActivity(), R.string.plzinputname, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+~~~
+##### 비밀번호 수정 다이얼로그
+~~~java
+public class ModifyDialog extends DialogFragment {
+    private Fragment fragment;
+
+    // 비밀번호 정규식
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
+
+    // 파이어스토어에 저장된 "password"이라는 이름의 값을 pass_key라는 문자에 저장
+    private final String pass_key = "password";
+
+    // 파이어스토어 인증 객체 생성
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    // 다이얼로그에 입력하는 password 객체 생성
+    private EditText password;
+
+    // 새롭게 저장할 password 값 객체 생성
+    private String newPassword ="";
+
+    public ModifyDialog(){
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.modify_dialog, container, false);
+
+        // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
+        // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
+        Button positivebutton = view.findViewById(R.id.positivebutton);
+        Button negativebutton = view.findViewById(R.id.negativebutton);
+
+        // 다이얼로그에 작성하는 password값 저장
+        password = view.findViewById(R.id.signup_password);
+
+        // 취소 버튼 클릭시
+        negativebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 다이얼로그 사라짐
+                getDialog().dismiss();
+            }
+        });
+
+        //확인 버튼 클릭시
+        positivebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 로그인 중인 사용자 가져오기
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // 로그인 상태일 경우
+                if(user != null) {
+                    // 다이얼로그에 작성한 password값을 string으로 처리하여 새로운 password값인 newPassword에 저장
+                    newPassword = password.getText().toString();
+                    // 입력한 비밀번호의 유효성 검사
+                    if (isValidPasswd()) {
+                        // 로그인 중인 사용자의 password를 newPassword로 업데이트
+                        user.updatePassword(newPassword)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            // 업데이트에 성공하면 파이어스토어에 저장된 password도 업데이트
+                                            // 파이어스토어 collection의 경로를 "users"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
+                                            DocumentReference ref = firebaseFirestore.collection("users").document(user.getEmail());
+                                            // 새로운 password값으로 업데이트
+                                            ref.update(pass_key, newPassword)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            // 업데이트 성공시 다이얼로그 사라짐
+                                                            getDialog().dismiss();
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                });
+                    }
+                }
+            }
+        });
+        return view;
+    }
+
+    // 비밀번호 유효성 검사
+    private boolean isValidPasswd() {
+        if (newPassword.isEmpty()) {
+            // 비밀번호 칸이 공백이면 false
+            Toast.makeText(getActivity(),R.string.plzinpytpassword, Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            // 비밀번호 형식이 불일치하면 false
+            Toast.makeText(getActivity(), R.string.notvalidpassword, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+~~~
+##### 전화번호 수정 다이얼로그
+~~~java
+
+public class ModifyPhoneDialog extends DialogFragment {
+    private Fragment fragment;
+
+    // 파이어스토어에 저장된 "phone"이라는 이름의 값을 pass_key라는 문자에 저장
+    private static final String pass_key = "phone";
+
+    // 파이어스토어 인증 객체 생성
+    private FirebaseUser user;
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    // 전화번호 정규식
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", Pattern.CASE_INSENSITIVE);
+
+    // 다이얼로그의 확인 버튼과 취소 버튼 객체 생성
+    private Button positivebutton;
+    private Button negativebutton;
+
+    // 다이얼로그에 입력하는 phone 객체 생성
+    private EditText phone;
+
+    // 새롭게 저장할 phone 값 객체 생성
+    String newPhone ="";
+
+    public ModifyPhoneDialog(){
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @NonNull Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.modify2_dialog, container, false);
+
+        // 레이아웃에 postivebutton이라는 버튼 값과 negativebutton이라는 버튼 값 저장
+        positivebutton = view.findViewById(R.id.positivebutton);
+        negativebutton = view.findViewById(R.id.negativebutton);
+
+        // 다이얼로그에 작성하는 phone값 저장
+        phone = view.findViewById(R.id.write_phone);
+
+        // 취소 버튼 클릭시
+        negativebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 다이얼로그 사라짐
+                getDialog().dismiss();
+            }
+        });
+
+        // 확인 버튼 클릭시
+        positivebutton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // 로그인 중인 사용자 가져오기
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // 로그인 상태일 경우
+                if(user != null) {
+                    // 다이얼로그에 작성한 phone값을 string으로 처리하여 새로운 phone값인 newPhone에 저장
+                    newPhone = phone.getText().toString();
+                    // 전화번호 유효성 검사
+                    if (isValidPhone()) {
+                        // 파이어스토어 collection 경로를 "uesrs"로 하고 로그인 중인 유저의 email을 documentID로 하는 정보를 가져옴
+                        DocumentReference contact = firebaseFirestore.collection("users").document(user.getEmail());
+                        // 새로운 phone값으로 업데이트
+                        contact.update(pass_key, newPhone)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        // 업데이트 성공시 다이얼로그 사라짐
+                                        getDialog().dismiss();
+                                    }
+                                });
+                    }
+                }
+            }
+        });
+        return view;
+    }
+    // 전화번호 유효성 검사
+    private boolean isValidPhone() {
+        if (newPhone.isEmpty()) {
+            // 전화번호 칸이 공백이면 false
+            Toast.makeText(getActivity(), "변경할 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!PHONE_PATTERN.matcher(newPhone).matches()) {
+            // 전화번호 형식이 불일치하면 false
+            Toast.makeText(getActivity(), R.string.notvalidphone, Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
+    }
+    }
+~~~
+<img src="https://user-images.githubusercontent.com/62936197/86555739-2f69a200-bf8c-11ea-8c39-da34b681ac41.png" width="50%">     
