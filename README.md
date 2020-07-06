@@ -37,12 +37,12 @@
 ### 2-1 사용자 생성
 회원가입과 로그인 및 로그아웃을 위해 데이터를 저장해 놓을 Firebase가 필요하다.
 >#### 2-1-1 회원가입
-Firebase에 개발을 진행할 프로젝트를 등록한다. Google 로그인을 사용할 예정이므로 SHA-1 정보도 저장해준다. 
-이후 Firebase Android 구성 파일(google-services.json)을 다운로드하여 등록한 프로젝트에 추가한다.
+Firebase에 개발을 진행할 프로젝트를 등록한다. Google 로그인을 사용할 예정이므로 SHA-1 정보도 저장해준다.   
+이후 Firebase Android 구성 파일(google-services.json)을 다운로드하여 등록한 프로젝트에 추가한다.   
 앱에서 Firebase 제품을 사용할 수 있도록 google-services 플러그인을 Gradle 파일에 추가힌다.
 <pre>
 <code>
- dependencies {
+dependencies {
     classpath 'com.google.gms:google-services:4.2.0'  // Google Services plugin
   }
 }
