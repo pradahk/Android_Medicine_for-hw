@@ -385,34 +385,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 ~~~   
-4) 이메일 및 비밀번호 유효성 검사 메서드   
-~~~java
- // 이메일 유효성 검사
-    private boolean isValidEmail() {
-        if (email.isEmpty()) {
-            // 이메일 칸이 공백이면 false
-            return false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            // 이메일 형식이 불일치하면 false
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    // 비밀번호 유효성 검사
-    private boolean isValidPasswd() {
-        if (password.isEmpty()) {
-            // 비밀번호 칸이 공백이면 fasle
-            return false;
-        } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            // 비밀번호 형식이 불일치하면 false
-            return false;
-        } else {
-            return true;
-        }
-    }
-~~~   
 5) 로그인을 진행하지 않아도 어플을 사용할 수 있으나 게시판 이용 및 회원정보 열람은 로그인에 성공하지 못하면 이용할 수 없다.    
 >#### 2-1-4 아이디 찾기 및 비밀번호 재설정
 1) 사용자가 자신의 아이디를 잊었다면 회원가입 시 사용한 이름과 전화번호를 통해 사용자의 아이디를 찾을 수 있게 한다.   
@@ -520,6 +492,78 @@ public class FindIdActivity extends AppCompatActivity {
     }
 }
 ~~~
-4) 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다.   
-사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.   
 <img src="https://user-images.githubusercontent.com/62936197/86550165-a4cd7680-bf7c-11ea-9acf-818212ebd9d8.png" width="40%">   
+4) 비밀번호를 잊었을 경우 아이디로 사용하는 이메일을 입력하면 Firestore에 저장된 이메일 값과 비교 후, 일치하는 이메일 값이 있다면 해당하는 이메일로 비밀번호를 재설정할 수 있는 메일을 전송한다.
+~~~java
+public class FindpwActivity extends AppCompatActivity {
+    // 파이어베이스 인증 객체 생성
+    private FirebaseAuth firebaseAuth;
+
+    // 작성한 이메일 값을 저장할 객체 생성
+    private EditText editTextEmail;
+    private String sendemail = "";
+
+    // 사용자에게 실시간 진행상태를 알려주는 ProgressDialog 객체 생성
+    private ProgressDialog progressDialog;
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_findpw);
+
+        // 파이어베이스 인증 객체 선언
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        // id가 write_email인 editText에 대한 메서드 저장
+        editTextEmail = findViewById(R.id.write_email);
+
+        // progressDialog 객체 선언
+        progressDialog = new ProgressDialog(this);
+    }
+
+    public void findPw(View view)
+    {
+        // editText에 작성한 내용을 String으로 변환하여 객체에 저장
+        sendemail = editTextEmail.getText().toString();
+
+        // 이메일 유효성 검사 후 findpw 메서드 실행
+        if(isValidEmail()){
+            findpw(sendemail);
+        }
+    }
+
+    // 비밀번호를 찾기 위한 findpw 메서드
+    private void findpw(String sendemail) {
+        // 프로그래스 다이얼로그 생성하여 보여줌
+        progressDialog.setMessage("처리중입니다. 잠시 기다려 주세요...");
+        progressDialog.show();
+        //비밀번호 재설정 이메일 보내기
+        firebaseAuth.sendPasswordResetEmail(sendemail)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // 이메일이 정상적으로 전송됐으면 "이메일을 발송하였습니다." 토스트를 보여줌
+                            Toast.makeText(FindpwActivity.this, R.string.emailsending, Toast.LENGTH_LONG).show();
+                            // 버튼을 누르면 메인화면으로 이동
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                            // 이메일을 정상적으로 보낸 후 로그인 화면으로 이동
+                            //startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            // 이메일이 정상적으로 전송되지 않았다면 "이메일 발송에 실패하였습니다." 토스트를 보여줌
+                            Toast.makeText(FindpwActivity.this, R.string.emailfail, Toast.LENGTH_LONG).show();
+                        }
+                        // 프로그래스 다이얼로그 사라짐
+                        progressDialog.dismiss();
+                    }
+                });
+    }
+}
+~~~
+<img src="https://user-images.githubusercontent.com/62936197/86553133-d0ecf580-bf84-11ea-9ae4-599829bcb9cc.png" width="40%">  
+사용자는 해당 메일을 통해 비밀번호를 재설정할 수 있으며 이후 재설정한 비밀번호로 로그인을 진행한다.      
+<img src="https://user-images.githubusercontent.com/62936197/86552930-53c18080-bf84-11ea-8ad4-5673ab09e8b2.png" width="40%">   
+
