@@ -70,8 +70,7 @@ dependencies {
 </pre>
 >#### 2-1-2 회원가입
 아이디로 사용할 이메일, 이름, 전화번호, 비밀번호를 입력한 후 각각의 항목에 대한 빈칸유무, 정규식 등의 유효성 검사를 진행한 후 입력한 값들이 모두 유효하면 Firebase에 저장해준다.
-<pre>
-<code>
+~~~java
 public class MainActivity extends AppCompatActivity {
     // 비밀번호 정규식
     Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
@@ -88,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private String email = "";
     private String password = "";
 
-</code>
-</pre>   
+~~~  
 <img src="https://user-images.githubusercontent.com/62936197/86549436-98e0b500-bf7a-11ea-8e1a-2906bb63d0d6.png" width="40%">
 <img src="https://user-images.githubusercontent.com/62936197/86549227-fe807180-bf79-11ea-9fbf-706f51c8ced9.png" width="70%">   
 회원가입이 정상적으로 성공하면 입력한 이메일로 인증 메일이 전송되며, Dialog를 통해 이메일 인증이 필요함을 알려준다.   
