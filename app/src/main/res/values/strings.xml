@@ -7,6 +7,8 @@
     <string name="yse">예</string>
     <string name="no">아니오</string>
 
+    <string name="kakao_app_key">3d259e6f8692116e142ab9ac23448ebf</string>
+
     <string name="email">이메일</string>
     <string name="password">비밀번호</string>
     <string name="findpw">비밀번호 재설정</string>

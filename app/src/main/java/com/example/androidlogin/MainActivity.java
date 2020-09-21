@@ -1,7 +1,11 @@
 package com.example.androidlogin;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -27,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.security.MessageDigest;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
@@ -151,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     // 구글 로그인 메서드
