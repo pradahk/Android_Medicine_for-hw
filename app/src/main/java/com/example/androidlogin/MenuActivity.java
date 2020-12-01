@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -206,6 +207,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                         public void onClick(DialogInterface dialog, int which) {
                             // "예" 클릭시 로그아웃
                             FirebaseAuth.getInstance().signOut();
+                            LoginManager.getInstance().logOut();
                             Toast.makeText(getApplicationContext(),R.string.logoutsuccess, Toast.LENGTH_SHORT).show();
                         }
                     });

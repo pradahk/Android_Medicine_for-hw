@@ -143,6 +143,7 @@
     <string name="markedit">"대소문자를 구분하여 입력하여 주세요!"</string>
     <!--초기화 버튼-->
     <string name="buttonResearch">검색 초기화</string>
+    <string name="facebook_app_id">2761712704064422</string>
 
 
 

@@ -53,8 +53,9 @@ public class ReviewMainActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        finish();
+
         super.onBackPressed();
+
     }
 
     @Override

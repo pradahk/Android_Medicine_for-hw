@@ -13,54 +13,89 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import java.util.Set;
 
 public class AlarmReceiver extends BroadcastReceiver {
+    private static final String TAG="AlarmReceiver";
+    private Context contexts;
     String notificationid;
-    AlarmManager alarmManager;
-    AlarmInfo alarmInfo2;
     Intent mainIntent;
-    Context contexts;
-    String cancelId;
-    String str;
-    int i = 0;
+    String text;
+    private int action;
+    public NotificationManager notificationManager;
+    public PendingIntent contentIntent;
 
-
-    //받아서 푸쉬알림 해주는 부분.
     @Override
     public void onReceive(Context context, Intent intent) {
+     /*   this.intent = intent;
+
+        String text = intent.getStringExtra("drug");
+        int notificationId = intent.getIntExtra("id",0);
+        Intent activityIntent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,activityIntent, 0);
+
+        String channelId = "chaanel_id";
+        String channelname = "약쏙";
+        String description = "약 복용시간에 알림합니다. ";
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(channelId, channelname, NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(description);
+            notificationManager.createNotificationChannel(channel);
+        }
+        Notification notification = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_drug_icon)
+                .setContentText("약쏙")
+                .setContentText(text+"을(를) 복용할시간이에요:)")
+                .setPriority(Notification.VISIBILITY_PRIVATE)
+                .setContentIntent(pendingIntent)
+                .setContentInfo("INFO")
+                .setDefaults(Notification.DEFAULT_VIBRATE)
+                .setWhen(System.currentTimeMillis())
+                .build();
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag");
+        wakeLock.acquire(5000);
+        notificationManager.notify(notificationId, notification);*/
         this.contexts = context;
         notificationid = intent.getStringExtra("id");
-        String text = intent.getStringExtra("drug");
-        str = notificationid.toString();
+        text = intent.getStringExtra("drug");
 
+        Log.e("약번호 넘어오자...", notificationid);
+        Log.e("약이름 넘어오자...", text);
 
-        Log.e("약번호 넘어오자...", String.valueOf(notificationid));
-        Log.e("약이름 넘어오자...",text);
 
 
         //푸쉬알람 해주는 부분
-        mainIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, Integer.parseInt(notificationid),mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mainIntent = new Intent(context, SetAlarm.class);
+        mainIntent.putExtra("cancelId",notificationid);
+        Log.e("mainactivity에 보내는 ID값: ", notificationid);
+        contentIntent = PendingIntent.getActivity(context, Integer.parseInt(notificationid), mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "drugId");
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "201821079");
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
 
-            Toast.makeText(context, "누가버전", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "누가버전", Toast.LENGTH_SHORT).show();
             builder.setSmallIcon(R.drawable.ic_drug_icon);
 
             builder.setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())
                     .setContentTitle("약쏙")
                     .setContentText(text + "을(를) 복용할시간에요:)")
-                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setPriority(Notification.PRIORITY_MAX)
                     .setContentIntent(contentIntent)
                     .setContentInfo("INFO")
                     .setDefaults(Notification.DEFAULT_VIBRATE);
-
 
             if (notificationManager != null) {
 
@@ -81,14 +116,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             builder.setSmallIcon(R.drawable.ic_drug_icon);
 
-            String channelId = "drug";
-            String chaanelName = "약쏙";
+            String channelId = "201821079";
+            String chanelName = "YAKSSOK";
             String description = "매일 정해진 시간에 알림합니다. ";
             int importance = NotificationManager.IMPORTANCE_HIGH;
 
-            NotificationChannel channel = new NotificationChannel(channelId, chaanelName, importance);
+            NotificationChannel channel = new NotificationChannel(channelId, chanelName, importance);
             channel.setDescription(description);
 
+            assert notificationManager != null;
             if (notificationManager.getNotificationChannel(channelId) == null) {
                 notificationManager.createNotificationChannel(channel);
             }
@@ -99,7 +135,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     .setWhen(System.currentTimeMillis())
                     .setContentTitle("약쏙")
                     .setContentText(text + "을(를) 복용할시간에요:)")
-                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setContentIntent(contentIntent)
                     .setContentInfo("INFO")
                     .setDefaults(Notification.DEFAULT_VIBRATE);
@@ -107,15 +143,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             //if(notificationManager !=null){
 
-
             PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag"
             );
             wakeLock.acquire(5000);
             notificationManager.notify(Integer.parseInt(notificationid), builder.build());
 
-            //}
-
         }
+
     }
+
 }

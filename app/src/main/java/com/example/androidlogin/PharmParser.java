@@ -19,6 +19,11 @@ public class PharmParser {
     XmlPullParser xpp;
     String key = "gyhnkvw8BuHNtPGQzXT5Nluh3Ri3hGlcpEnheMdjI1gjDbZhPSEpy05ofIMaFu2a96c%2FUX%2FzOVblYrTa%2B%2Fu%2Bjg%3D%3D"; //약국 공공데이터 서비스키
 
+
+    String pharmname;
+    String pharmadd;
+    String pharmtel;
+
     public String getXmlData() {
         StringBuffer buffer = new StringBuffer();
 
@@ -45,7 +50,9 @@ public class PharmParser {
 
             xpp.next();
             int eventType = xpp.getEventType();
-
+            pharmname="";
+            pharmadd="";
+            pharmtel="";
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {
                     case XmlPullParser.START_DOCUMENT:
@@ -56,22 +63,18 @@ public class PharmParser {
                         tag = xpp.getName();//테그 이름 얻어오기
 
                         if (tag.equals("item")) ;// 첫번째 태그값이랑 비교
-
                         else if (tag.equals("addr")) {
-                            buffer.append("주소 : ");
                             xpp.next();
-                            buffer.append(xpp.getText());//title 요소의 TEXT 읽어오기
-                            buffer.append("\n"); //줄바꿈
+                            pharmadd = xpp.getText();
                         } else if (tag.equals("yadmNm")) {
-                            buffer.append("약국명 :");
-                            xpp.next();
-                            buffer.append(xpp.getText());
                             buffer.append("\n");
+                            xpp.next();
+                            pharmname = xpp.getText();
+                            buffer.append("약국명 : " + pharmname +"\n" + "주소 : " + pharmadd + "\n" + "전화번호 : " + pharmtel);
+                            buffer.append("\n"+"_______________________________________________");
                         } else if (tag.equals("telno")) {
-                            buffer.append("전화번호 :");
                             xpp.next();
-                            buffer.append(xpp.getText());
-                            buffer.append("\n");
+                            pharmtel = xpp.getText();
                         }
                         break;
 
@@ -80,7 +83,6 @@ public class PharmParser {
 
                     case XmlPullParser.END_TAG:
                         tag = xpp.getName(); //테그 이름 얻어오기
-
                         if (tag.equals("item"))
                             buffer.append("\n");// 첫번째 검색결과종료 후 줄바꿈
                         break;

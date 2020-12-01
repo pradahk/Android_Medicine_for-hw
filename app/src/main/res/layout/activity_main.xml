@@ -164,10 +164,17 @@
     <com.google.android.gms.common.SignInButton
         android:id="@+id/signInButton"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="550dp">
     </com.google.android.gms.common.SignInButton>
 
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebook_login_button"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="610dp" />
 
 </RelativeLayout>

@@ -34,22 +34,10 @@ public class AlarmInfo implements Serializable {
         //this.notificationId = notificationId;
     }
 
-   public Map<String, Object> getAlarmInfo(){
-        Map<String, Object> mData = new HashMap<>();
-       // mData.put("times",times);
-        mData.put("drugtext",drugText);
-        mData.put("ampm",ampm);
-        mData.put("hour",hour);
-        mData.put("minute",minute);
-        mData.put("times",hour+minute);
-        //mData.put("documentID", documentId);
-        //mData.put("notificationId",id);
-        return mData;
-    }
 
-   public String getHour() {
-       return hour;
-   }
+    public String getHour() {
+        return hour;
+    }
 
     public void setHour(String hour) {
         this.hour = hour;

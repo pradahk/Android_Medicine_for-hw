@@ -13,6 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.test.espresso.remote.EspressoRemoteMessage;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -23,10 +29,12 @@ import com.google.android.gms.tasks.OnCompleteListener;;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
     // 구글 로그인 객체 생성
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
+
+    // 페이스북 로그인 객체 생성
+    private LoginButton btn_facebook_login;
+    private CallbackManager mCallbackManager;
 
     @Override
     public void onBackPressed() {
@@ -78,6 +90,27 @@ public class MainActivity extends AppCompatActivity {
         Button findpw_btn = findViewById(R.id.btn_findpw);
         // 이메일 찾기 버튼 객체 생성
         Button findid_btn = findViewById(R.id.btn_findid);
+
+        // 페이스북 로그인 버튼 생성
+        mCallbackManager = CallbackManager.Factory.create();
+
+        btn_facebook_login = (LoginButton) findViewById(R.id.facebook_login_button);
+        btn_facebook_login.setReadPermissions(Arrays.asList("public_profile", "email"));
+        btn_facebook_login.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.e("페이스북 로그인", "facebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+            @Override
+            public void onCancel() {
+                Log.e("페이스북 로그인", "facebook:onCancel");
+            }
+            @Override
+            public void onError(FacebookException error) {
+                Log.d("페이스북 로그인", "facebook:onError", error);
+            }
+        });
 
         // 구글 로그인 버튼 객체 생성
         SignInButton signInButton = findViewById(R.id.signInButton);
@@ -151,7 +184,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     // 구글 로그인 메서드
@@ -160,8 +192,10 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
         Log.e("구글 로그인","메서드 실행");
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("구글 로그인","result 메서드");
         // RC_SIGN_IN을 통해 로그인 확인여부 코드가 저상 전달되었다면
@@ -206,6 +240,30 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    // 파이어베이스와 페이스북 로그인 연결
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.e("페이스북 로그인", "handleFacebookAccessToken:" + token);
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                           // 로그인 성공시
+                            Toast.makeText(MainActivity.this, R.string.success_login, Toast.LENGTH_SHORT).show();
+                            Log.e("페이스북 로그인", "signInWithCredential:success");
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // 로그인에 실패하면 "로그인 실패" 토스트를 보여줌
+                            Toast.makeText(MainActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
     // 이메일 로그인 메서드
     public void signInemail(View view) {
 

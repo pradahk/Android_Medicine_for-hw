@@ -4,25 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+  >
 
-    <TextView
-        android:id="@+id/alarmView"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:text="ALARM"
-        android:textSize="60sp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <ListView
+        android:id="@+id/alarmlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="100dp">
+        android:gravity="center" />
 
-
-    </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -34,6 +24,6 @@
         android:layout_marginBottom="10dp"
         android:clickable="true"
         android:src="@drawable/ic_add_black_24dp"
-        android:backgroundTint="#A8A8A8"/>
+        app:backgroundTint="#A8A8A8"/>
 
 </RelativeLayout>

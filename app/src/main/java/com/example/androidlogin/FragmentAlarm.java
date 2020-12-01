@@ -1,171 +1,224 @@
 package com.example.androidlogin;
 
-import android.app.Activity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-
-import listener.OnAlarmListener;
-
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.AdapterView;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.w3c.dom.Text;
+
 import androidx.fragment.app.Fragment;
 
+import static android.app.Activity.RESULT_OK;
+
 public class FragmentAlarm extends Fragment {
+    private static final String TAG="FragmentAlarm";
 
-    private static final String TAG = "FragmentAlarm";
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private MyAdapter myAdapter;
-    private FirebaseFirestore firebaseFirestore;
-    private ArrayList<AlarmInfo> alarmList;
-    private EditText editText;
-    private TimePicker timePicker;
-    private int hour,minute;
-    private AlarmManager alarmManager;
-    String id;
+    private SQLiteDatabase database;
+    private AlarmDbHelper dbHelper;
+    public static final int REQUEST_CODE =1000;
+    private AlarmAdapter mAdapter;
+    public String cancelId;
+    SetAlarm setAlarm = new SetAlarm();
+    AlarmReceiver alarmReceiver = new AlarmReceiver();
 
-    public FragmentAlarm(){
-    }
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.fragment_alarm);
+
+        /*
+        FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(FragmentAlarm.this, SetAlarm.class),
+                        REQUEST_CODE);
+            }
+        });
+
+
+
+        final ListView listView = findViewById(R.id.alarmView);
+
+        final Cursor cursor = getAlarmCursor();
+        mAdapter = new AlarmAdapter(this,cursor);
+        listView.setAdapter(mAdapter);
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
+                final long deleted = id;
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(FragmentAlarm.this);
+                builder.setTitle("Alarm delete");
+                builder.setMessage("알림을 삭제 하시겠습니까?");
+                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SQLiteDatabase db = AlarmDbHelper.getInstance(FragmentAlarm.this).getWritableDatabase();
+                        int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
+                                Databases.CreateDB._ID + "=" + deleted, null);
+
+                        if(deletedCount ==0){
+                            Toast.makeText(FragmentAlarm.this, "알림삭제 오류", Toast.LENGTH_SHORT).show();
+
+                        }else{
+                            mAdapter.swapCursor(getAlarmCursor());
+                            Toast.makeText(FragmentAlarm.this,"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
+                            //setAlarm.cancelAlarm(getApplicationContext(),);
+                            //Log.e("alarmtime 확인: ", cursor.getString(5));
+                            //alarmReceiver.notificationManager.cancel(Integer.parseInt(cursor.getString(cursor.getPosition())));
+                            //Log.e("alarmtime 확인: ", cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME)));
+                            //setAlarm.cancelAlarm(getApplicationContext(), Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME))));
+
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("취소",null);
+                builder.show();
+
+                return true;
+
+            }
+        });
+        //listView.deferNotifyDataSetChanged();
+         */
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_alarm,container,false);
-        editText = (EditText)view.findViewById(R.id.editText);
-        timePicker = (TimePicker)view.findViewById(R.id.timepicker);
-        recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-        view.findViewById(R.id.floatingActionButton).setOnClickListener(onClickListener);
-        alarmUpdate();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.alarm_activity_main, container, false);
+
+        FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(getActivity(), SetAlarm.class),
+                        REQUEST_CODE);
+            }
+        });
+
+
+
+        final ListView listView =  (ListView) view.findViewById(R.id.alarmlist);
+
+        final Cursor cursor = getAlarmCursor();
+        mAdapter = new AlarmAdapter(getContext(),cursor);
+        listView.setAdapter(mAdapter);
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
+                final long deleted = id;
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Alarm delete");
+                builder.setMessage("알림을 삭제 하시겠습니까?");
+                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SQLiteDatabase db = AlarmDbHelper.getInstance(getActivity()).getWritableDatabase();
+                        int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
+                                Databases.CreateDB._ID + "=" + deleted, null);
+
+                        if(deletedCount ==0){
+                            Toast.makeText(getActivity(), "알림삭제 오류", Toast.LENGTH_SHORT).show();
+
+                        }else{
+                            mAdapter.swapCursor(getAlarmCursor());
+                            Toast.makeText(getActivity(),"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("취소",null);
+                builder.show();
+
+                return true;
+
+            }
+        });
+
         return view;
     }
 
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            myStartActivity(SettingAlarm.class);
-        }
-    };
 
-    //DB에 저장된 게시물 보여주는 코드. 배열로 해서 apater로 넘겨줌.
-    private void alarmUpdate(){
-        firebaseFirestore.collection("AlarmDemo").orderBy("hour", Query.Direction.ASCENDING).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()){
-                            alarmList = new ArrayList<>();
-                            alarmList.clear();
-                            for(QueryDocumentSnapshot document : task.getResult()){
-                                alarmList.add(new AlarmInfo(
-                                        document.getData().get("hour").toString(),
-                                        document.getData().get("minute").toString(),
-                                        document.getData().get("drugtext").toString(),
-                                        document.getData().get("ampm").toString(),
-                                        document.getId()
-                                ));
-                            }
-                            myAdapter = new MyAdapter(getActivity(), alarmList);
-                            myAdapter.setOnAlarmListener(onAlarmListener);
-                            recyclerView.setAdapter(myAdapter);
-                            myAdapter.notifyDataSetChanged();
-                        }else {
-                            Log.d(TAG, "Error : ",task.getException());
-                        }
-                    }
-                });
-    }
 
-    OnAlarmListener onAlarmListener = new OnAlarmListener() {//인터페이스인 OnPostListener를 가져와서 구현해줌
-        @Override
-        public void onDelete(final int position) {//MainAdapter에 넘겨주기 위한 메서드 작성
-
-            id = alarmList.get(position).getId();//document의 id에 맞게 지워주기 위해 id값을 얻어옴
-            firebaseFirestore.collection("AlarmDemo").document(id).delete()//그 id에 맞는 값들을 지워줌
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {//성공시
-                            alarmUpdate();
-
-                            Intent intent = new Intent(getActivity(), AlarmReceiver.class);
-                            // intent.putExtra("cancelId", alarmList.get(position).getHour()+alarmList.get(position).getMinute());
-                            //cancelId = intent.getStringExtra("cancelId");
-                            //if (cancelId != null){
-                            Log.e("cancel : ","cancel");
-                            //alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-                            // Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-                            PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(),
-                                    Integer.parseInt(alarmList.get(position).getHour()+alarmList.get(position).getMinute()),intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            alarmManager.cancel(pIntent);
-                            pIntent.cancel();
-                            Toast.makeText(getActivity(), "알림이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                            Log.e("ERROR : ","ERROR");
-
-                            Log.e("DB삭제 성공 : ","성공");
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener(){
-                @Override
-                public void onFailure(@NonNull Exception e) {//실패시
-                    startToast("게시글 삭제에 실패하였습니다.");
-                }
-            });
-        }
-        @Override
-        public void onModify(int position) {//여기서 수정하면 writepostActivity를 켜서 수정해주는코드
-            // myStartActivity(SettingAlarm.class,alarmList.get(position));
-            Intent intent = new Intent(getActivity(), SettingAlarm.class);
-            //intent.putExtra("drug",firedrugtext);
-            intent.putExtra("modifyId", alarmList.get(position).getHour()+alarmList.get(position).getMinute());
-            intent.putExtra("alarmInfo",alarmList.get(position));
-            startActivity(intent);
-        }
-    };
-    private void myStartActivity(Class c) {//게시물을 추가하는 경우 WritePostActivity 화면으로 넘겨주는 코드
-        Intent intent = new Intent(getActivity(), c);
-        startActivityForResult(intent, 1);
+    private Cursor getAlarmCursor(){
+        dbHelper = AlarmDbHelper.getInstance(getContext());
+        return dbHelper.getReadableDatabase()
+                .query(Databases.CreateDB.TABLE_NAME, null,null,null,null,null,null);
 
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            mAdapter.swapCursor(getAlarmCursor());
+        }
+    }
 
-    private void startToast(String msg){//toast를 띄워주는 메서드를 함수로 정의함
-        Toast.makeText(getActivity(),msg, Toast.LENGTH_SHORT).show();
+    private static class AlarmAdapter extends CursorAdapter{
+
+        public AlarmAdapter(Context context, Cursor c) {
+            super(context, c,false);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context)
+                    .inflate(R.layout.item_alarm, parent, false);
+
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView ampmtext = view.findViewById(R.id.ampmText);
+            ampmtext.setText(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.AMPM)));
+
+            TextView hourtext = view.findViewById(R.id.hourText);
+            hourtext.setText(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.HOUR)));
+
+            TextView colon = view.findViewById(R.id.colonText);
+            colon.setText(":");
+
+            TextView minutetext = view.findViewById(R.id.minuteText);
+            minutetext.setText(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.MINUTE)));
+
+            TextView drug = view.findViewById(R.id.drug_text);
+            drug.setText(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.DRUGTEXT)));
+
+        }
     }
 
 }
