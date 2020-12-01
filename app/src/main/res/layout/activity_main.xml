@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/main_header_selector"
+    android:background="#87ceeb"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -26,7 +26,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
         android:text= "@string/title"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="30sp" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_marginTop="200dp"
         android:layout_marginRight="50dp"
         android:text="@string/email"
-        android:textColor="#FFFFFF" />
+        android:textColor="#000000" />
 
     <EditText
         android:id="@+id/et_eamil"
@@ -59,7 +59,7 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:text="@string/password"
-        android:textColor="#FFFFFF" />
+        android:textColor="#000000" />
 
     <EditText
         android:id="@+id/et_password"
