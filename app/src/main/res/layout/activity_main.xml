@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#87ceeb"
+    android:background="#70B4F4"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
-        android:text= "@string/title"
+        android:text= "약   꾹"
         android:textColor="#000000"
         android:textSize="30sp" />
 
@@ -114,6 +114,7 @@
             android:layout_weight="1"
             android:background="#00ffffff"
             android:text="@string/makeuser"
+            android:textStyle="bold"
             android:textAllCaps="false"
             android:textColor="#2A49F3"
             android:textColorHint="#5A7CAA"

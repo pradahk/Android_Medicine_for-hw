@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,10 +36,13 @@ public class FragmentMainMenu extends Fragment {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     // ImageButton 객체 생성
+    private ImageButton btn_rotate;
     private ImageButton btn_image;
     private ImageButton btn_map;
     private ImageButton btn_review;
     private ImageButton btn_shape;
+    private ImageButton btn_recom;
+
 
     public FragmentMainMenu(){
     }
@@ -55,12 +61,16 @@ public class FragmentMainMenu extends Fragment {
         // fragment_menu 화면을 inflate해서 보여줌
         View view = inflater.inflate(R.layout.fragment_menu,container,false);
 
+        btn_rotate = view.findViewById(R.id.btn_roate);
+        Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_anim);
+        btn_rotate.setAnimation(animation);
+
         // 이미지 버튼의 각 아이디 값에 맞는 버튼 저장
         btn_image = view.findViewById(R.id.ImageButton);
         btn_map = view.findViewById(R.id.mapButton);
         btn_review = view.findViewById(R.id.reviewButton);
         btn_shape = view.findViewById(R.id.shapeButton);
-
+        btn_recom = view.findViewById(R.id.btn_recom);
         // 이름으로 검색하기 위한 이미지 버튼 클릭시
         btn_image.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -101,6 +111,15 @@ public class FragmentMainMenu extends Fragment {
                 startActivity(intent);
             }
             });
+
+        btn_recom.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // FormMainActivity로 화면 전환
+                Intent intent = new Intent(getActivity(), RecomMainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }
