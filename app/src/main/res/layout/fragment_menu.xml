@@ -12,16 +12,18 @@
         android:orientation="vertical">
 
         <ImageButton
-            android:id="@+id/btn_roate"
+            android:id="@+id/btn_rotate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:src="@drawable/ic_search_black_24dp"
-            android:background="#00ffffff"/>
+            android:background="#00ffffff"
+            android:gravity="center"
+            android:src="@drawable/doctor24" />
         <TextView
             android:id="@+id/textView9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="약 꾹"
             android:textColor="#ffffff"
@@ -32,7 +34,6 @@
             android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:gravity="center"
             android:textColor="#ffffff"
             android:textSize="18sp"

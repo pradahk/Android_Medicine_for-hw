@@ -61,7 +61,7 @@ public class FragmentMainMenu extends Fragment {
         // fragment_menu 화면을 inflate해서 보여줌
         View view = inflater.inflate(R.layout.fragment_menu,container,false);
 
-        btn_rotate = view.findViewById(R.id.btn_roate);
+        btn_rotate = view.findViewById(R.id.btn_rotate);
         Animation animation = AnimationUtils.loadAnimation(getActivity(),R.anim.rotate_anim);
         btn_rotate.setAnimation(animation);
 
@@ -71,6 +71,7 @@ public class FragmentMainMenu extends Fragment {
         btn_review = view.findViewById(R.id.reviewButton);
         btn_shape = view.findViewById(R.id.shapeButton);
         btn_recom = view.findViewById(R.id.btn_recom);
+
         // 이름으로 검색하기 위한 이미지 버튼 클릭시
         btn_image.setOnClickListener(new View.OnClickListener(){
             @Override
