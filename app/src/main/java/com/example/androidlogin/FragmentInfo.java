@@ -317,4 +317,3 @@ public class FragmentInfo extends Fragment {
     }
 
 }
-

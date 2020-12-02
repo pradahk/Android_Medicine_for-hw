@@ -15,7 +15,7 @@
             android:id="@+id/gohome"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_home_black_24dp"
+            app:srcCompat="@drawable/ic_home_black_24dp"
             android:background="#00ffffff"/>
     </LinearLayout>
 
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="70dp"
         android:text= "약   꾹"
         android:textColor="#000000"
         android:textSize="30sp" />
@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="150dp"
         android:layout_marginRight="50dp"
         android:text="@string/email"
         android:textColor="#000000" />
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="350dp"
+        android:layout_marginTop="300dp"
         android:orientation="vertical">
 
         <Button
@@ -101,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="430dp"
+            android:layout_marginTop="380dp"
             android:layout_weight="1"
             android:gravity="center"
             android:padding="30dp"
@@ -131,7 +131,7 @@
             android:id="@+id/btn_findid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="400dp"
+            android:layout_marginTop="350dp"
             android:layout_marginLeft="30dp"
             android:layout_weight="1"
             android:background="#00FFFFFF"
@@ -142,7 +142,7 @@
             android:id="@+id/btn_findpw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="400dp"
+            android:layout_marginTop="350dp"
             android:layout_marginRight="30dp"
             android:layout_weight="1"
             android:background="#00FFFFFF"
@@ -150,32 +150,40 @@
             android:layout_centerHorizontal="true"/>
 
     </LinearLayout>
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="450dp"
+    android:orientation="horizontal">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="485dp"
-        android:layout_weight="1"
         android:gravity="center"
         android:padding="30dp"
-        android:text="@string/dlogin"
-        android:layout_centerHorizontal="true" />
+        android:text="@string/dlogin" />
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="510dp"
+        android:orientation="vertical">
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/signInButton"
         android:layout_width="300dp"
         android:layout_height="40dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="550dp">
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal">
     </com.google.android.gms.common.SignInButton>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/facebook_login_button"
-        android:layout_width="300dp"
+        android:layout_width="290dp"
         android:layout_height="40dp"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="610dp" />
-
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 </RelativeLayout>

@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.internal.ICancelToken;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.w3c.dom.Text;
@@ -37,10 +38,12 @@ public class FragmentAlarm extends Fragment {
 
     private SQLiteDatabase database;
     private AlarmDbHelper dbHelper;
+    public Databases databases;
     public static final int REQUEST_CODE =1000;
     private AlarmAdapter mAdapter;
     public String cancelId;
     SetAlarm setAlarm = new SetAlarm();
+    public int ampmhour;
     AlarmReceiver alarmReceiver = new AlarmReceiver();
 
 
@@ -48,131 +51,8 @@ public class FragmentAlarm extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.fragment_alarm);
 
-        /*
-        FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(FragmentAlarm.this, SetAlarm.class),
-                        REQUEST_CODE);
-            }
-        });
-
-
-
-        final ListView listView = findViewById(R.id.alarmView);
-
-        final Cursor cursor = getAlarmCursor();
-        mAdapter = new AlarmAdapter(this,cursor);
-        listView.setAdapter(mAdapter);
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
-                final long deleted = id;
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(FragmentAlarm.this);
-                builder.setTitle("Alarm delete");
-                builder.setMessage("알림을 삭제 하시겠습니까?");
-                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SQLiteDatabase db = AlarmDbHelper.getInstance(FragmentAlarm.this).getWritableDatabase();
-                        int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
-                                Databases.CreateDB._ID + "=" + deleted, null);
-
-                        if(deletedCount ==0){
-                            Toast.makeText(FragmentAlarm.this, "알림삭제 오류", Toast.LENGTH_SHORT).show();
-
-                        }else{
-                            mAdapter.swapCursor(getAlarmCursor());
-                            Toast.makeText(FragmentAlarm.this,"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
-                            //setAlarm.cancelAlarm(getApplicationContext(),);
-                            //Log.e("alarmtime 확인: ", cursor.getString(5));
-                            //alarmReceiver.notificationManager.cancel(Integer.parseInt(cursor.getString(cursor.getPosition())));
-                            //Log.e("alarmtime 확인: ", cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME)));
-                            //setAlarm.cancelAlarm(getApplicationContext(), Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME))));
-
-                        }
-
-                    }
-                });
-                builder.setNegativeButton("취소",null);
-                builder.show();
-
-                return true;
-
-            }
-        });
-        //listView.deferNotifyDataSetChanged();
-         */
     }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.alarm_activity_main, container, false);
-
-        FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingActionButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(getActivity(), SetAlarm.class),
-                        REQUEST_CODE);
-            }
-        });
-
-
-
-        final ListView listView =  (ListView) view.findViewById(R.id.alarmlist);
-
-        final Cursor cursor = getAlarmCursor();
-        mAdapter = new AlarmAdapter(getContext(),cursor);
-        listView.setAdapter(mAdapter);
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, long id) {
-                final long deleted = id;
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Alarm delete");
-                builder.setMessage("알림을 삭제 하시겠습니까?");
-                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SQLiteDatabase db = AlarmDbHelper.getInstance(getActivity()).getWritableDatabase();
-                        int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
-                                Databases.CreateDB._ID + "=" + deleted, null);
-
-                        if(deletedCount ==0){
-                            Toast.makeText(getActivity(), "알림삭제 오류", Toast.LENGTH_SHORT).show();
-
-                        }else{
-                            mAdapter.swapCursor(getAlarmCursor());
-                            Toast.makeText(getActivity(),"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
-
-                        }
-
-                    }
-                });
-                builder.setNegativeButton("취소",null);
-                builder.show();
-
-                return true;
-
-            }
-        });
-
-        return view;
-    }
-
-
 
     private Cursor getAlarmCursor(){
         dbHelper = AlarmDbHelper.getInstance(getContext());
@@ -187,11 +67,11 @@ public class FragmentAlarm extends Fragment {
             mAdapter.swapCursor(getAlarmCursor());
         }
     }
+    private class AlarmAdapter extends CursorAdapter {
 
-    private static class AlarmAdapter extends CursorAdapter{
 
         public AlarmAdapter(Context context, Cursor c) {
-            super(context, c,false);
+            super(context, c, false);
         }
 
         @Override
@@ -218,7 +98,112 @@ public class FragmentAlarm extends Fragment {
             TextView drug = view.findViewById(R.id.drug_text);
             drug.setText(cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.DRUGTEXT)));
 
+            //cancelId = cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME));
+            //Log.e("cancelId확인: ", cancelId);
+
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.alarm_activity_main, container, false);
+
+        FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(getActivity(), SetAlarm.class),
+                        REQUEST_CODE);
+            }
+        });
+
+
+
+        final ListView listView =  (ListView) view.findViewById(R.id.alarmlist);
+
+        final Cursor cursor = getAlarmCursor();
+        mAdapter = new AlarmAdapter(getContext(),cursor);
+        listView.setAdapter(mAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final long deleted = id;
+
+                SQLiteDatabase db = AlarmDbHelper.getInstance(getActivity()).getWritableDatabase();
+                int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
+                        Databases.CreateDB._ID + "=" + deleted, null);
+
+
+                if(deletedCount ==0){
+                    //Toast.makeText(getActivity(), "알림삭제 오류", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    mAdapter.swapCursor(getAlarmCursor());
+                    //Toast.makeText(getActivity(),"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
+                    Log.d("클릭한 알람 ID:", String.valueOf(id));
+                    cancelId = cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME));
+                    Log.e("cancelId확인: ", cancelId);
+                    Intent intent = new Intent(getContext(),AlarmReceiver.class);
+                    PendingIntent cancelP = PendingIntent.getBroadcast(getContext(), Integer.parseInt(cancelId),intent,0);
+                    cancelP.cancel();
+
+                    Intent intent1 = new Intent(getContext(), ModifyAlarm.class);
+                    intent1.putExtra("AMPM",cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.AMPM)));
+                    intent1.putExtra("HOUR",cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.HOUR)));
+                    intent1.putExtra("MINUTE",cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.MINUTE)));
+                    intent1.putExtra("DRUG",cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.DRUGTEXT)));
+                    getActivity().startActivity(intent1);
+                }
+
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, final int position, final long id) {
+                final long deleted = id;
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Alarm delete");
+                builder.setMessage("알림을 삭제 하시겠습니까?");
+                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SQLiteDatabase db = AlarmDbHelper.getInstance(getActivity()).getWritableDatabase();
+                        int deletedCount = db.delete(Databases.CreateDB.TABLE_NAME,
+                                Databases.CreateDB._ID + "=" + deleted, null);
+
+                        cancelId = cursor.getString(cursor.getColumnIndexOrThrow(Databases.CreateDB.ALARMTIME));
+                        Log.e("cancelId확인: ", cancelId);
+
+                        if(deletedCount ==0){
+                            Toast.makeText(getActivity(), "알림삭제 오류", Toast.LENGTH_SHORT).show();
+
+                        }else{
+                            mAdapter.swapCursor(getAlarmCursor());
+                            Toast.makeText(getActivity(),"알림을 삭제했습니다.", Toast.LENGTH_SHORT).show();
+                            Log.e("클릭한 알람 ID:", String.valueOf(id));
+                            Intent intent = new Intent(getContext(),AlarmReceiver.class);
+                            PendingIntent cancelP = PendingIntent.getBroadcast(getContext(), Integer.parseInt(cancelId),intent,0);
+                            cancelP.cancel();
+
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("취소",null);
+                builder.show();
+
+                return true;
+
+            }
+        });
+
+        return view;
     }
 
 }

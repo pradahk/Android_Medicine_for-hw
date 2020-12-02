@@ -64,6 +64,7 @@
         <activity android:name=".RecomMainActivity"/>
 
         <activity android:name=".SetAlarm"></activity>
+        <activity android:name=".ModifyAlarm"></activity>
         <receiver
             android:name=".AlarmReceiver" />
 

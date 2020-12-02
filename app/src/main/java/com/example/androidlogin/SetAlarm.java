@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -27,15 +29,19 @@ public class SetAlarm extends AppCompatActivity {
     private EditText editText;
     private AlarmManager alarmManager;
     SQLiteDatabase mDb;
-    Button cancel;
     Button regist;
     private int hour, minute;
     public String alarmtime;
     private String text, ampm;
+    String inAmpm;
+    String inHour;
+    String inMinute;
+    String inDrug;
     public AlarmDbHelper alarmDbHelper;
     public String cancelId;
     public PendingIntent pIntent;
     public Intent intent;
+    public Databases databases;
 
     @Override
     public void onBackPressed() {
@@ -51,6 +57,7 @@ public class SetAlarm extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.set_alarm);
+
 
         timePicker = (TimePicker) findViewById(R.id.timepicker);
         editText = (EditText) findViewById(R.id.editText);
@@ -68,7 +75,7 @@ public class SetAlarm extends AppCompatActivity {
                     text = editText.getText().toString();
                     alarmtime = String.valueOf(hour)+minute;
 
-                    if(hour>12 && hour<24){
+                    if(hour>=12 && hour<24){
                         ampm = "오후";
                     }
                     else{
@@ -105,7 +112,7 @@ public class SetAlarm extends AppCompatActivity {
                     }
                     Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
 
-                    intent.putExtra("id" ,Databases.CreateDB._ID);
+                    intent.putExtra("id" ,alarmtime);
                     intent.putExtra("drug", text);
 
                     //alarmDbHelper.onCreate(mDb);
@@ -124,7 +131,7 @@ public class SetAlarm extends AppCompatActivity {
                     text = editText.getText().toString();
                     alarmtime = String.valueOf(hour)+minute;
 
-                    if(hour>12 && hour<24){
+                    if(hour>=12 && hour<24){
                         ampm = "오후";
                     }
                     else{
@@ -145,12 +152,6 @@ public class SetAlarm extends AppCompatActivity {
                     }
                     intent = new Intent(getApplicationContext(), AlarmReceiver.class);
 
-                    intent.putExtra("id" ,alarmtime);
-                    intent.putExtra("drug", text);
-
-                    Log.e("intent확인 id: ", alarmtime);
-                    Log.e("intent확인 drug: ", text);
-
                     //alarmDbHelper.onCreate(mDb);
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(Databases.CreateDB.AMPM, ampm);
@@ -159,14 +160,21 @@ public class SetAlarm extends AppCompatActivity {
                     contentValues.put(Databases.CreateDB.DRUGTEXT, text);
                     contentValues.put(Databases.CreateDB.ALARMTIME, alarmtime);
 
+                    intent.putExtra("id" , alarmtime);
+                    intent.putExtra("drug", text);
+
+                    Log.e("intent확인 id: ", alarmtime);
+                    Log.e("intent확인 drug: ", text);
+
                     mDb = AlarmDbHelper.getInstance(getApplicationContext()).getWritableDatabase();
                     mDb.insert(Databases.CreateDB.TABLE_NAME,null,contentValues);
+
+
 
                   /*  Log.e("SQLite에 저장확인 AMPM: ", Databases.CreateDB.AMPM);
                     Log.e("SQLite에 저장확인 HOUR: ", Databases.CreateDB.HOUR);
                      Log.e("SQLite에 저장확인 MINUTE: ", Databases.CreateDB.MINUTE);
                     Log.e("SQLite에 저장확인 DRUG: ", Databases.CreateDB.DRUGTEXT);*/
-                    Log.e("SQLite에 저장확인 alarmtime:", Databases.CreateDB.ALARMTIME);
 
                     PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(alarmtime), intent,0);
                     alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), pIntent);
@@ -174,15 +182,6 @@ public class SetAlarm extends AppCompatActivity {
 
                     setResult(RESULT_OK);
                 }
-
-            }
-        });
-        cancel = (Button)findViewById(R.id.btncancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent2 = new Intent(getApplicationContext(),MainActivity.class);
-                Toast.makeText(getApplicationContext(),"알림설정을 취소하였습니다.", Toast.LENGTH_SHORT).show();
 
             }
         });

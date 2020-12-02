@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_header_selector"
     android:orientation="vertical">
 
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -15,7 +15,7 @@
             android:id="@+id/btn_rotate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="60dp"
             android:background="#00ffffff"
             android:gravity="center"
             android:src="@drawable/doctor24" />
@@ -40,6 +40,8 @@
             android:textStyle="bold"
             android:text=" 세상에서 가장 작은 약국 " />
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -55,7 +57,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingLeft="50dp">
+                android:paddingLeft="50dp"
+                android:paddingStart="50dp">
 
                 <ImageButton
                     android:id="@+id/ImageButton"
@@ -63,7 +66,7 @@
                     android:layout_height="67dp"
                     android:elevation="30dp"
                     android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_search_black_24dp" />
+                    app:srcCompat="@drawable/ic_search_black_24dp" />
 
                 <TextView
                     android:id="@+id/textView5"
@@ -89,7 +92,7 @@
                     android:layout_height="67dp"
                     android:elevation="30dp"
                     android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_note_add_black_24dp" />
+                    app:srcCompat="@drawable/ic_baseline_ballot_24" />
 
                 <TextView
                     android:id="@+id/textView6"
@@ -103,10 +106,68 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:layout_weight="0.3">
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingLeft="50dp"
+                android:layout_weight="1"
+                android:paddingStart="50dp">
+                <ImageButton
+                    android:id="@+id/dan"
+                    android:layout_width="64dp"
+                    android:layout_height="67dp"
+                    android:elevation="30dp"
+                    android:background="@drawable/mainbutton_state"
+                    app:srcCompat="@drawable/ic_baseline_feedback_24" />
+                <TextView
+                    android:id="@+id/textView_dan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="부작용정보 검색"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingRight="50dp"
+                android:layout_weight="1">
+                <ImageButton
+                    android:id="@+id/btn_recom"
+                    android:layout_width="64dp"
+                    android:layout_height="67dp"
+                    android:elevation="30dp"
+                    android:background="@drawable/mainbutton_state"
+                    app:srcCompat="@drawable/ic_note_add_black_24dp" />
+                <TextView
+                    android:id="@+id/textView_song"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="증상으로 검색"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -116,13 +177,15 @@
                 android:elevation="30dp"
                 android:gravity="center"
                 android:paddingLeft="50dp"
+                android:paddingStart="50dp"
                 android:layout_weight="1">
                 <ImageButton
                     android:id="@+id/reviewButton"
                     android:layout_width="64dp"
                     android:layout_height="67dp"
+                    android:elevation="30dp"
                     android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_view_list_black_24dp" />
+                    app:srcCompat="@drawable/ic_view_list_black_24dp" />
                 <TextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
@@ -146,7 +209,7 @@
                     android:layout_height="67dp"
                     android:elevation="30dp"
                     android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_add_location_black_24dp" />
+                    app:srcCompat="@drawable/ic_add_location_black_24dp" />
                 <TextView
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
@@ -155,64 +218,11 @@
                     android:text="@string/drugmap"
                     android:textSize="15sp" />
             </LinearLayout>
-        </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingLeft="50dp"
-                android:layout_weight="1">
-                <ImageButton
-                    android:id="@+id/dan"
-                    android:layout_width="64dp"
-                    android:layout_height="67dp"
-                    android:elevation="30dp"
-                    android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_view_list_black_24dp" />
-                <TextView
-                    android:id="@+id/textView_dan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="다은"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingRight="50dp"
-                android:layout_weight="1">
-                <ImageButton
-                    android:id="@+id/btn_recom"
-                    android:layout_width="64dp"
-                    android:layout_height="67dp"
-                    android:elevation="30dp"
-                    android:background="@drawable/mainbutton_state"
-                    android:src="@drawable/ic_add_location_black_24dp" />
-                <TextView
-                    android:id="@+id/textView_song"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="민송"
-                    android:textSize="15sp" />
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+
 
 
 

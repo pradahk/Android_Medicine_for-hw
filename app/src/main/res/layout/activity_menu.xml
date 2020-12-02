@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/main_header_selector"
     tools:context=".MenuActivity"
     >
 
@@ -31,6 +32,7 @@
                 android:layout_height="40dp"
                 android:background="#00FFFFFF"
                 android:text="@string/signout" />
+
         </LinearLayout>
     </FrameLayout>
 
@@ -40,6 +42,7 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:id="@+id/linearLayout"
+        android:background="#add8e6"
         android:layout_marginBottom="5dp">
 
         <Button
