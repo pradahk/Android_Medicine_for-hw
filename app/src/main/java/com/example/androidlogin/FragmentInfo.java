@@ -206,7 +206,7 @@ public class FragmentInfo extends Fragment {
         // 다이얼로그 호출
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         dialog.setTitle("회원정보 열람을 위해 이메일을 다시 한 번 입력해주세요.")
-                .setMessage("(구글 로그인 회원은 회원정보를 제공하지 않습니다.)")
+                .setMessage("(계정을 생성한 회원만 보여집니다.)")
                 .setView(edittext)  // 이메일을 입력하기 위한 edittext
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
@@ -293,7 +293,7 @@ public class FragmentInfo extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult())
                             {
-                                assert user != null;
+
                                 // 입력한 string값과 파이어베이스의 이메일 비교하여 같을 때 처리
                                 if(string.equals(document.getData().get("email"))) {
                                     // editText에 파이어스토에 저장된 값을 setText해줌

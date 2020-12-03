@@ -80,12 +80,12 @@ public class ModifyDialog extends DialogFragment {
                 // 로그인 중인 사용자 가져오기
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 // 로그인 상태일 경우
-                if(user != null) {
                     // 다이얼로그에 작성한 password값을 string으로 처리하여 새로운 password값인 newPassword에 저장
                     newPassword = password.getText().toString();
                     // 입력한 비밀번호의 유효성 검사
                     if (isValidPasswd()) {
                         // 로그인 중인 사용자의 password를 newPassword로 업데이트
+                        assert user != null;
                         user.updatePassword(newPassword)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -108,7 +108,7 @@ public class ModifyDialog extends DialogFragment {
                                     }
                                 });
                     }
-                }
+
             }
 
         });

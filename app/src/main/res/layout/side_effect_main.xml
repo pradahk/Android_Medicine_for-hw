@@ -1,47 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_weight="8"
+    android:layout_gravity="center">
 
     <Button
         android:id="@+id/child"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="166dp"
+        android:layout_weight="1"
         android:text="어린이 주의"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="168dp"
+        android:background="@drawable/song_button2"
         android:onClick="child"/>
 
     <Button
         android:id="@+id/senior"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_below="@+id/child"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="89dp"
+        android:layout_marginTop="30dp"
         android:text="노인 주의"
-        tools:layout_editor_absoluteX="162dp"
-        tools:layout_editor_absoluteY="280dp"
+        android:background="@drawable/song_button5"
+
         android:onClick="senior"/>
 
     <Button
         android:id="@+id/pregnant"
-        android:layout_width="wrap_content"
-        android:layout_height="43dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_below="@+id/senior"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="89dp"
-        android:layout_marginBottom="176dp"
+
+        android:layout_marginTop="30dp"
         android:text="임부 금기"
-        tools:layout_editor_absoluteX="162dp"
-        tools:layout_editor_absoluteY="387dp"
+        android:background="@drawable/song_button8"
         android:onClick="pregnant"/>
-</RelativeLayout>
+</LinearLayout>

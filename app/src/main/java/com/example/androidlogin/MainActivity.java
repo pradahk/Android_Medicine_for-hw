@@ -205,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             try {
                 // 구글 로그인이 성공하면, 파이어베이스에 로그인 인증 등록
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                assert account != null;
                 // 구글 이용자가 확인된 사용자 정보를 파이어베이스로 넘기기
                 firebaseAuthWithGoogle(account);
                 Log.e("구글 로그인","구글 로그인 성공");

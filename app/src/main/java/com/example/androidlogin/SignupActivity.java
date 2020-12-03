@@ -28,6 +28,13 @@ import static com.example.androidlogin.FirebaseID.user;
 
 public class SignupActivity extends AppCompatActivity {
 
+    // 뒤로가기 버튼 클릭시 로그인 화면 갱신
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplication(),MainActivity.class));
+    }
+
     // 비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
     // 이메일 정규식
