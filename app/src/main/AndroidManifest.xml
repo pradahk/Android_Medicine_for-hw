@@ -68,6 +68,19 @@
         <receiver
             android:name=".AlarmReceiver" />
 
+        <activity
+            android:name=".SideEffectMainActivity">
+        </activity>
+        <activity
+            android:name=".SideEffectChild">
+        </activity>
+        <activity
+            android:name=".SideEffectPregnant">
+        </activity>
+        <activity
+            android:name=".SideEffectSenior">
+        </activity>
+
 
         <activity
             android:name=".MenuActivity"

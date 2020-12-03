@@ -121,7 +121,7 @@
                 android:layout_weight="1"
                 android:paddingStart="50dp">
                 <ImageButton
-                    android:id="@+id/dan"
+                    android:id="@+id/sideButton"
                     android:layout_width="64dp"
                     android:layout_height="67dp"
                     android:elevation="30dp"

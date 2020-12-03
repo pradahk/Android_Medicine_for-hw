@@ -42,7 +42,7 @@ public class FragmentMainMenu extends Fragment {
     private ImageButton btn_review;
     private ImageButton btn_shape;
     private ImageButton btn_recom;
-
+    private ImageButton btn_side;
 
     public FragmentMainMenu(){
     }
@@ -71,6 +71,7 @@ public class FragmentMainMenu extends Fragment {
         btn_review = view.findViewById(R.id.reviewButton);
         btn_shape = view.findViewById(R.id.shapeButton);
         btn_recom = view.findViewById(R.id.btn_recom);
+        btn_side = view.findViewById(R.id.sideButton);
 
         // 이름으로 검색하기 위한 이미지 버튼 클릭시
         btn_image.setOnClickListener(new View.OnClickListener(){
@@ -118,6 +119,16 @@ public class FragmentMainMenu extends Fragment {
             public void onClick(View v) {
                 // FormMainActivity로 화면 전환
                 Intent intent = new Intent(getActivity(), RecomMainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // 부작용 버튼 클릭시 --> 추가된 부분
+        btn_side.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // FormMainActivity로 화면 전환
+                Intent intent = new Intent(getActivity(), SideEffectMainActivity.class);
                 startActivity(intent);
             }
         });

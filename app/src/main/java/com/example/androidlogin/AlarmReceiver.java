@@ -31,39 +31,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-     /*   this.intent = intent;
 
-        String text = intent.getStringExtra("drug");
-        int notificationId = intent.getIntExtra("id",0);
-        Intent activityIntent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,activityIntent, 0);
-
-        String channelId = "chaanel_id";
-        String channelname = "약쏙";
-        String description = "약 복용시간에 알림합니다. ";
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(channelId, channelname, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription(description);
-            notificationManager.createNotificationChannel(channel);
-        }
-        Notification notification = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.ic_drug_icon)
-                .setContentText("약쏙")
-                .setContentText(text+"을(를) 복용할시간이에요:)")
-                .setPriority(Notification.VISIBILITY_PRIVATE)
-                .setContentIntent(pendingIntent)
-                .setContentInfo("INFO")
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setWhen(System.currentTimeMillis())
-                .build();
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-
-        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "My:Tag");
-        wakeLock.acquire(5000);
-        notificationManager.notify(notificationId, notification);*/
         this.contexts = context;
         notificationid = intent.getStringExtra("id");
         text = intent.getStringExtra("drug");
@@ -90,7 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             builder.setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())
-                    .setContentTitle("약쏙")
+                    .setContentTitle("약꾹")
                     .setContentText(text + "을(를) 복용할시간에요:)")
                     .setPriority(Notification.PRIORITY_MAX)
                     .setContentIntent(contentIntent)
@@ -133,7 +101,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             builder.setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())
-                    .setContentTitle("약쏙")
+                    .setContentTitle("약꾹")
                     .setContentText(text + "을(를) 복용할시간에요:)")
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setContentIntent(contentIntent)

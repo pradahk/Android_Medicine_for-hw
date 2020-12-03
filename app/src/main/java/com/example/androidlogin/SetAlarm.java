@@ -92,11 +92,6 @@ public class SetAlarm extends AppCompatActivity {
                     mDb = AlarmDbHelper.getInstance(getApplicationContext()).getWritableDatabase();
                     mDb.insert(Databases.CreateDB.TABLE_NAME,null,contentValues);
 
-             /*       Log.e("SQLite에 저장확인 AMPM: ", Databases.CreateDB.AMPM);
-                    Log.e("SQLite에 저장확인 HOUR: ", Databases.CreateDB.HOUR);
-                    Log.e("SQLite에 저장확인 MINUTE: ", Databases.CreateDB.MINUTE);
-                    Log.e("SQLite에 저장확인 DRUG: ", Databases.CreateDB.DRUGTEXT);*/
-
                     Calendar calendar = Calendar.getInstance();
 
                     calendar.set(Calendar.HOUR_OF_DAY,hour);
@@ -115,10 +110,8 @@ public class SetAlarm extends AppCompatActivity {
                     intent.putExtra("id" ,alarmtime);
                     intent.putExtra("drug", text);
 
-                    //alarmDbHelper.onCreate(mDb);
-
                     pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(alarmtime), intent,0);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), pIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),intervalTime,pIntent);
                     Toast.makeText(getApplicationContext(),"알림이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
 
@@ -170,14 +163,8 @@ public class SetAlarm extends AppCompatActivity {
                     mDb.insert(Databases.CreateDB.TABLE_NAME,null,contentValues);
 
 
-
-                  /*  Log.e("SQLite에 저장확인 AMPM: ", Databases.CreateDB.AMPM);
-                    Log.e("SQLite에 저장확인 HOUR: ", Databases.CreateDB.HOUR);
-                     Log.e("SQLite에 저장확인 MINUTE: ", Databases.CreateDB.MINUTE);
-                    Log.e("SQLite에 저장확인 DRUG: ", Databases.CreateDB.DRUGTEXT);*/
-
                     PendingIntent pIntent = PendingIntent.getBroadcast(getApplicationContext(), Integer.parseInt(alarmtime), intent,0);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), pIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),intervalTime,pIntent);
                     Toast.makeText(getApplicationContext(),"알림이 설정되었습니다.", Toast.LENGTH_SHORT).show();
 
                     setResult(RESULT_OK);
@@ -188,21 +175,4 @@ public class SetAlarm extends AppCompatActivity {
 
     }
 
-    /* private long addAlarm(int hour, int minute, String text) {
-         ContentValues contentValues = new ContentValues();
-         contentValues.put(Databases.CreateDB.HOUR, hour);
-         contentValues.put(Databases.CreateDB.MINUTE, minute);
-         contentValues.put(Databases.CreateDB.DRUGTEXT, text);
-         mDb = AlarmDbHelper.getInstance(this).getWritableDatabase();
-
-         return mDb.insert(Databases.CreateDB.TABLE_NAME,null,contentValues);
-     }*/
-    public void cancelAlarm(Context context, int id){
-        Intent cancelintent = new Intent(context, AlarmReceiver.class);
-        AlarmManager alarmManager1 = (AlarmManager)getSystemService(ALARM_SERVICE);
-        PendingIntent cancelIntent = PendingIntent.getBroadcast(context, id, cancelintent,PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager1.cancel(cancelIntent);
-        //cancelIntent.cancel();
-        //notification알림 삭제.
-    }
 }
