@@ -81,6 +81,7 @@
             android:name=".SideEffectSenior">
         </activity>
 
+        <activity android:name=".RecomSearchActivity" />
 
         <activity
             android:name=".MenuActivity"
