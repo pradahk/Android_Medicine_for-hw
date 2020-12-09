@@ -82,7 +82,7 @@ public class ReviewMainAdapter extends RecyclerView.Adapter<ReviewMainAdapter.Ma
         // 버튼을 클릭시 popup메뉴를 보여주는 코드임.
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
-        assert user != null;
+
 
         if(user != null)  {
             email = user.getEmail();

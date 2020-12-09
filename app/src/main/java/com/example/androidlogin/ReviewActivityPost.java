@@ -163,7 +163,6 @@ public class ReviewActivityPost extends ReviewMainActivity {
 
     private void userCheck(){
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); //현재 로그인중인 유저
-        assert user != null;
         email = user.getEmail();
 
         firebaseFirestore =  FirebaseFirestore.getInstance();

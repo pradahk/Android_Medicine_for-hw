@@ -23,12 +23,6 @@ public class LookupActivity extends NameMainActivity {
     String sort = null; // form, name 중 어느 어댑터에서 넘어온 건지 구분하기 위함
 
     @Override
-    public void onBackPressed() {
-        finish();
-        super.onBackPressed();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lookup);
@@ -72,5 +66,10 @@ public class LookupActivity extends NameMainActivity {
 
 
 
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

@@ -71,7 +71,7 @@ public class PharmParser {
                             xpp.next();
                             pharmname = xpp.getText();
                             buffer.append("약국명 : " + pharmname +"\n" + "주소 : " + pharmadd + "\n" + "전화번호 : " + pharmtel);
-                            buffer.append("\n"+"_______________________________________________");
+                            buffer.append("\n"+"_____________________________________________________");
                         } else if (tag.equals("telno")) {
                             xpp.next();
                             pharmtel = xpp.getText();
