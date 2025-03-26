@@ -1,3 +1,6 @@
+//사용자가 입력한 이메일과 이름을 기반으로 Firestore에서 비밀번호를 찾아 보여주는 기능
+//Id 찾는 코드 이해하면 어려운건 없을듯.
+//근데 계속 불안정하고 오류가 존재하는 코드라고 떠서 좀
 package com.example.androidlogin;
 
 import android.app.ProgressDialog;
@@ -19,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+//FindIdActivity에서 import com.google.firebase.firestore.DocumentReference;랑 import com.google.firebase.firestore.DocumentSnapshot;만 빠져있고 동일.
 
 public class FindpwActivity extends AppCompatActivity {
 
