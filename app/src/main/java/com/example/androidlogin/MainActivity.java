@@ -1,3 +1,6 @@
+//안드로이드에서 이메일, 구글, 페이스북 로그인을 지원하는 로그인 화면 구현
+//이메일 로그인(Firebase Authentication), 구글 로그인(Google Sign-In API & Firebase), 페이스북 로그인(Facebook SDK & Firebase)
+//비밀번호 유효성 검사 / 로그인 후 메인 화면(MenuActivity)으로 이동
 package com.example.androidlogin;
 
 import android.content.Intent;
